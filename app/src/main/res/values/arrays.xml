@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="province">
+        <item>Metro Manila</item>
+        <item>Abra</item>
+        <item>Agusan Del Norte</item>
+        <item>Agusan Del Sur</item>
+        <item>Aklan</item>
+        <item>Albay</item>
+        <item>Antique</item>
+        <item>Apayao</item>
+        <item>Aurora</item>
+        <item>Bataan</item>
+        <item>Batangas</item>
+        <item>Batanes</item>
+        <item>Basilan</item>
+        <item>Benguet</item>
+        <item>Biliran</item>
+        <item>Bohol</item>
+        <item>Bukidnon</item>
+        <item>Bulacan</item>
+        <item>Cagayan</item>
+        <item>Camarines Norte</item>
+        <item>Camarines Sur</item>
+        <item>Camiguin</item>
+        <item>Capiz</item>
+        <item>Catanduanes</item>
+        <item>Cavite</item>
+        <item>Cebu</item>
+        <item>Cotabato</item>
+        <item>Davao De Oro</item>
+        <item>Davao Del Norte</item>
+        <item>Davao Del Sur</item>
+        <item>Davao Occidental</item>
+        <item>Davao Oriental</item>
+        <item>Dinagat Islands</item>
+        <item>Eastern Samar</item>
+        <item>Guimaras</item>
+        <item>Ifugao</item>
+        <item>Ilocos Norte</item>
+        <item>Ilocos Sur</item>
+        <item>Iloilo</item>
+        <item>Isabela</item>
+        <item>Kalinga</item>
+        <item>La Union</item>
+        <item>Laguna</item>
+        <item>Lanao Del Norte</item>
+        <item>Lanao Del Sur</item>
+        <item>Leyte</item>
+        <item>Maguindanao</item>
+        <item>Marinduque</item>
+        <item>Masbate</item>
+        <item>Occidental Mindoro</item>
+        <item>Oriental Mindoro</item>
+        <item>Misamis Occidental</item>
+        <item>Misamis Oriental</item>
+        <item>Mountain Province</item>
+        <item>Negros Occidental</item>
+        <item>Negros Oriental</item>
+        <item>Northern Samar</item>
+        <item>Nueva Ecija</item>
+        <item>Nueva Vizcaya</item>
+        <item>Palawan</item>
+        <item>Pampanga</item>
+        <item>Pangasinan</item>
+        <item>Quezon</item>
+        <item>Quirino</item>
+        <item>Rizal</item>
+        <item>Romblon</item>
+        <item>Samar</item>
+        <item>Sarangani</item>
+        <item>Siquijor</item>
+        <item>Sorsogon</item>
+        <item>South Cotabato</item>
+        <item>Southern Leyte</item>
+        <item>Sultan Kudarat</item>
+        <item>Sulu</item>
+        <item>Surigao Del Norte</item>
+        <item>Surigao Del Sur</item>
+        <item>Tawi-Tawi</item>
+        <item>Tarlac</item>
+        <item>Zambales</item>
+        <item>Zamboanga Del Norte</item>
+        <item>Zamboanga Del Sur</item>
+        <item>Zamboanga Sibugay</item>
+    </string-array>
+    <string-array name="sex">
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string-array name="add_photo">
+        <item>Upload Photo</item>
+        <item>Take Photo</item>
+    </string-array>
+    <string-array name="edit_photo">
+        <item>Upload Photo</item>
+        <item>Take Photo</item>
+        <item>Remove Photo</item>
+    </string-array>
+    <string-array name="labels">
+        <item>Animal</item>
+        <item>Bird</item>
+        <item>Cat</item>
+        <item>Dog</item>
+        <item>Fish</item>
+        <item>Insect</item>
+        <item>Lizard</item>
+        <item>Pet</item>
+    </string-array>
+    <string-array name="type">
+        <item>Bird</item>
+        <item>Cat</item>
+        <item>Dog</item>
+        <item>Fish</item>
+        <item>Lizard</item>
+    </string-array>
+    <string-array name="age_unit">
+        <item>day/s</item>
+        <item>week/s</item>
+        <item>month/s</item>
+        <item>year/s</item>
+    </string-array>
+    <string-array name="bird">
+        <item>Apo Myna</item>
+        <item>Bukidnon Woodcock</item>
+        <item>Dove</item>
+        <item>Green Racquet-Tail</item>
+        <item>Palawan Peacock Peasant</item>
+        <item>Philippine Cockatoo</item>
+        <item>Philippine Eagle</item>
+        <item>Rufous Hornbill</item>
+        <item>Scale-Feathered Malkoha</item>
+        <item>Spotted Wood Kingfisher</item>
+        <item>Steere\'s Pitta</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="cat">
+        <item>Abyssinian Cat</item>
+        <item>American Shorthair</item>
+        <item>Bengal</item>
+        <item>British Shorthair</item>
+        <item>Burmese Cat</item>
+        <item>Exotic Shorthair</item>
+        <item>Himalayan Cat</item>
+        <item>Maine Coon</item>
+        <item>Manx Cat</item>
+        <item>Persian Cat</item>
+        <item>Puspin</item>
+        <item>Ragdoll</item>
+        <item>Savannah Cat</item>
+        <item>Scottish Fold</item>
+        <item>Siamese Cat</item>
+        <item>Sphynx Cat</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="dog">
+        <item>Airedale Terrier</item>
+        <item>American Foxhound</item>
+        <item>American Water Spaniel</item>
+        <item>Aspin</item>
+        <item>Australian Cattle Dog</item>
+        <item>Beagles</item>
+        <item>Border Collie</item>
+        <item>Chihuahua</item>
+        <item>Chow Chow</item>
+        <item>Dalmatian</item>
+        <item>Doberman Pinscher</item>
+        <item>German Shepherd</item>
+        <item>German Shorthaired Pointer</item>
+        <item>Golden Retriever</item>
+        <item>Great Dane</item>
+        <item>Labrador Retriever</item>
+        <item>Pomeranian</item>
+        <item>Poodle</item>
+        <item>Pugs</item>
+        <item>Shih Tzu</item>
+        <item>Siberian Husky</item>
+        <item>Yorkshire Terrier</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="fish">
+        <item>Clownfish</item>
+        <item>Fancy Guppy</item>
+        <item>Giant Gourami</item>
+        <item>Goldfish</item>
+        <item>Koi</item>
+        <item>Lionhead</item>
+        <item>Oranda</item>
+        <item>Pearlscale</item>
+        <item>Puntius Barbs</item>
+        <item>Rasbora</item>
+        <item>Ryukin</item>
+        <item>Zebra Danio</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="lizard">
+        <item>Agamid Lizard</item>
+        <item>Bronchocela Cristatella</item>
+        <item>Chameleon</item>
+        <item>Common House Gecko</item>
+        <item>Lamprolepis Smaragdina</item>
+        <item>Many-Striped Skink</item>
+        <item>Monitor Lizard</item>
+        <item>Northern Sierra Madre Forest Monitor</item>
+        <item>Philippine Sailfin Lizard</item>
+        <item>Tokay Gecko</item>
+        <item>Yellow-Headed Water Monitor</item>
+        <item>Other</item>
+    </string-array>
+    <string-array name="vaccine_status">
+        <item>Vaccinated</item>
+        <item>Unvaccinated</item>
+    </string-array>
+    <string-array name="medical_records">
+        <item>Available</item>
+        <item>Unavailable</item>
+    </string-array>
+    <string-array name="theme_new">
+        <item>Follow System</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+    <string-array name="theme_old">
+        <item>Set By Battery Saver</item>
+        <item>Light</item>
+        <item>Dark</item>
+    </string-array>
+</resources>
