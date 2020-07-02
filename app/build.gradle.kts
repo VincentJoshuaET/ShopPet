@@ -1,5 +1,3 @@
-import kotlin.collections.setOf
-
 plugins {
     id("com.android.application")
     kotlin("android")
@@ -83,7 +81,7 @@ dependencies {
     implementation("androidx.core:core-ktx:1.3.0")
     implementation("androidx.fragment:fragment-ktx:1.3.0-alpha06")
     implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha03")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha04")
 
     // CameraX
     val cameraVersion = "1.0.0-beta06"
@@ -126,14 +124,14 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
-    implementation("androidx.lifecycle:lifecycle-runtime:$lifecycleVersion")
+    implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 
     // Material Components
     implementation("com.google.android.material:material:1.3.0-alpha01")
 
     // ML Kit
-    implementation("com.google.mlkit:image-labeling:16.0.0")
+    implementation("com.google.mlkit:image-labeling:16.1.0")
 
     // Navigation Component
     val navigationVersion = "2.3.0"
