@@ -1,14 +1,14 @@
 package com.vt.shoppet.ui
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.TextView
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.lifecycle.observe
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.observe
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -19,12 +19,12 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.navigation.NavigationView
 import com.vt.shoppet.R
-import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.databinding.ActivityMainBinding
 import com.vt.shoppet.databinding.HeaderMainBinding
 import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.util.loadProfileImage
+import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -79,13 +79,13 @@ class MainActivity : AppCompatActivity() {
             supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
         navController = navHostFragment.navController
 
+        val fragments =
+            setOf(R.id.fragment_splash, R.id.fragment_login, R.id.fragment_shop, R.id.fragment_chat)
+
         bottomNavigationView.setupWithNavController(navController)
         navigationViewMain.setupWithNavController(navController)
         navigationView.setupWithNavController(navController)
-        toolbar.setupWithNavController(
-            navController,
-            AppBarConfiguration(setOf(R.id.fragment_shop, R.id.fragment_chat), drawer)
-        )
+        toolbar.setupWithNavController(navController, AppBarConfiguration(fragments, drawer))
     }
 
     private fun setupAuthView() {

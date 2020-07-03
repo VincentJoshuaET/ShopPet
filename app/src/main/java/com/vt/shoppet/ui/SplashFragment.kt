@@ -23,8 +23,7 @@ class SplashFragment : Fragment() {
 
         if (auth.isLoggedIn()) {
             if (auth.isUserVerified()) {
-                viewModel.setUserLiveData(auth.uid())
-                viewModel.setPetLiveData()
+                viewModel.initFirebaseData()
                 findNavController().navigate(R.id.action_splash_to_home)
             } else {
                 auth.signOut()

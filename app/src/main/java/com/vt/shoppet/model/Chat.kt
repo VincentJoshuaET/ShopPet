@@ -5,7 +5,7 @@ import com.google.firebase.Timestamp
 data class Chat(
     var id: String = "",
     var message: String? = null,
-    var uids: List<String> = emptyList(),
+    var uid: List<String> = emptyList(),
     var username: List<String> = emptyList(),
     var read: List<Boolean> = emptyList(),
     var empty: Boolean = false,

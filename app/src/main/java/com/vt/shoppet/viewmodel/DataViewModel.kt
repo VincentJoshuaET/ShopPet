@@ -7,7 +7,8 @@ import com.firebase.ui.common.ChangeEventType
 import com.firebase.ui.firestore.ChangeEventListener
 import com.firebase.ui.firestore.ClassSnapshotParser
 import com.firebase.ui.firestore.FirestoreArray
-import com.google.firebase.firestore.*
+import com.google.firebase.firestore.DocumentSnapshot
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.vt.shoppet.livedata.DocumentLiveData
@@ -16,45 +17,29 @@ import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
+import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.FirestoreRepo
 
 class DataViewModel @ViewModelInject constructor(
-    private val repo: FirestoreRepo,
+    private val auth: AuthRepo,
+    private val firestore: FirestoreRepo,
     @Assisted private val handle: SavedStateHandle
 ) : ViewModel(), DefaultLifecycleObserver {
 
     private val currentPet = MutableLiveData<Pet>()
-    private val currentUser = MutableLiveData<User>()
+    private val currentUser = handle.getLiveData<User>("currentUser")
     private val user = MutableLiveData<User>()
     private val chat = MutableLiveData<Chat>()
     private val pets = MutableLiveData<List<Pet>>()
 
-    private var firestorePets =
-        MutableLiveData(FirestoreArray(repo.getPets(), ClassSnapshotParser(Pet::class.java)))
-    private var firestoreStarredPets =
-        MutableLiveData(FirestoreArray(repo.getStarredPets(), ClassSnapshotParser(Pet::class.java)))
-    private var firestoreOwnPets =
-        MutableLiveData(FirestoreArray(repo.getOwnPets(), ClassSnapshotParser(Pet::class.java)))
-    private var firestoreChats =
-        MutableLiveData(FirestoreArray(repo.getChats(), ClassSnapshotParser(Chat::class.java)))
+    private var firestorePets = MutableLiveData<FirestoreArray<Pet>>()
+    private var firestoreStarredPets = MutableLiveData<FirestoreArray<Pet>>()
+    private var firestoreOwnPets = MutableLiveData<FirestoreArray<Pet>>()
+    private var firestoreChats = MutableLiveData<FirestoreArray<Chat>>()
 
     fun getPets(): LiveData<List<Pet>> = pets
 
-    fun setPetLiveData() =
-        QueryLiveData(repo.getPets()).observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> pets.value = result.data.toObjects()
-            }
-        }
-
     fun getCurrentUser(): LiveData<User> = currentUser
-
-    fun setUserLiveData(uid: String) =
-        DocumentLiveData(repo.getUser(uid)).observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> currentUser.value = result.data.toObject()
-            }
-        }
 
     fun getUser(): LiveData<User> = user
 
@@ -83,20 +68,36 @@ class DataViewModel @ViewModelInject constructor(
     fun getFirestoreOwnPets() = firestoreOwnPets
     fun getFirestoreChats() = firestoreChats
 
-    fun setFirestoreArrays() {
-        firestorePets.value = FirestoreArray(repo.getPets(), ClassSnapshotParser(Pet::class.java))
+    fun initFirebaseData() {
+        DocumentLiveData(firestore.getUser(auth.uid())).observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> currentUser.value = result.data.toObject()
+            }
+        }
+
+        QueryLiveData(firestore.getPets()).observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> pets.value = result.data.toObjects()
+            }
+        }
+
+        firestorePets.value =
+            FirestoreArray(firestore.getPets(), ClassSnapshotParser(Pet::class.java))
         firestoreStarredPets.value =
-            FirestoreArray(repo.getStarredPets(), ClassSnapshotParser(Pet::class.java))
+            FirestoreArray(firestore.getStarredPets(), ClassSnapshotParser(Pet::class.java))
         firestoreOwnPets.value =
-            FirestoreArray(repo.getOwnPets(), ClassSnapshotParser(Pet::class.java))
+            FirestoreArray(firestore.getOwnPets(), ClassSnapshotParser(Pet::class.java))
         firestoreChats.value =
-            FirestoreArray(repo.getChats(), ClassSnapshotParser(Chat::class.java))
-        handle.set("arrays", true)
+            FirestoreArray(firestore.getChats(), ClassSnapshotParser(Chat::class.java))
+        handle.set("initFirebaseData", true)
         onStart(ProcessLifecycleOwner.get())
     }
 
     init {
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+        handle.get<Boolean>("initFirebaseData")?.let { boolean ->
+            if (boolean) initFirebaseData()
+        }
     }
 
     override fun onStart(owner: LifecycleOwner) {

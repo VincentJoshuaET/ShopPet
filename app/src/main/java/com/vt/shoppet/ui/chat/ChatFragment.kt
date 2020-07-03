@@ -7,14 +7,15 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.firebase.firestore.ktx.toObject
 import com.vt.shoppet.R
-import com.vt.shoppet.databinding.FragmentChatBinding
 import com.vt.shoppet.actions.ChatActions
+import com.vt.shoppet.databinding.FragmentChatBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
@@ -62,10 +63,15 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 adapter.setActions(object : ChatActions {
                     override fun onClick(chat: Chat) = View.OnClickListener {
-                        val currentIndex = if (user.uid == chat.uids[0]) 0 else 1
-                        val index = if (user.uid == chat.uids[0]) 1 else 0
+                        val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
+                        val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
                         viewModel.setChat(chat)
                         recyclerChats.removeItemDecorationAt(0)
+                        val action = ChatFragmentDirections.actionChatToConversation(
+                            senderIndex,
+                            receiverIndex
+                        )
+                        findNavController().navigate(action)
                     }
 
                     override fun setImage(uid: String, imageView: ImageView) {

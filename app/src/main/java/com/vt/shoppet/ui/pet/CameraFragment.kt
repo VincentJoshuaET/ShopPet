@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
@@ -41,6 +42,12 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         override fun onError(exception: ImageCaptureException) {
             showSnackbar(exception)
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
     }
 
     @ExperimentalGetImage

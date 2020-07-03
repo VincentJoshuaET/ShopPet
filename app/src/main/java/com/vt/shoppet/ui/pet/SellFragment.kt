@@ -12,13 +12,17 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSellBinding
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.repo.LabelerRepo
 import com.vt.shoppet.repo.StorageRepo
-import com.vt.shoppet.util.*
+import com.vt.shoppet.util.circularProgress
+import com.vt.shoppet.util.loadImage
+import com.vt.shoppet.util.showSnackbar
+import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
@@ -38,6 +42,12 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
     @Inject
     lateinit var storage: StorageRepo
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

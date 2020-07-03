@@ -1,7 +1,9 @@
 package com.vt.shoppet.util
 
 import com.google.firebase.Timestamp
-import java.time.*
+import java.time.Duration
+import java.time.LocalDateTime
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
 val zone: ZoneId = ZoneId.of("Asia/Manila")
@@ -45,12 +47,11 @@ fun Timestamp.calculatePostDuration(sold: Boolean): String {
     }
 }
 
-fun Timestamp.calculateChatDuration(): String? {
-
-    val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
-    val shortDateFormat = DateTimeFormatter.ofPattern("MMM d")
-    val longDateFormat = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-
+private fun Timestamp.calculateDate(
+    timeFormat: DateTimeFormatter,
+    shortDateFormat: DateTimeFormatter,
+    longDateFormat: DateTimeFormatter
+): String {
     val date = LocalDateTime.ofInstant(toDate().toInstant(), zone)
     val seconds = Duration.between(date, LocalDateTime.now()).seconds
     val minutes = (seconds / 60).toInt()
@@ -65,4 +66,21 @@ fun Timestamp.calculateChatDuration(): String? {
         months >= 1 || weeks >= 1 || days >= 1 -> shortDateFormat.format(date)
         else -> timeFormat.format(date)
     }
+}
+
+fun Timestamp.calculateChatDate(): String {
+
+    val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
+    val shortDateFormat = DateTimeFormatter.ofPattern("MMM d")
+    val longDateFormat = DateTimeFormatter.ofPattern("MMMM d, yyyy")
+
+    return calculateDate(timeFormat, shortDateFormat, longDateFormat)
+}
+
+fun Timestamp.calculateMessageDate(): String {
+    val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
+    val shortDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d")
+    val longDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d, yyyy")
+
+    return calculateDate(timeFormat, shortDateFormat, longDateFormat)
 }

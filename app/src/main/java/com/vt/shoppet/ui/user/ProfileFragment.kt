@@ -145,11 +145,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                             when (result) {
                                 is Result.Loading -> item.icon = progress as Drawable
                                 is Result.Success -> {
-                                    if (result.data.exists()) dialog.show()
-                                    else {
+                                    if (result.data.exists()) {
                                         showSnackbar(getString(R.string.txt_user_already_reported))
                                         item.setIcon(R.drawable.ic_report)
-                                    }
+                                    } else dialog.show()
                                 }
                                 is Result.Failure -> {
                                     showSnackbar(result.exception)

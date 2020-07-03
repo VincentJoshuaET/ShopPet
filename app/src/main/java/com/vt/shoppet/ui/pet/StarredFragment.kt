@@ -12,12 +12,13 @@ import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.vt.shoppet.R
-import com.vt.shoppet.databinding.FragmentStarredBinding
 import com.vt.shoppet.actions.PetActions
+import com.vt.shoppet.databinding.FragmentStarredBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.FirestorePetAdapter
 import com.vt.shoppet.util.loadFirebaseImage
+import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -37,6 +38,17 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
 
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.run {
+            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
+                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+                remove<Boolean>("removed")
+            }
+            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
+                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+                remove<Boolean>("sold")
+            }
+        }
 
         viewModel.getFirestoreStarredPets().observe(viewLifecycleOwner) { pets ->
             val options =

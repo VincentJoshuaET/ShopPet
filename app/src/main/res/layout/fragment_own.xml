@@ -19,7 +19,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:text="@string/txt_no_pets"
+        android:text="@string/lbl_no_pets"
         android:visibility="gone" />
 
 </FrameLayout>

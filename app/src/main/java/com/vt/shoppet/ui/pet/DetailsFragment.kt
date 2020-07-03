@@ -9,6 +9,7 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentDetailsBinding
@@ -40,6 +41,12 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
     @Inject
     lateinit var storage: StorageRepo
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+    }
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

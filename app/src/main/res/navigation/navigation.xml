@@ -96,7 +96,11 @@
             android:id="@+id/fragment_chat"
             android:name="com.vt.shoppet.ui.chat.ChatFragment"
             android:label="Chat"
-            tools:layout="@layout/fragment_chat" />
+            tools:layout="@layout/fragment_chat">
+            <action
+                android:id="@+id/action_chat_to_conversation"
+                app:destination="@id/fragment_conversation" />
+        </fragment>
 
         <fragment
             android:id="@+id/fragment_camera"
@@ -147,6 +151,9 @@
             <action
                 android:id="@+id/action_selected_to_profile"
                 app:destination="@id/fragment_profile" />
+            <action
+                android:id="@+id/action_selected_to_conversation"
+                app:destination="@id/fragment_conversation" />
         </fragment>
 
         <fragment
@@ -187,6 +194,21 @@
             <action
                 android:id="@+id/action_own_to_selected"
                 app:destination="@id/fragment_selected" />
+        </fragment>
+
+        <fragment
+            android:id="@+id/fragment_conversation"
+            android:name="com.vt.shoppet.ui.chat.ConversationFragment"
+            android:label="Conversation"
+            tools:layout="@layout/fragment_conversation">
+            <argument
+                android:name="senderIndex"
+                android:defaultValue="0"
+                app:argType="integer" />
+            <argument
+                android:name="receiverIndex"
+                android:defaultValue="1"
+                app:argType="integer" />
         </fragment>
 
         <dialog

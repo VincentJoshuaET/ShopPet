@@ -4,10 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.liveData
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
-import com.vt.shoppet.model.Chat
-import com.vt.shoppet.model.Pet
-import com.vt.shoppet.model.Result
-import com.vt.shoppet.model.User
+import com.vt.shoppet.model.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
@@ -246,7 +243,7 @@ class FirestoreRepo @Inject constructor(
 
     fun getChats() =
         firestore.collection("chats")
-            .whereArrayContains("uids", auth.uid())
+            .whereArrayContains("uid", auth.uid())
             .whereEqualTo("empty", false)
             .orderBy("date", Query.Direction.DESCENDING)
 
@@ -263,6 +260,48 @@ class FirestoreRepo @Inject constructor(
         }
 
     fun createChat(chat: Chat): LiveData<Result<Void?>> =
+        liveData(Dispatchers.IO) {
+            emit(Result.Loading())
+            try {
+                val task = firestore.collection("chats").document(chat.id).set(chat).await()
+                emit(Result.Success(task))
+            } catch (e: Exception) {
+                emit(Result.Failure(e))
+            }
+        }
+
+    fun updateChat(chat: Chat, read: List<Boolean>): LiveData<Result<Void?>> =
+        liveData(Dispatchers.IO) {
+            emit(Result.Loading())
+            try {
+                val task =
+                    firestore.collection("chats").document(chat.id).update("read", read).await()
+                emit(Result.Success(task))
+            } catch (e: Exception) {
+                emit(Result.Failure(e))
+            }
+        }
+
+    fun getConversation(id: String) =
+        firestore.collection("chats")
+            .document(id)
+            .collection("messages")
+            .orderBy("date", Query.Direction.ASCENDING)
+
+    fun sendMessage(chat: Chat, message: Message): LiveData<Result<Void?>> =
+        liveData(Dispatchers.IO) {
+            emit(Result.Loading())
+            try {
+                val task =
+                    firestore.collection("chats").document(chat.id)
+                        .collection("messages").document().set(message).await()
+                emit(Result.Success(task))
+            } catch (e: Exception) {
+                emit(Result.Failure(e))
+            }
+        }
+
+    fun sendChat(chat: Chat): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {

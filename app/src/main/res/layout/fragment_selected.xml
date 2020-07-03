@@ -54,7 +54,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="64dp"
                 android:layout_gravity="center"
-                android:text="Loading"
+                android:text="@string/lbl_loading"
                 android:visibility="gone"
                 app:strokeColor="@color/colorPrimary"
                 tools:visibility="visible" />
@@ -73,7 +73,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Edit"
+                    android:text="@string/btn_edit"
                     app:icon="@drawable/ic_edit"
                     app:strokeColor="@color/colorPrimary" />
 
@@ -83,7 +83,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_gravity="center"
-                    android:text="Remove"
+                    android:text="@string/btn_remove"
                     app:icon="@drawable/ic_cross"
                     app:strokeColor="@color/colorPrimary" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
@@ -248,7 +248,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:text="Owner"
+                android:text="@string/hint_owner"
                 android:textStyle="bold" />
 
             <com.google.android.material.card.MaterialCardView
@@ -257,15 +257,14 @@
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:clickable="true"
-                android:focusable="true"
-                android:padding="24dp"
-                app:cardCornerRadius="8dp">
+                android:focusable="true">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/layoutSellerCard"
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
-                    android:padding="24dp">
+                    android:paddingTop="16dp"
+                    android:paddingBottom="16dp">
 
                     <com.google.android.material.imageview.ShapeableImageView
                         android:id="@+id/imageSeller"

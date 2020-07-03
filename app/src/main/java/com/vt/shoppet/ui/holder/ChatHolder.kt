@@ -4,11 +4,11 @@ import android.graphics.Typeface
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
-import com.vt.shoppet.databinding.ItemChatBinding
 import com.vt.shoppet.actions.ChatActions
+import com.vt.shoppet.databinding.ItemChatBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.User
-import com.vt.shoppet.util.calculateChatDuration
+import com.vt.shoppet.util.calculateChatDate
 
 class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -27,18 +27,18 @@ class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.roo
         actions: ChatActions
     ) {
         when (user.uid) {
-            chat.uids[0] -> {
+            chat.uid[0] -> {
                 val username = chat.username[1]
                 val unread = !chat.read[0]
-                val uid = chat.uids[1]
+                val uid = chat.uid[1]
                 txtUsername.text = username
                 txtMessage.typeface = if (unread) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
                 actions.setImage(uid, imageUser)
             }
-            chat.uids[1] -> {
+            chat.uid[1] -> {
                 val username = chat.username[0]
                 val unread = !chat.read[1]
-                val uid = chat.uids[0]
+                val uid = chat.uid[0]
                 txtUsername.text = username
                 txtMessage.typeface = if (unread) Typeface.DEFAULT_BOLD else Typeface.DEFAULT
                 actions.setImage(uid, imageUser)
@@ -46,7 +46,7 @@ class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.roo
         }
 
         txtMessage.text = chat.message
-        txtDate.text = chat.date.calculateChatDuration()
+        txtDate.text = chat.date.calculateChatDate()
 
         itemView.setOnClickListener(actions.onClick(chat))
     }

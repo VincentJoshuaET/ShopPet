@@ -19,6 +19,7 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
+import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditProfileBinding
@@ -116,6 +117,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         imageUserUpload.setImageResource(R.drawable.ic_person)
         imageUser.isVisible = true
         uri = Uri.EMPTY
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
+        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

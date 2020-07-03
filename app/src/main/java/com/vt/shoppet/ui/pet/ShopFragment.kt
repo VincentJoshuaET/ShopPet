@@ -1,7 +1,7 @@
 package com.vt.shoppet.ui.pet
 
 import android.os.Bundle
-import android.view.*
+import android.view.View
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
@@ -17,18 +17,18 @@ import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.transition.MaterialFade
 import com.vt.shoppet.R
+import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentShopBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.FirestorePetAdapter
-import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 import kotlinx.coroutines.Runnable
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShopFragment : Fragment(R.layout.fragment_shop) {
@@ -78,6 +78,17 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val txtEmpty = binding.txtEmpty
 
         if (args.posted) showSnackbar(getString(R.string.txt_upload_success))
+
+        findNavController().currentBackStackEntry?.savedStateHandle?.run {
+            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
+                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+                remove<Boolean>("removed")
+            }
+            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
+                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+                remove<Boolean>("sold")
+            }
+        }
 
         val upload =
             MaterialAlertDialogBuilder(context)

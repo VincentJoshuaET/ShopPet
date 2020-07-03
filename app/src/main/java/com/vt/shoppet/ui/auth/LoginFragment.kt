@@ -4,9 +4,9 @@ import android.graphics.Paint
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
@@ -57,8 +57,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             btnLogin.icon = null
                             progress.stop()
                             firestore.addToken(result.data.token)
-                            viewModel.setUserLiveData(auth.uid())
-                            viewModel.setPetLiveData()
+                            viewModel.initFirebaseData()
                             findNavController().navigate(R.id.action_auth_to_home)
                         }
                         is Result.Failure -> {
