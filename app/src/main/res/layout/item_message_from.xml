@@ -1,58 +1,64 @@
 <?xml version="1.0" encoding="utf-8"?>
-<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
-    android:layout_gravity="end"
-    android:layout_margin="8dp"
-    app:cardBackgroundColor="@color/colorPrimary">
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:orientation="vertical">
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end"
+        android:layout_margin="8dp"
+        app:cardBackgroundColor="@color/colorPrimary">
 
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardImage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_margin="4dp"
-            app:cardBackgroundColor="@color/colorPrimary"
-            app:cardCornerRadius="4dp">
+        <androidx.appcompat.widget.LinearLayoutCompat
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-            <com.google.android.material.imageview.ShapeableImageView
-                android:id="@+id/imageMessage"
-                android:layout_width="240dp"
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardImage"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:adjustViewBounds="true"
-                android:scaleType="centerCrop"
-                tools:src="@tools:sample/avatars" />
+                android:layout_margin="4dp"
+                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardCornerRadius="4dp">
 
-        </com.google.android.material.card.MaterialCardView>
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/imageMessage"
+                    android:layout_width="240dp"
+                    android:layout_height="wrap_content"
+                    android:adjustViewBounds="true"
+                    android:scaleType="centerCrop"
+                    tools:src="@tools:sample/avatars" />
 
-        <TextView
-            android:id="@+id/txtMessage"
-            style="?attr/textAppearanceBody2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:gravity="end"
-            android:maxWidth="240dp"
-            android:padding="8dp"
-            android:textColor="@android:color/white"
-            tools:text="@tools:sample/lorem" />
+            </com.google.android.material.card.MaterialCardView>
 
-        <TextView
-            android:id="@+id/txtDate"
-            style="?attr/textAppearanceOverline"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="end"
-            android:padding="8dp"
-            android:textColor="@android:color/white"
-            tools:text="@tools:sample/date/hhmm" />
+            <TextView
+                android:id="@+id/txtMessage"
+                style="?attr/textAppearanceBody2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:gravity="end"
+                android:maxWidth="240dp"
+                android:padding="4dp"
+                android:textColor="@android:color/white"
+                tools:text="@tools:sample/lorem" />
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+            <TextView
+                android:id="@+id/txtDate"
+                style="?attr/textAppearanceOverline"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:padding="4dp"
+                android:textColor="@android:color/white"
+                tools:text="@tools:sample/date/hhmm" />
 
-</com.google.android.material.card.MaterialCardView>
+        </androidx.appcompat.widget.LinearLayoutCompat>
+
+    </com.google.android.material.card.MaterialCardView>
+
+</FrameLayout>

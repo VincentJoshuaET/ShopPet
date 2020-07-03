@@ -156,6 +156,7 @@ class MainActivity : AppCompatActivity() {
                     setupToolbar()
                     toolbar.inflateMenu(R.menu.menu_edit_profile)
                 }
+                R.id.fragment_conversation -> setupToolbar()
             }
         }
     }

@@ -14,26 +14,23 @@ import com.vt.shoppet.util.calculateMessageDate
 
 class MessageHolder(view: View) : RecyclerView.ViewHolder(view) {
 
-    private val binding =
-        when (itemViewType) {
-            R.layout.item_message_from -> ItemMessageFromBinding.bind(itemView)
-            R.layout.item_message_to -> ItemMessageToBinding.bind(itemView)
-            else -> null
-        }
-
     private lateinit var txtMessage: TextView
     private lateinit var txtDate: TextView
     private lateinit var imageMessage: ShapeableImageView
 
     fun bindView(message: Message, actions: MessageActions) {
-        when (binding) {
-            is ItemMessageFromBinding -> {
+        when (itemViewType) {
+            R.layout.item_message_from -> {
+                val binding = ItemMessageFromBinding.bind(itemView)
                 txtMessage = binding.txtMessage
                 txtDate = binding.txtDate
+                imageMessage = binding.imageMessage
             }
-            is ItemMessageToBinding -> {
+            R.layout.item_message_to -> {
+                val binding = ItemMessageToBinding.bind(itemView)
                 txtMessage = binding.txtMessage
                 txtDate = binding.txtDate
+                imageMessage = binding.imageMessage
             }
         }
 

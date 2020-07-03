@@ -15,9 +15,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:reverseLayout="true"
         app:stackFromEnd="true"
-        tools:listitem="@layout/item_message_to" />
+        tools:listitem="@layout/item_message_from" />
 
     <TextView
         android:id="@+id/txtEmpty"
