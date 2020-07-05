@@ -21,7 +21,7 @@ class DataViewModel @ViewModelInject constructor(
 ) : ViewModel() {
 
     private val currentPet = MutableLiveData<Pet>()
-    private val currentUser = handle.getLiveData<User>("currentUser")
+    private val currentUser = MutableLiveData<User>()
     private val user = MutableLiveData<User>()
     private val chat = MutableLiveData<Chat>()
     private val pets = MutableLiveData<List<Pet>>()
