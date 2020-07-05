@@ -21,6 +21,7 @@ import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
@@ -65,6 +66,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val txtDateOfBirthTitle = binding.txtDateOfBirthTitle
         val txtDateOfBirth = binding.txtDateOfBirth
 
+        val report = resources.getDrawable(R.drawable.ic_report, context.theme)
+
         val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 
         fun reportUser(uid: String, currentUid: String) =
@@ -72,16 +75,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 when (result) {
                     is Result.Loading -> {
                         progress.start()
-                        toolbar.menu.findItem(R.id.item_report).icon = progress as Drawable
+                        toolbar.menu.getItem(0).icon = progress as Drawable
                     }
                     is Result.Success -> {
-                        toolbar.menu.findItem(R.id.item_report).setIcon(R.drawable.ic_report)
+                        toolbar.menu.getItem(0).icon = report
                         progress.stop()
                         showSnackbar(getString(R.string.txt_reported_user))
                     }
                     is Result.Failure -> {
                         showSnackbar(result.exception)
-                        toolbar.menu.findItem(R.id.item_report).setIcon(R.drawable.ic_report)
+                        toolbar.menu.getItem(0).icon = report
                         progress.stop()
                     }
                 }
@@ -101,7 +104,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             txtMobile.text = user.mobile.replaceFirst("0", "+63")
             txtLocation.text = user.location
             txtSex.text = user.sex
-            val dateOfBirth = LocalDateTime.ofInstant(user.dateOfBirth.toDate().toInstant(), zone)
+            val dateOfBirth =
+                LocalDateTime.ofInstant(Instant.ofEpochSecond(user.dateOfBirth.seconds), zone)
             txtDateOfBirth.text = dateTimeFormatter.format(dateOfBirth)
 
             val image = user.image
@@ -118,12 +122,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                             when (result) {
                                 is Result.Loading -> {
                                     progress.start()
-                                    toolbar.menu.findItem(R.id.item_report).icon = progress as Drawable
+                                    toolbar.menu.getItem(0).icon = progress as Drawable
                                 }
                                 is Result.Success -> reportUser(uid, currentUid)
                                 is Result.Failure -> {
                                     showSnackbar(result.exception)
-                                    toolbar.menu.findItem(R.id.item_report).setIcon(R.drawable.ic_report)
+                                    toolbar.menu.getItem(0).icon = report
                                     progress.stop()
                                 }
                             }

@@ -79,6 +79,12 @@
                 app:argType="boolean"
                 android:defaultValue="false" />
             <action
+                android:id="@+id/action_shop_to_filter"
+                app:destination="@id/dialog_filter" />
+            <action
+                android:id="@+id/action_shop_to_sort"
+                app:destination="@id/dialog_sort" />
+            <action
                 android:id="@+id/action_shop_to_chat"
                 app:destination="@id/fragment_chat" />
             <action
@@ -91,6 +97,16 @@
                 android:id="@+id/action_shop_to_selected"
                 app:destination="@id/fragment_selected" />
         </fragment>
+
+        <dialog
+            android:id="@+id/dialog_filter"
+            android:name="com.vt.shoppet.ui.pet.FilterDialog"
+            android:label="Filter" />
+
+        <dialog
+            android:id="@+id/dialog_sort"
+            android:name="com.vt.shoppet.ui.pet.SortDialog"
+            android:label="Sort" />
 
         <fragment
             android:id="@+id/fragment_chat"
@@ -148,6 +164,9 @@
             android:name="com.vt.shoppet.ui.pet.SelectedFragment"
             android:label="Selected Pet"
             tools:layout="@layout/fragment_selected">
+            <argument
+                android:name="id"
+                app:argType="string" />
             <action
                 android:id="@+id/action_selected_to_profile"
                 app:destination="@id/fragment_profile" />

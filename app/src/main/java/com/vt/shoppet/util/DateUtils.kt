@@ -2,6 +2,7 @@ package com.vt.shoppet.util
 
 import com.google.firebase.Timestamp
 import java.time.Duration
+import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
@@ -9,8 +10,8 @@ import java.time.format.DateTimeFormatter
 val zone: ZoneId = ZoneId.of("Asia/Manila")
 
 fun Timestamp.calculateAge(): String {
-    val date = LocalDateTime.ofInstant(toDate().toInstant(), zone)
-    val seconds = Duration.between(date, LocalDateTime.now()).seconds
+    val instant = Instant.ofEpochSecond(seconds)
+    val seconds = Duration.between(instant, Instant.now()).seconds
     val days = (seconds / 60 / 60 / 24).toInt()
     val weeks = days / 7
     val months = weeks / 4
@@ -25,15 +26,15 @@ fun Timestamp.calculateAge(): String {
 }
 
 fun Timestamp.calculatePostDuration(sold: Boolean): String {
-    val date = LocalDateTime.ofInstant(toDate().toInstant(), zone)
-    val seconds = Duration.between(date, LocalDateTime.now()).seconds
+    val instant = Instant.ofEpochSecond(seconds)
+    val seconds = Duration.between(instant, Instant.now()).seconds
     val minutes = (seconds / 60).toInt()
     val hours = minutes / 60
     val days = hours / 24
     val weeks = days / 7
     val months = weeks / 4
     val years = months / 12
-    
+
     val status = if (sold) "Sold" else "Posted"
 
     return when {
@@ -52,7 +53,8 @@ private fun Timestamp.calculateDate(
     shortDateFormat: DateTimeFormatter,
     longDateFormat: DateTimeFormatter
 ): String {
-    val date = LocalDateTime.ofInstant(toDate().toInstant(), zone)
+    val instant = Instant.ofEpochSecond(seconds)
+    val date = LocalDateTime.ofInstant(instant, zone)
     val seconds = Duration.between(date, LocalDateTime.now()).seconds
     val minutes = (seconds / 60).toInt()
     val hours = minutes / 60
@@ -69,7 +71,6 @@ private fun Timestamp.calculateDate(
 }
 
 fun Timestamp.calculateChatDate(): String {
-
     val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
     val shortDateFormat = DateTimeFormatter.ofPattern("MMM d")
     val longDateFormat = DateTimeFormatter.ofPattern("MMMM d, yyyy")

@@ -8,7 +8,7 @@ import com.vt.shoppet.actions.MessageActions
 import com.vt.shoppet.model.Message
 import com.vt.shoppet.ui.holder.MessageHolder
 
-open class FirestoreMessageAdapter(options: FirestoreRecyclerOptions<Message>) :
+open class MessageAdapter(options: FirestoreRecyclerOptions<Message>) :
     FirestoreRecyclerAdapter<Message, MessageHolder>(options) {
 
     private lateinit var actions: MessageActions

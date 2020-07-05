@@ -19,7 +19,6 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditProfileBinding
@@ -119,12 +118,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         uri = Uri.EMPTY
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -154,6 +147,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(zone)
         val max = LocalDateTime.now().minusYears(18).atZone(zone).toInstant().toEpochMilli()
 
+        val save = resources.getDrawable(R.drawable.ic_save, context.theme)
+
         val removeDialog =
             MaterialAlertDialogBuilder(context)
                 .setTitle(R.string.title_remove_image)
@@ -163,13 +158,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                         when (result) {
                             is Result.Loading -> {
                                 circularProgress.start()
-                                toolbar.menu.findItem(R.id.item_save).icon =
-                                    circularProgress as Drawable
+                                toolbar.menu.getItem(0).icon = circularProgress as Drawable
                                 fabEdit.isClickable = false
                             }
                             is Result.Success -> {
                                 storage.removeUserPhoto()
-                                toolbar.menu.findItem(R.id.item_save).setIcon(R.drawable.ic_save)
+                                toolbar.menu.getItem(0).icon = save
                                 circularProgress.stop()
                                 clearImageView()
                                 showSnackbar(getString(R.string.txt_profile_updated))
@@ -177,7 +171,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                             }
                             is Result.Failure -> {
                                 showSnackbar(result.exception)
-                                toolbar.menu.findItem(R.id.item_save).setIcon(R.drawable.ic_save)
+                                toolbar.menu.getItem(0).icon = save
                                 circularProgress.stop()
                                 fabEdit.isClickable = true
                             }
@@ -218,18 +212,18 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 when (result) {
                     is Result.Loading -> {
                         circularProgress.start()
-                        toolbar.menu.findItem(R.id.item_save).icon = circularProgress as Drawable
+                        toolbar.menu.getItem(0).icon = circularProgress as Drawable
                         fabEdit.isClickable = false
                     }
                     is Result.Success -> {
-                        toolbar.menu.findItem(R.id.item_save).setIcon(R.drawable.ic_save)
+                        toolbar.menu.getItem(0).icon = save
                         circularProgress.stop()
                         showSnackbar(getString(R.string.txt_profile_updated))
                         findNavController().popBackStack()
                     }
                     is Result.Failure -> {
                         showSnackbar(result.exception)
-                        toolbar.menu.findItem(R.id.item_save).setIcon(R.drawable.ic_save)
+                        toolbar.menu.getItem(0).icon = save
                         fabEdit.isClickable = true
                         circularProgress.stop()
                     }
@@ -267,10 +261,10 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             txtMobile.setText(user.mobile)
             txtSex.setText(user.sex, false)
             txtProvince.setText(user.location, false)
-            val zonedDateTime =
-                LocalDateTime.ofInstant(user.dateOfBirth.toDate().toInstant(), zone).atZone(zone)
-            dateOfBirth = zonedDateTime.toInstant().toEpochMilli()
-            txtDateOfBirth.setText(dateTimeFormatter.format(zonedDateTime.toInstant()))
+            val instant = Instant.ofEpochSecond(user.dateOfBirth.seconds)
+            val dateTime = LocalDateTime.ofInstant(instant, zone)
+            dateOfBirth = instant.toEpochMilli()
+            txtDateOfBirth.setText(dateTimeFormatter.format(dateTime))
 
             txtDateOfBirth.setOnClickListener {
                 keyboard.hide(this)
@@ -317,11 +311,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
                         if (fail) return@setOnMenuItemClickListener false
 
-                        val instant = Instant.ofEpochMilli(dateOfBirth)
                         val new = user.copy(
                             name = name,
                             sex = sex,
-                            dateOfBirth = Timestamp(instant.epochSecond, instant.nano),
+                            dateOfBirth = Timestamp(
+                                Instant.ofEpochMilli(dateOfBirth).epochSecond,
+                                Instant.ofEpochMilli(dateOfBirth).nano
+                            ),
                             mobile = mobile,
                             location = location
                         )
@@ -342,7 +338,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                                     }
                                     is Result.Failure -> {
                                         showSnackbar(result.exception)
-                                        item.setIcon(R.drawable.ic_save)
+                                        item.icon = save
                                         fabEdit.isClickable = true
                                         progress.isInvisible = true
                                         circularProgress.stop()

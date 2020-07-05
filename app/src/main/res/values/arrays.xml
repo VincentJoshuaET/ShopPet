@@ -88,6 +88,15 @@
         <item>Male</item>
         <item>Female</item>
     </string-array>
+    <string-array name="sex_filter">
+        <item>Both</item>
+        <item>Male</item>
+        <item>Female</item>
+    </string-array>
+    <string-array name="price_filter">
+        <item>No Filter</item>
+        <item>Range</item>
+    </string-array>
     <string-array name="add_photo">
         <item>Upload Photo</item>
         <item>Take Photo</item>
@@ -114,11 +123,26 @@
         <item>Fish</item>
         <item>Lizard</item>
     </string-array>
+    <string-array name="type_filter">
+        <item>All</item>
+        <item>Bird</item>
+        <item>Cat</item>
+        <item>Dog</item>
+        <item>Fish</item>
+        <item>Lizard</item>
+    </string-array>
     <string-array name="age_unit">
         <item>day/s</item>
         <item>week/s</item>
         <item>month/s</item>
         <item>year/s</item>
+    </string-array>
+    <string-array name="age_unit_filter">
+        <item>No Filter</item>
+        <item>Days</item>
+        <item>Weeks</item>
+        <item>Months</item>
+        <item>Years</item>
     </string-array>
     <string-array name="bird">
         <item>Apo Myna</item>
@@ -225,4 +249,23 @@
         <item>Light</item>
         <item>Dark</item>
     </string-array>
+    <string-array name="field">
+        <item>Age</item>
+        <item>Breed</item>
+        <item>Price</item>
+        <item>Type</item>
+        <item>Upload Date</item>
+    </string-array>
+    <string-array name="order">
+        <item>Ascending</item>
+        <item>Descending</item>
+    </string-array>
+    <array name="price">
+        <item>0</item>
+        <item>10000</item>
+    </array>
+    <array name="age">
+        <item>0</item>
+        <item>100</item>
+    </array>
 </resources>

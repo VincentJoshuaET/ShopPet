@@ -29,7 +29,13 @@
     <string name="hint_unit">Unit</string>
     <string name="hint_description">Description</string>
     <string name="hint_owner">Owner</string>
+    <string name="hint_field">Field</string>
+    <string name="hint_order">Order</string>
+    <string name="hint_from">From</string>
+    <string name="hint_to">To</string>
+    <string name="hint_age_unit">Age Unit</string>
     <string name="sym_currency">₱</string>
+    <string name="sym_range">-</string>
 
     <string name="btn_login">Sign In</string>
     <string name="btn_register">Register</string>
@@ -41,6 +47,7 @@
     <string name="btn_cancel">Cancel</string>
     <string name="btn_resend">Resend</string>
     <string name="btn_no">No</string>
+    <string name="btn_ok">OK</string>
     <string name="btn_yes">Yes</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_save">Save</string>
@@ -49,6 +56,7 @@
     <string name="txt_btn_login">Already have an account?</string>
     <string name="btn_edit">Edit</string>
     <string name="btn_remove">Remove</string>
+    <string name="btn_remove_filters">Remove Filters</string>
 
     <string name="txt_enter_email">Enter email address!</string>
     <string name="txt_enter_password">Enter password!</string>

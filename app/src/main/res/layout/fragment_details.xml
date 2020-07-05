@@ -40,11 +40,10 @@
 
             <TextView
                 android:id="@+id/textCurrency"
-                style="?attr/textAppearanceButton"
+                style="?attr/textAppearanceHeadline6"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/sym_currency"
-                android:textSize="24sp" />
+                android:text="@string/sym_currency" />
 
             <com.google.android.material.textfield.TextInputLayout
                 android:id="@+id/inputPrice"
@@ -192,7 +191,7 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <LinearLayout
+        <androidx.appcompat.widget.LinearLayoutCompat
             android:id="@+id/layoutAge"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -233,7 +232,7 @@
 
             </com.google.android.material.textfield.TextInputLayout>
 
-        </LinearLayout>
+        </androidx.appcompat.widget.LinearLayoutCompat>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputDescription"

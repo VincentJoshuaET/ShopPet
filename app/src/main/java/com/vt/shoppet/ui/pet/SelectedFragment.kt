@@ -8,6 +8,7 @@ import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
@@ -15,7 +16,7 @@ import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.transition.MaterialSharedAxis
+import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
 import com.vt.shoppet.R
@@ -53,6 +54,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     private lateinit var cardSeller: MaterialCardView
     private lateinit var imageSeller: ShapeableImageView
     private lateinit var progress: Animatable
+    private lateinit var chat: Drawable
 
     private var starred = false
 
@@ -73,12 +75,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     private fun removePetPhoto(id: String) =
         storage.removePetPhoto(id).observe(viewLifecycleOwner) { result ->
             when (result) {
-                is Result.Success -> {
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "removed",
-                        true
-                    )
-                    findNavController().popBackStack()
+                is Result.Success -> findNavController().run {
+                    previousBackStackEntry?.savedStateHandle?.set("removed", true)
+                    popBackStack()
                 }
                 is Result.Failure -> showSnackbar(result.exception)
             }
@@ -99,21 +98,13 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                             fabChatSold.setImageDrawable(progress as Drawable)
                             fabChatSold.isClickable = false
                         }
-                        is Result.Success -> {
-                            findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                                "sold",
-                                true
-                            )
-                            findNavController().popBackStack()
+                        is Result.Success -> findNavController().run {
+                            previousBackStackEntry?.savedStateHandle?.set("sold", true)
+                            popBackStack()
                         }
                         is Result.Failure -> {
                             showSnackbar(result.exception)
-                            fabChatSold.setImageDrawable(
-                                resources.getDrawable(
-                                    R.drawable.ic_chat,
-                                    requireContext().theme
-                                )
-                            )
+                            fabChatSold.setImageDrawable(chat)
                             fabChatSold.isClickable = true
                             progress.stop()
                         }
@@ -201,21 +192,17 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         viewModel.setChat(chats.first())
                         val senderIndex = chats.first().uid.indexOf(pet.uid)
                         val receiverIndex = chats.first().uid.indexOf(user.uid)
-                        val action = SelectedFragmentDirections.actionSelectedToConversation(
-                            senderIndex,
-                            receiverIndex
-                        )
+                        val action =
+                            SelectedFragmentDirections.actionSelectedToConversation(
+                                senderIndex,
+                                receiverIndex
+                            )
                         findNavController().navigate(action)
                     }
                 }
                 is Result.Failure -> {
                     showSnackbar(result.exception)
-                    fabChatSold.setImageDrawable(
-                        resources.getDrawable(
-                            R.drawable.ic_chat,
-                            requireContext().theme
-                        )
-                    )
+                    fabChatSold.setImageDrawable(chat)
                     fabChatSold.isClickable = true
                     progress.stop()
                 }
@@ -260,15 +247,15 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     btnStar.text = getString(R.string.lbl_loading)
                 }
                 is Result.Success -> {
-                    showSnackbar(getString(R.string.txt_unstarred))
-                    starred = false
-                    unstarPetButton()
+                    showSnackbar(getString(R.string.txt_starred))
+                    starred = true
+                    starPetButton()
                     progress.stop()
                 }
                 is Result.Failure -> {
                     showSnackbar(result.exception)
-                    starred = true
-                    starPetButton()
+                    starred = false
+                    unstarPetButton()
                     progress.stop()
                 }
             }
@@ -284,15 +271,15 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     btnStar.text = getString(R.string.lbl_loading)
                 }
                 is Result.Success -> {
-                    showSnackbar(getString(R.string.txt_starred))
-                    starred = true
-                    starPetButton()
+                    showSnackbar(getString(R.string.txt_unstarred))
+                    starred = false
+                    unstarPetButton()
                     progress.stop()
                 }
                 is Result.Failure -> {
                     showSnackbar(result.exception)
-                    starred = false
-                    unstarPetButton()
+                    starred = true
+                    starPetButton()
                     progress.stop()
                 }
             }
@@ -300,8 +287,20 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
+        sharedElementEnterTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.fragment
+            fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
+            interpolator = FastOutSlowInInterpolator()
+            duration = 500
+            isElevationShadowEnabled = false
+        }
+        sharedElementReturnTransition = MaterialContainerTransform().apply {
+            drawingViewId = R.id.fragment
+            fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
+            interpolator = FastOutSlowInInterpolator()
+            duration = 500
+            isElevationShadowEnabled = false
+        }
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -334,7 +333,10 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val types = resources.getStringArray(R.array.type)
 
+        chat = resources.getDrawable(R.drawable.ic_chat, context.theme)
+
         viewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
+            binding.root.transitionName = pet.id
             layoutCatsDogs.isVisible = pet.type == types[1] || pet.type == types[2]
             fabChatSold.isGone = pet.sold
 

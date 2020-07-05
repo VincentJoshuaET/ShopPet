@@ -13,7 +13,6 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -23,7 +22,6 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
-import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.actions.MessageActions
@@ -34,14 +32,12 @@ import com.vt.shoppet.model.Result
 import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.repo.StorageRepo
-import com.vt.shoppet.ui.adapter.FirestoreMessageAdapter
+import com.vt.shoppet.ui.adapter.MessageAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import java.util.*
 import javax.inject.Inject
 
@@ -65,8 +61,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     @Inject
     lateinit var storage: StorageRepo
-
-    private lateinit var adapterMessages: FirestoreMessageAdapter
 
     private lateinit var layoutImage: CoordinatorLayout
     private lateinit var imageMessage: ShapeableImageView
@@ -125,14 +119,16 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     private fun loadImage() {
         loadImage(imageMessage, uri)
         layoutImage.isVisible = true
-        recyclerMessages.layoutManager?.scrollToPosition(adapterMessages.itemCount - 1)
+        val adapter = recyclerMessages.adapter ?: return
+        recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun clearImageView() {
         imageMessage.setImageDrawable(null)
         layoutImage.isVisible = false
-        recyclerMessages.layoutManager?.scrollToPosition(adapterMessages.itemCount - 1)
         uri = Uri.EMPTY
+        val adapter = recyclerMessages.adapter ?: return
+        recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun updateChat(chat: Chat) {
@@ -155,7 +151,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     txtMessage.isEnabled = true
                     inputMessage.endIconDrawable = send
                     progress.stop()
-                    recyclerMessages.scrollToPosition(adapterMessages.itemCount - 1)
                 }
                 is Result.Failure -> {
                     showSnackbar(result.exception)
@@ -226,12 +221,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             }
         }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
-        returnTransition = MaterialSharedAxis(MaterialSharedAxis.Z, false)
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -287,39 +276,31 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     .setQuery(query, Message::class.java)
                     .build()
 
-            adapterMessages = object : FirestoreMessageAdapter(options) {
+            val adapter = object : MessageAdapter(options) {
                 override fun getItemViewType(position: Int): Int =
                     if (uid == getItem(position).senderid) R.layout.item_message_from
                     else R.layout.item_message_to
 
                 override fun onDataChanged() {
                     txtEmpty.isVisible = itemCount == 0
+                    if (itemCount != 0) {
+                        recyclerMessages.layoutManager?.scrollToPosition(itemCount - 1)
+                        updateChat(chat)
+                    }
                 }
             }
-            adapterMessages.setActions(object : MessageActions {
+            adapter.setActions(object : MessageActions {
                 override fun setImage(id: String, imageView: ImageView) {
                     loadFirebaseImage(imageView, storage.getMessagePhoto(id))
                 }
             })
 
-            val runnable = Runnable {
-                recyclerMessages.layoutManager?.scrollToPosition(adapterMessages.itemCount - 1)
-                updateChat(chat)
-            }
-
             recyclerMessages.apply {
-                addOnLayoutChangeListener { _, _, _, _, bottom, _, _, _, oldBottom ->
-                    if (bottom < oldBottom) recyclerMessages.postDelayed(runnable, 100)
-                }
                 setHasFixedSize(true)
                 layoutManager = LinearLayoutManager(context).apply {
                     stackFromEnd = true
                 }
-                adapter = adapterMessages
-            }
-
-            lifecycleScope.launch(Dispatchers.IO) {
-                updateChat(chat)
+                setAdapter(adapter)
             }
 
             inputMessage.setEndIconOnClickListener {

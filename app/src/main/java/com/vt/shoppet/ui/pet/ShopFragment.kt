@@ -4,16 +4,17 @@ import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import androidx.transition.TransitionManager
-import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.transition.MaterialFade
 import com.vt.shoppet.R
@@ -21,7 +22,8 @@ import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentShopBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.repo.StorageRepo
-import com.vt.shoppet.ui.adapter.FirestorePetAdapter
+import com.vt.shoppet.ui.MainActivity
+import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
@@ -69,26 +71,47 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        postponeEnterTransition()
+        view.doOnPreDraw { startPostponedEnterTransition() }
 
         val context = requireContext()
+        val activity = requireActivity() as MainActivity
 
         val fabSell = binding.fabSell
 
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
 
+        val toolbar = activity.toolbar
+
         if (args.posted) showSnackbar(getString(R.string.txt_upload_success))
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.run {
-            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
-                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
-                remove<Boolean>("removed")
+        val adapter = PetAdapter()
+        adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+        adapter.setActions(object : PetActions {
+            override fun onClick(pet: Pet, view: View): View.OnClickListener =
+                View.OnClickListener {
+                    viewModel.setCurrentPet(pet)
+                    val id = pet.id
+                    view.transitionName = id
+                    val extras = FragmentNavigatorExtras(view to id)
+                    val action = ShopFragmentDirections.actionShopToSelected(id)
+                    findNavController().navigate(action, extras)
+                }
+
+            override fun setImage(id: String, imageView: ImageView) {
+                loadFirebaseImage(imageView, storage.getPetPhoto(id))
             }
-            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
-                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
-                remove<Boolean>("sold")
+        })
+        recyclerPets.apply {
+            setHasFixedSize(true)
+            layoutManager = GridLayoutManager(context, 2)
+            addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
+                if (top < oldTop) smoothScrollToPosition(oldTop)
             }
+            setAdapter(adapter)
         }
+        txtEmpty.isVisible = adapter.itemCount == 0
 
         val upload =
             MaterialAlertDialogBuilder(context)
@@ -110,37 +133,36 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                 }
                 .create()
 
-        viewModel.getFirestorePets().observe(viewLifecycleOwner) { pets ->
-            val options =
-                FirestoreRecyclerOptions.Builder<Pet>()
-                    .setLifecycleOwner(this)
-                    .setSnapshotArray(pets)
-                    .build()
-
-            val adapter = object : FirestorePetAdapter(options) {
-                override fun onDataChanged() {
-                    txtEmpty.isVisible = itemCount == 0
-                }
+        findNavController().currentBackStackEntry?.savedStateHandle?.run {
+            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
+                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+                remove<Boolean>("removed")
             }
-            adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            adapter.setActions(object : PetActions {
-                override fun onClick(pet: Pet): View.OnClickListener =
-                    View.OnClickListener {
-                        viewModel.setCurrentPet(pet)
-                        findNavController().navigate(R.id.action_shop_to_selected)
+            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
+                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+                remove<Boolean>("sold")
+            }
+            getLiveData<Boolean>("filter").observe(viewLifecycleOwner) { filter ->
+                if (filter) {
+                    viewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
+                        adapter.submitList(filtered)
+                        txtEmpty.isVisible = filtered.isEmpty()
                     }
-
-                override fun setImage(id: String, imageView: ImageView) {
-                    loadFirebaseImage(imageView, storage.getPetPhoto(id))
                 }
-            })
+                remove<Boolean>("filter")
+            }
+        }
 
-            recyclerPets.apply {
-                setHasFixedSize(true)
-                layoutManager = GridLayoutManager(context, 2)
-                setAdapter(adapter)
-                addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
-                    if (top < oldTop) smoothScrollToPosition(oldTop)
+        viewModel.getFilter().observe(viewLifecycleOwner) { filter ->
+            if (filter.enabled) {
+                viewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
+                    adapter.submitList(filtered)
+                    txtEmpty.isVisible = filtered.isEmpty()
+                }
+            } else {
+                viewModel.getPets().observe(viewLifecycleOwner) { pets ->
+                    adapter.submitList(pets)
+                    txtEmpty.isVisible = pets.isEmpty()
                 }
             }
         }
@@ -159,5 +181,23 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.post(runnable)
         }
 
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.item_refresh -> {
+                    recyclerPets.smoothScrollToPosition(0)
+                    viewModel.resetFilter()
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.item_filter -> {
+                    findNavController().navigate(R.id.action_shop_to_filter)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.item_sort -> {
+                    findNavController().navigate(R.id.action_shop_to_sort)
+                    return@setOnMenuItemClickListener true
+                }
+                else -> return@setOnMenuItemClickListener false
+            }
+        }
     }
 }

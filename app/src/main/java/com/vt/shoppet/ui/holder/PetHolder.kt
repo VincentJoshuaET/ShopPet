@@ -3,9 +3,9 @@ package com.vt.shoppet.ui.holder
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
+import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.ItemPetBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.util.calculateAge
 import com.vt.shoppet.util.calculatePostDuration
 
@@ -34,7 +34,7 @@ class PetHolder(binding: ItemPetBinding) : RecyclerView.ViewHolder(binding.root)
         txtAge.text = pet.dateOfBirth.calculateAge()
         txtBreed.text = pet.breed
         txtDate.text = pet.date.calculatePostDuration(pet.sold)
-        itemView.setOnClickListener(actions.onClick(pet))
+        itemView.setOnClickListener(actions.onClick(pet, itemView))
     }
 
 }
