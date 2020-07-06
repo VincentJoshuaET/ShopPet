@@ -1,10 +1,12 @@
 package com.vt.shoppet.ui.auth
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.View
 import androidx.core.text.trimmedLength
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
@@ -15,11 +17,12 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentRegisterBinding
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.util.*
+import com.vt.shoppet.viewmodel.AuthViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import java.time.*
+import java.time.Instant
+import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
@@ -28,21 +31,111 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     private val binding by viewBinding(FragmentRegisterBinding::bind)
 
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
+    private val auth: AuthViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by activityViewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
+
+    private lateinit var progress: Animatable
+    private lateinit var check: Drawable
+    private lateinit var btnRegister: MaterialButton
+
+    private fun verifyEmail() =
+        auth.verifyEmail().observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnRegister.isClickable = false
+                    btnRegister.icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    btnRegister.icon = check
+                    progress.stop()
+                    showSnackbar(getString(R.string.txt_verification_sent))
+                    auth.signOut()
+                    findNavController().popBackStack()
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnRegister.isClickable = true
+                    btnRegister.icon = check
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun addUser(user: User) =
+        firestore.addUser(user).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnRegister.isClickable = false
+                    btnRegister.icon = progress as Drawable
+                }
+                is Result.Success -> verifyEmail()
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnRegister.isClickable = true
+                    btnRegister.icon = check
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun createUser(user: User, email: String, password: String) =
+        auth.createUser(email, password).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnRegister.isClickable = false
+                    btnRegister.icon = progress as Drawable
+                }
+                is Result.Success -> addUser(user.copy(uid = auth.uid()))
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnRegister.isClickable = true
+                    btnRegister.icon = check
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun checkUsername(user: User, email: String, password: String) =
+        firestore.checkUsername(user.username).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnRegister.isClickable = false
+                    btnRegister.icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    if (result.data.isEmpty) createUser(user, email, password)
+                    else {
+                        showSnackbar(getString(R.string.txt_username_exists))
+                        btnRegister.isClickable = true
+                        btnRegister.icon = check
+                        progress.stop()
+                    }
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    binding.btnRegister.isClickable = true
+                    btnRegister.icon = check
+                    progress.stop()
+                }
+            }
+        }
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
-        val progress = circularProgress(context)
+
+        progress = circularProgress()
+        check = resources.getDrawable(R.drawable.ic_check, context.theme)
+        btnRegister = binding.btnRegister as MaterialButton
 
         val txtName = binding.txtName
         val txtEmail = binding.txtEmail
@@ -54,9 +147,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val txtProvince = binding.txtProvince
         val txtSex = binding.txtSex
         val btnLogin = binding.btnLogin
-        val btnRegister = binding.btnRegister as MaterialButton
-
-        val check = resources.getDrawable(R.drawable.ic_check, context.theme)
 
         val provinceAdapter = getArrayAdapter(resources.getStringArray(R.array.province))
         val sexAdapter = getArrayAdapter(resources.getStringArray(R.array.sex))
@@ -64,96 +154,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(zone)
         val max = LocalDateTime.now().minusYears(18).atZone(zone).toInstant().toEpochMilli()
         var dateOfBirth = max
-
-        fun verifyEmail() =
-            auth.verifyEmail()
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnRegister.isClickable = false
-                            btnRegister.icon = progress as Drawable
-                        }
-                        is Result.Success -> {
-                            btnRegister.icon = check
-                            progress.stop()
-                            showSnackbar(getString(R.string.txt_verification_sent))
-                            auth.signOut()
-                            findNavController().popBackStack()
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnRegister.isClickable = true
-                            btnRegister.icon = check
-                            progress.stop()
-                        }
-                    }
-                }
-
-        fun addUser(user: User) =
-            firestore.addUser(user)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnRegister.isClickable = false
-                            btnRegister.icon = progress as Drawable
-                        }
-                        is Result.Success -> verifyEmail()
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnRegister.isClickable = true
-                            btnRegister.icon = check
-                            progress.stop()
-                        }
-                    }
-                }
-
-        fun createUser(user: User, email: String, password: String) =
-            auth.createUser(email, password)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnRegister.isClickable = false
-                            btnRegister.icon = progress as Drawable
-                        }
-                        is Result.Success -> addUser(user.copy(uid = auth.uid()))
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnRegister.isClickable = true
-                            btnRegister.icon = check
-                            progress.stop()
-                        }
-                    }
-                }
-
-        fun checkUsername(user: User, email: String, password: String) =
-            firestore.checkUsername(user.username)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnRegister.isClickable = false
-                            btnRegister.icon = progress as Drawable
-                        }
-                        is Result.Success -> {
-                            if (result.data.isEmpty) createUser(user, email, password)
-                            else {
-                                showSnackbar(getString(R.string.txt_username_exists))
-                                btnRegister.isClickable = true
-                                btnRegister.icon = check
-                                progress.stop()
-                            }
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            binding.btnRegister.isClickable = true
-                            btnRegister.icon = check
-                            progress.stop()
-                        }
-                    }
-                }
 
         txtName.setErrorListener()
         txtEmail.setErrorListener()
@@ -269,13 +269,12 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
             val instant = Instant.ofEpochMilli(dateOfBirth)
             val user = User(
-                "",
-                name,
-                username,
-                mobile,
-                location,
-                sex,
-                Timestamp(instant.epochSecond, instant.nano)
+                name = name,
+                username = username,
+                mobile = mobile,
+                location = location,
+                sex = sex,
+                dateOfBirth = Timestamp(instant.epochSecond, instant.nano)
             )
 
             checkUsername(user, email, password)

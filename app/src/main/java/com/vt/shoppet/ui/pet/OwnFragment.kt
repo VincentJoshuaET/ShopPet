@@ -16,23 +16,21 @@ import com.vt.shoppet.R
 import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentOwnBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.loadFirebaseImage
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class OwnFragment : Fragment(R.layout.fragment_own) {
 
     private val binding by viewBinding(FragmentOwnBinding::bind)
-    private val viewModel: DataViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
-    @Inject
-    lateinit var storage: StorageRepo
+    private val storage: StorageViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -58,7 +56,7 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
             setActions(object : PetActions {
                 override fun onClick(pet: Pet, view: View): View.OnClickListener =
                     View.OnClickListener {
-                        viewModel.setCurrentPet(pet)
+                        dataViewModel.setCurrentPet(pet)
                         val id = pet.id
                         view.transitionName = id
                         val extras = FragmentNavigatorExtras(view to id)
@@ -75,13 +73,13 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
-            setAdapter(adapter)
             addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
                 if (top < oldTop) smoothScrollToPosition(oldTop)
             }
+            setAdapter(adapter)
         }
 
-        viewModel.getOwnPets().observe(viewLifecycleOwner) { pets ->
+        dataViewModel.getOwnPets().observe(viewLifecycleOwner) { pets ->
             adapter.submitList(pets)
             txtEmpty.isVisible = pets.isEmpty()
         }

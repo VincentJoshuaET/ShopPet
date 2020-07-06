@@ -5,25 +5,23 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import com.vt.shoppet.R
-import com.vt.shoppet.repo.AuthRepo
+import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SplashFragment : Fragment() {
 
-    @Inject
-    lateinit var auth: AuthRepo
+    private val auth: AuthViewModel by activityViewModels()
 
-    private val viewModel: DataViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (auth.isLoggedIn()) {
             if (auth.isUserVerified()) {
-                viewModel.initFirebaseData()
+                dataViewModel.initFirebaseData()
                 findNavController().navigate(R.id.action_splash_to_home)
             } else {
                 auth.signOut()

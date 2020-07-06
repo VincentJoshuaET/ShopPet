@@ -5,11 +5,11 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
+import com.vt.shoppet.firebase.AuthRepo
+import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.livedata.DocumentLiveData
 import com.vt.shoppet.livedata.QueryLiveData
 import com.vt.shoppet.model.*
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.util.zone
 import java.time.Instant
 import java.time.LocalDateTime
@@ -24,10 +24,12 @@ class DataViewModel @ViewModelInject constructor(
     private val currentUser = MutableLiveData<User>()
     private val user = MutableLiveData<User>()
     private val chat = MutableLiveData<Chat>()
+
     private val pets = MutableLiveData<List<Pet>>()
     private val starredPets = MutableLiveData<List<Pet>>()
     private val ownPets = MutableLiveData<List<Pet>>()
     private val chats = MutableLiveData<List<Chat>>()
+
     private val filtered = MutableLiveData<List<Pet>>()
     private val filter = MutableLiveData(Filter())
 
@@ -54,28 +56,30 @@ class DataViewModel @ViewModelInject constructor(
                 if (filter.price == "No Filter") sexList
                 else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
 
+            val now = LocalDateTime.now()
+
             val fromInstant = when (filter.age) {
-                "Days" -> LocalDateTime.now().minusDays(filter.ages[0].toLong()).atZone(zone)
+                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(zone)
                     .toInstant()
-                "Weeks" -> LocalDateTime.now().minusWeeks(filter.ages[0].toLong()).atZone(zone)
+                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(zone)
                     .toInstant()
-                "Months" -> LocalDateTime.now().minusMonths(filter.ages[0].toLong()).atZone(zone)
+                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(zone)
                     .toInstant()
-                "Years" -> LocalDateTime.now().minusYears(filter.ages[0].toLong()).atZone(zone)
+                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(zone)
                     .toInstant()
-                else -> LocalDateTime.now().atZone(zone).toInstant()
+                else -> now.atZone(zone).toInstant()
             }
 
             val toInstant = when (filter.age) {
-                "Days" -> LocalDateTime.now().minusDays(filter.ages[1].toLong()).atZone(zone)
+                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(zone)
                     .toInstant()
-                "Weeks" -> LocalDateTime.now().minusWeeks(filter.ages[1].toLong()).atZone(zone)
+                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(zone)
                     .toInstant()
-                "Months" -> LocalDateTime.now().minusMonths(filter.ages[1].toLong()).atZone(zone)
+                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(zone)
                     .toInstant()
-                "Years" -> LocalDateTime.now().minusYears(filter.ages[1].toLong()).atZone(zone)
+                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(zone)
                     .toInstant()
-                else -> LocalDateTime.now().atZone(zone).toInstant()
+                else -> now.atZone(zone).toInstant()
             }
 
             val ageList =
@@ -116,10 +120,6 @@ class DataViewModel @ViewModelInject constructor(
         this.user.value = user
     }
 
-    fun clearUser() {
-        user.value = null
-    }
-
     fun getCurrentPet(): LiveData<Pet> = currentPet
 
     fun setCurrentPet(pet: Pet) {
@@ -133,7 +133,7 @@ class DataViewModel @ViewModelInject constructor(
     }
 
     fun initFirebaseData() {
-        DocumentLiveData(firestore.getUser(auth.uid())).observe(ProcessLifecycleOwner.get()) { result ->
+        DocumentLiveData(firestore.getUserReference(auth.uid())).observe(ProcessLifecycleOwner.get()) { result ->
             when (result) {
                 is Result.Success -> currentUser.value = result.data.toObject()
             }

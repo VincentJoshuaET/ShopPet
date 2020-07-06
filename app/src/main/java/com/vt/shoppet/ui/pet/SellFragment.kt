@@ -1,5 +1,6 @@
 package com.vt.shoppet.ui.pet
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -12,36 +13,68 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSellBinding
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.LabelerRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.util.circularProgress
 import com.vt.shoppet.util.loadImage
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.LabelerViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private val binding by viewBinding(FragmentSellBinding::bind)
 
-    private val viewModel: DataViewModel by activityViewModels()
+    private val labeler: LabelerViewModel by activityViewModels()
+    private val storage: StorageViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private val args: SellFragmentArgs by navArgs()
 
-    @Inject
-    lateinit var labeler: LabelerRepo
+    private lateinit var circularProgress: Animatable
+    private lateinit var upload: Drawable
+    private lateinit var progress: ProgressIndicator
+    private lateinit var btnUpload: MaterialButton
 
-    @Inject
-    lateinit var storage: StorageRepo
+    private fun uploadImage(uri: Uri) {
+        val image = UUID.randomUUID().toString()
+        storage.uploadPetPhoto(image, uri).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    circularProgress.start()
+                    btnUpload.isClickable = false
+                    btnUpload.icon = circularProgress as Drawable
+                    progress.isVisible = true
+                }
+                is Result.Success -> {
+                    btnUpload.icon = upload
+                    circularProgress.stop()
+                    progress.isVisible = false
+                    dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+                        val action =
+                            SellFragmentDirections.actionSellToDetails(image, user.username)
+                        findNavController().navigate(action)
+                    }
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnUpload.isClickable = true
+                    btnUpload.icon = upload
+                    circularProgress.stop()
+                    progress.isVisible = false
+                }
+            }
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,85 +88,52 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         val context = requireContext()
         val labels = resources.getStringArray(R.array.labels)
 
-        val progress = binding.progress
-        val circularProgress = circularProgress(context)
-        val imagePet = binding.imagePet
-        val btnUpload = binding.btnUpload as MaterialButton
+        circularProgress = circularProgress()
+        upload = resources.getDrawable(R.drawable.ic_upload, context.theme)
+        progress = binding.progress
+        btnUpload = binding.btnUpload as MaterialButton
         val txtLabels = binding.txtLabels
-
-        val upload = resources.getDrawable(R.drawable.ic_upload, context.theme)
+        val imagePet = binding.imagePet
 
         val uri = args.uri.toUri()
 
         loadImage(imagePet, uri)
 
-        fun uploadImage(uri: Uri) {
-            val image = UUID.randomUUID().toString()
-            storage.uploadPetPhoto(image, uri)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            circularProgress.start()
-                            btnUpload.isClickable = false
-                            btnUpload.icon = circularProgress as Drawable
-                            progress.isVisible = true
-                        }
-                        is Result.Success -> {
-                            btnUpload.icon = upload
-                            circularProgress.stop()
-                            progress.isVisible = false
-                            viewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
-                                val action = SellFragmentDirections.actionSellToDetails(image, user.username)
-                                findNavController().navigate(action)
-                            }
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnUpload.isClickable = true
-                            btnUpload.icon = upload
-                            circularProgress.stop()
-                            progress.isVisible = false
-                        }
-                    }
-                }
-        }
-
         btnUpload.setOnClickListener {
             var isAnimal = false
             val image = InputImage.fromFilePath(context, uri)
-            labeler.process(image)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            circularProgress.start()
-                            btnUpload.isClickable = false
-                            btnUpload.icon = circularProgress as Drawable
+            labeler.process(image).observe(viewLifecycleOwner) { result ->
+                when (result) {
+                    is Result.Loading -> {
+                        circularProgress.start()
+                        btnUpload.isClickable = false
+                        btnUpload.icon = circularProgress as Drawable
+                    }
+                    is Result.Success -> {
+                        txtLabels.text = null
+                        for (label in result.data) {
+                            val text = label.text
+                            val confidence = label.confidence * 100
+                            txtLabels.append("$text | $confidence%\n")
+                            isAnimal = labels.contains(text)
+                            if (isAnimal) break
                         }
-                        is Result.Success -> {
-                            txtLabels.text = null
-                            for (label in result.data) {
-                                val text = label.text
-                                val confidence = label.confidence * 100
-                                txtLabels.append("$text | $confidence%\n")
-                                isAnimal = labels.contains(text)
-                                if (isAnimal) break
-                            }
-                            if (isAnimal) uploadImage(uri)
-                            else {
-                                showSnackbar(getString(R.string.txt_animal_undetected))
-                                btnUpload.isClickable = true
-                                btnUpload.icon = upload
-                                circularProgress.stop()
-                            }
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
+                        if (isAnimal) uploadImage(uri)
+                        else {
+                            showSnackbar(getString(R.string.txt_animal_undetected))
                             btnUpload.isClickable = true
                             btnUpload.icon = upload
                             circularProgress.stop()
                         }
                     }
+                    is Result.Failure -> {
+                        showSnackbar(result.exception)
+                        btnUpload.isClickable = true
+                        btnUpload.icon = upload
+                        circularProgress.stop()
+                    }
                 }
+            }
         }
     }
 

@@ -21,28 +21,23 @@ import com.google.android.material.navigation.NavigationView
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
 import com.vt.shoppet.databinding.HeaderMainBinding
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.util.loadProfileImage
 import com.vt.shoppet.util.viewBinding
+import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
-    private val viewModel: DataViewModel by viewModels()
-
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var storage: StorageRepo
+    private val auth: AuthViewModel by viewModels()
+    private val storage: StorageViewModel by viewModels()
+    private val dataViewModel: DataViewModel by viewModels()
 
     lateinit var toolbar: MaterialToolbar
 
@@ -124,13 +119,13 @@ class MainActivity : AppCompatActivity() {
 
         bindViews()
 
-        viewModel.getCurrentUser().observe(this) { user ->
+        dataViewModel.getCurrentUser().observe(this) { user ->
             txtName.text = user.name
             txtUsername.text = user.username
             txtEmail.text = auth.email()
 
             val image = user.image
-            if (image.isNotEmpty()) {
+            if (image != null) {
                 loadProfileImage(imageUser, storage.getUserPhoto(image))
             } else imageUser.setImageResource(R.drawable.ic_person)
         }

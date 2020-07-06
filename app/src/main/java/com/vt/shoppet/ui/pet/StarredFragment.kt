@@ -16,14 +16,13 @@ import com.vt.shoppet.R
 import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentStarredBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.loadFirebaseImage
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class StarredFragment : Fragment(R.layout.fragment_starred) {
@@ -31,8 +30,7 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
     private val binding by viewBinding(FragmentStarredBinding::bind)
     private val viewModel: DataViewModel by activityViewModels()
 
-    @Inject
-    lateinit var storage: StorageRepo
+    private val storage: StorageViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -53,31 +51,32 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
             }
         }
 
-        val adapter = PetAdapter()
-        adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        adapter.setActions(object : PetActions {
-            override fun onClick(pet: Pet, view: View): View.OnClickListener =
-                View.OnClickListener {
-                    viewModel.setCurrentPet(pet)
-                    val id = pet.id
-                    view.transitionName = id
-                    val extras = FragmentNavigatorExtras(view to id)
-                    val action = StarredFragmentDirections.actionStarredToSelected(id)
-                    findNavController().navigate(action, extras)
-                }
+        val adapter = PetAdapter().apply {
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            setActions(object : PetActions {
+                override fun onClick(pet: Pet, view: View): View.OnClickListener =
+                    View.OnClickListener {
+                        viewModel.setCurrentPet(pet)
+                        val id = pet.id
+                        view.transitionName = id
+                        val extras = FragmentNavigatorExtras(view to id)
+                        val action = StarredFragmentDirections.actionStarredToSelected(id)
+                        findNavController().navigate(action, extras)
+                    }
 
-            override fun setImage(id: String, imageView: ImageView) {
-                loadFirebaseImage(imageView, storage.getPetPhoto(id))
-            }
-        })
+                override fun setImage(id: String, imageView: ImageView) {
+                    loadFirebaseImage(imageView, storage.getPetPhoto(id))
+                }
+            })
+        }
 
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
-            setAdapter(adapter)
             addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
                 if (top < oldTop) smoothScrollToPosition(oldTop)
             }
+            setAdapter(adapter)
         }
 
         viewModel.getStarredPets().observe(viewLifecycleOwner) { pets ->

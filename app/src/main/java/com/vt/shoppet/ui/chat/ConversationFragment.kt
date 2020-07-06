@@ -29,14 +29,14 @@ import com.vt.shoppet.databinding.FragmentConversationBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Message
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.MessageAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
+import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.util.*
 import javax.inject.Inject
@@ -46,21 +46,16 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     private val binding by viewBinding(FragmentConversationBinding::bind)
 
-    private val viewModel: DataViewModel by activityViewModels()
+    private val auth: AuthViewModel by activityViewModels()
+    private val storage: StorageViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by activityViewModels()
+
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private val args: ConversationFragmentArgs by navArgs()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
-
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
-
-    @Inject
-    lateinit var storage: StorageRepo
 
     private lateinit var layoutImage: CoordinatorLayout
     private lateinit var imageMessage: ShapeableImageView
@@ -107,8 +102,10 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     private val choosePhoto =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
-            uri = it
-            loadImage()
+            if (it != null) {
+                uri = it
+                loadImage()
+            }
         }
 
     private val openCamera =
@@ -131,15 +128,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
         recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
-    private fun updateChat(chat: Chat) {
-        val read = mutableListOf(false, false)
-        read[args.senderIndex] = true
-        read[args.receiverIndex] = chat.read[args.receiverIndex]
-        firestore.updateChat(chat, read)
-    }
-
     private fun sendChat(chat: Chat) =
-        firestore.sendChat(chat).observe(viewLifecycleOwner) { result ->
+        firestore.updateChat(chat).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
                     txtMessage.text = null
@@ -172,9 +162,10 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 }
                 is Result.Success -> {
                     val text = if (message.message.isEmpty()) "Image" else message.message
-                    val read = mutableListOf(true, false)
-                    read[args.senderIndex] = true
-                    read[args.receiverIndex] = false
+                    val read = chat.read.apply {
+                        this[args.senderIndex] = true
+                        this[args.receiverIndex] = false
+                    }
                     val data =
                         chat.copy(empty = false, message = text, read = read, date = message.date)
                     sendChat(data)
@@ -188,8 +179,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             }
         }
 
-    private fun uploadMessagePhoto(chat: Chat, text: String, id: String) =
-        storage.uploadMessagePhoto(id, uri).observe(viewLifecycleOwner) { result ->
+    private fun uploadMessagePhoto(chat: Chat, text: String, image: String) =
+        storage.uploadMessagePhoto(image, uri).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
                     txtMessage.text = null
@@ -201,14 +192,14 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     clearImageView()
                     val date = Timestamp.now()
                     val message = Message(
-                        text,
-                        chat.id,
-                        chat.uid[args.senderIndex],
-                        chat.uid[args.receiverIndex],
-                        chat.username[args.senderIndex],
-                        chat.username[args.receiverIndex],
-                        id,
-                        date
+                        message = text,
+                        chatid = chat.id,
+                        senderid = chat.uid[args.senderIndex],
+                        recipientid = chat.uid[args.receiverIndex],
+                        senderusername = chat.username[args.senderIndex],
+                        recipientusername = chat.username[args.receiverIndex],
+                        image = image,
+                        date = date
                     )
                     sendTextMessage(chat, message)
                 }
@@ -232,7 +223,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
         imageMessage = binding.imageMessage
         inputMessage = binding.inputMessage
         txtMessage = binding.txtMessage
-        progress = circularProgress(context)
+        progress = circularProgress()
         send = resources.getDrawable(R.drawable.ic_send, context.theme)
 
         val txtEmpty = binding.txtEmpty
@@ -267,8 +258,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             clearImageView()
         }
 
-        viewModel.getChat().observe(viewLifecycleOwner) { chat ->
-            val query = firestore.getConversation(chat.id)
+        dataViewModel.getChat().observe(viewLifecycleOwner) { chat ->
+            val query = firestore.getMessages(chat.id)
 
             val options =
                 FirestoreRecyclerOptions.Builder<Message>()
@@ -285,7 +276,9 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     txtEmpty.isVisible = itemCount == 0
                     if (itemCount != 0) {
                         recyclerMessages.layoutManager?.scrollToPosition(itemCount - 1)
-                        updateChat(chat)
+                        firestore.updateChat(chat.copy(read = chat.read.apply {
+                            this[args.senderIndex] = true
+                        }))
                     }
                 }
             }
@@ -308,18 +301,19 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
                 val text = txtMessage.text.toString()
 
-                if (uri != Uri.EMPTY) uploadMessagePhoto(chat, text, UUID.randomUUID().toString())
-                else {
+                if (uri != Uri.EMPTY) {
+                    val image = UUID.randomUUID().toString()
+                    uploadMessagePhoto(chat, text, image)
+                } else {
                     val date = Timestamp.now()
                     val message = Message(
-                        text,
-                        chat.id,
-                        chat.uid[args.senderIndex],
-                        chat.uid[args.receiverIndex],
-                        chat.username[args.senderIndex],
-                        chat.username[args.receiverIndex],
-                        null,
-                        date
+                        message = text,
+                        chatid = chat.id,
+                        senderid = chat.uid[args.senderIndex],
+                        recipientid = chat.uid[args.receiverIndex],
+                        senderusername = chat.username[args.senderIndex],
+                        recipientusername = chat.username[args.receiverIndex],
+                        date = date
                     )
                     if (text.isNotEmpty()) sendTextMessage(chat, message)
                     else {

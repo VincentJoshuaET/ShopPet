@@ -13,7 +13,7 @@ data class User(
     var location: String = "",
     var sex: String = "",
     var dateOfBirth: Timestamp = Timestamp.now(),
-    var image: String = "",
+    var image: String? = null,
     var tokens: MutableList<String> = mutableListOf(),
     var reports: Int = 0
 ) : Parcelable

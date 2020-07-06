@@ -14,33 +14,28 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
-import androidx.transition.TransitionManager
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.transition.MaterialFade
 import com.vt.shoppet.R
 import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentShopBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.Runnable
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val binding by viewBinding(FragmentShopBinding::bind)
-    private val viewModel: DataViewModel by activityViewModels()
     private val args: ShopFragmentArgs by navArgs()
 
-    @Inject
-    lateinit var storage: StorageRepo
+    private val storage: StorageViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private var action = 0
 
@@ -65,8 +60,10 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val selectPhoto =
         registerForActivityResult(ActivityResultContracts.GetContent()) { uri ->
-            val action = ShopFragmentDirections.actionShopToSell(uri.toString())
-            findNavController().navigate(action)
+            if (uri != null) {
+                val action = ShopFragmentDirections.actionShopToSell(uri.toString())
+                findNavController().navigate(action)
+            }
         }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -86,23 +83,24 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         if (args.posted) showSnackbar(getString(R.string.txt_upload_success))
 
-        val adapter = PetAdapter()
-        adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-        adapter.setActions(object : PetActions {
-            override fun onClick(pet: Pet, view: View): View.OnClickListener =
-                View.OnClickListener {
-                    viewModel.setCurrentPet(pet)
-                    val id = pet.id
-                    view.transitionName = id
-                    val extras = FragmentNavigatorExtras(view to id)
-                    val action = ShopFragmentDirections.actionShopToSelected(id)
-                    findNavController().navigate(action, extras)
-                }
+        val adapter = PetAdapter().apply {
+            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+            setActions(object : PetActions {
+                override fun onClick(pet: Pet, view: View): View.OnClickListener =
+                    View.OnClickListener {
+                        dataViewModel.setCurrentPet(pet)
+                        val id = pet.id
+                        view.transitionName = id
+                        val extras = FragmentNavigatorExtras(view to id)
+                        val action = ShopFragmentDirections.actionShopToSelected(id)
+                        findNavController().navigate(action, extras)
+                    }
 
-            override fun setImage(id: String, imageView: ImageView) {
-                loadFirebaseImage(imageView, storage.getPetPhoto(id))
-            }
-        })
+                override fun setImage(id: String, imageView: ImageView) {
+                    loadFirebaseImage(imageView, storage.getPetPhoto(id))
+                }
+            })
+        }
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
@@ -111,7 +109,6 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
             setAdapter(adapter)
         }
-        txtEmpty.isVisible = adapter.itemCount == 0
 
         val upload =
             MaterialAlertDialogBuilder(context)
@@ -144,7 +141,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
             getLiveData<Boolean>("filter").observe(viewLifecycleOwner) { filter ->
                 if (filter) {
-                    viewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
+                    dataViewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
                         adapter.submitList(filtered)
                         txtEmpty.isVisible = filtered.isEmpty()
                     }
@@ -153,14 +150,14 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
         }
 
-        viewModel.getFilter().observe(viewLifecycleOwner) { filter ->
+        dataViewModel.getFilter().observe(viewLifecycleOwner) { filter ->
             if (filter.enabled) {
-                viewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
+                dataViewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
                     adapter.submitList(filtered)
                     txtEmpty.isVisible = filtered.isEmpty()
                 }
             } else {
-                viewModel.getPets().observe(viewLifecycleOwner) { pets ->
+                dataViewModel.getPets().observe(viewLifecycleOwner) { pets ->
                     adapter.submitList(pets)
                     txtEmpty.isVisible = pets.isEmpty()
                 }
@@ -172,20 +169,15 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             upload.show()
         }
 
-        val runnable = Runnable {
-            TransitionManager.beginDelayedTransition(binding.root, MaterialFade())
-            fabSell.isVisible = true
-        }
-
-        viewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
-            if (user.reports < resources.getInteger(R.integer.reports)) fabSell.post(runnable)
+        dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+            if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
         }
 
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.item_refresh -> {
                     recyclerPets.smoothScrollToPosition(0)
-                    viewModel.resetFilter()
+                    dataViewModel.resetFilter()
                     return@setOnMenuItemClickListener true
                 }
                 R.id.item_filter -> {

@@ -9,6 +9,7 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
@@ -17,19 +18,16 @@ import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.LabelerRepo
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
+import com.vt.shoppet.viewmodel.LabelerViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private val binding by viewBinding(FragmentCameraBinding::bind)
-
-    @Inject
-    lateinit var labeler: LabelerRepo
+    private val labeler: LabelerViewModel by activityViewModels()
 
     inner class ImageSavedCallback(private val cameraProvider: ProcessCameraProvider) :
         ImageCapture.OnImageSavedCallback {
@@ -128,13 +126,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         val runnable = Runnable {
             preview.setSurfaceProvider(cameraView.createSurfaceProvider())
             cameraProviderFuture.get()
-                .bindToLifecycle(
-                    this,
-                    selector,
-                    preview,
-                    analysis,
-                    capture
-                )
+                .bindToLifecycle(this, selector, preview, analysis, capture)
         }
 
         cameraProviderFuture.addListener(runnable, executor)

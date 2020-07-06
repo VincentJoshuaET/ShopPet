@@ -5,14 +5,15 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentForgotPasswordBinding
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.util.*
+import com.vt.shoppet.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -20,12 +21,10 @@ import javax.inject.Inject
 class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
     private val binding by viewBinding(FragmentForgotPasswordBinding::bind)
+    private val auth: AuthViewModel by activityViewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
-
-    @Inject
-    lateinit var auth: AuthRepo
 
     private lateinit var progress: Animatable
     private lateinit var btnReset: MaterialButton
@@ -59,7 +58,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
         val context = requireContext()
 
-        progress = circularProgress(context)
+        progress = circularProgress()
         btnReset = binding.btnReset as MaterialButton
         emailIcon = resources.getDrawable(R.drawable.ic_email, context.theme)
 

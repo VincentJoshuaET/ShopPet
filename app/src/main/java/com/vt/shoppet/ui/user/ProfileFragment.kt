@@ -14,17 +14,16 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentProfileBinding
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
+import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
@@ -32,16 +31,11 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val binding by viewBinding(FragmentProfileBinding::bind)
 
     private val args: ProfileFragmentArgs by navArgs()
-    private val viewModel: DataViewModel by activityViewModels()
 
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
-
-    @Inject
-    lateinit var storage: StorageRepo
+    private val auth: AuthViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by activityViewModels()
+    private val storage: StorageViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -50,7 +44,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val toolbar = activity.toolbar
 
         val context = requireContext()
-        val progress = circularProgress(context)
+        val progress = circularProgress()
 
         val currentUid = auth.uid()
         val email = auth.email()
@@ -109,7 +103,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             txtDateOfBirth.text = dateTimeFormatter.format(dateOfBirth)
 
             val image = user.image
-            if (image.isNotEmpty()) {
+            if (image != null) {
                 loadProfileImage(imageUser, storage.getUserPhoto(image))
             } else imageUser.setImageResource(R.drawable.ic_person)
 
@@ -170,12 +164,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         if (args.current) {
             toolbar.inflateMenu(R.menu.menu_current_profile)
-            viewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
                 setProfile(user)
             }
         } else {
             toolbar.inflateMenu(R.menu.menu_profile)
-            viewModel.getUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.getUser().observe(viewLifecycleOwner) { user ->
                 setProfile(user)
             }
         }

@@ -15,10 +15,10 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentLoginBinding
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.util.*
+import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -26,16 +26,13 @@ import javax.inject.Inject
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private val binding by viewBinding(FragmentLoginBinding::bind)
-    private val viewModel: DataViewModel by activityViewModels()
+
+    private val auth: AuthViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
-
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
 
     private lateinit var progress: Animatable
     private lateinit var btnLogin: MaterialButton
@@ -57,7 +54,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                             btnLogin.icon = null
                             progress.stop()
                             firestore.addToken(result.data.token)
-                            viewModel.initFirebaseData()
+                            dataViewModel.initFirebaseData()
                             findNavController().navigate(R.id.action_auth_to_home)
                         }
                         is Result.Failure -> {
@@ -140,9 +137,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
-        progress = circularProgress(context)
+        progress = circularProgress()
         btnLogin = binding.btnLogin as MaterialButton
 
         val txtEmail = binding.txtEmail

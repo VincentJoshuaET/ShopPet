@@ -1,13 +1,13 @@
 package com.vt.shoppet.ui
 
 import android.app.Dialog
-import android.content.SharedPreferences
 import android.os.Build
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.fragment.app.DialogFragment
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
+import com.vt.shoppet.util.PreferenceUtils
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -15,15 +15,10 @@ import javax.inject.Inject
 class ThemeDialog : DialogFragment() {
 
     @Inject
-    lateinit var preferences: SharedPreferences
-
-    private fun setThemeMode(mode: Int) {
-        AppCompatDelegate.setDefaultNightMode(mode)
-        preferences.edit().putInt("theme", mode).apply()
-    }
+    lateinit var preferences: PreferenceUtils
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        var item = preferences.getInt("theme", 0)
+        var item = preferences.getTheme()
         if (item == -1 || item == 3) item = 0
         val items =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) resources.getStringArray(R.array.theme_new)
@@ -35,11 +30,11 @@ class ThemeDialog : DialogFragment() {
                 when (which) {
                     0 -> {
                         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                            setThemeMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
-                        } else setThemeMode(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
+                            preferences.setTheme(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+                        } else preferences.setTheme(AppCompatDelegate.MODE_NIGHT_AUTO_BATTERY)
                     }
-                    1 -> setThemeMode(AppCompatDelegate.MODE_NIGHT_NO)
-                    2 -> setThemeMode(AppCompatDelegate.MODE_NIGHT_YES)
+                    1 -> preferences.setTheme(AppCompatDelegate.MODE_NIGHT_NO)
+                    2 -> preferences.setTheme(AppCompatDelegate.MODE_NIGHT_YES)
                 }
                 dialog.dismiss()
             }

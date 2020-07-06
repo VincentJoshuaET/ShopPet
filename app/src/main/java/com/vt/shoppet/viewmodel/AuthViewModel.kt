@@ -1,29 +1,24 @@
-package com.vt.shoppet.repo
+package com.vt.shoppet.viewmodel
 
+import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.auth.AuthResult
-import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.iid.InstanceIdResult
+import com.vt.shoppet.firebase.AuthRepo
 import com.vt.shoppet.model.Result
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.tasks.await
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class AuthRepo @Inject constructor(
-    private val auth: FirebaseAuth,
-    private val instanceId: FirebaseInstanceId
-) {
+class AuthViewModel @ViewModelInject constructor(
+    private val auth: AuthRepo
+) : ViewModel() {
 
     fun signIn(email: String, password: String): LiveData<Result<AuthResult>> =
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {
-                val result = auth.signInWithEmailAndPassword(email, password).await()
-                emit(Result.Success(result))
+                emit(Result.Success(auth.signIn(email, password)))
             } catch (e: Exception) {
                 emit(Result.Failure(e))
             }
@@ -33,8 +28,7 @@ class AuthRepo @Inject constructor(
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {
-                val result = auth.createUserWithEmailAndPassword(email, password).await()
-                emit(Result.Success(result))
+                emit(Result.Success(auth.createUser(email, password)))
             } catch (e: Exception) {
                 emit(Result.Failure(e))
             }
@@ -44,8 +38,7 @@ class AuthRepo @Inject constructor(
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {
-                val task = auth.currentUser?.sendEmailVerification()?.await()
-                emit(Result.Success(task))
+                emit(Result.Success(auth.verifyEmail()))
             } catch (e: Exception) {
                 emit(Result.Failure(e))
             }
@@ -55,8 +48,7 @@ class AuthRepo @Inject constructor(
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {
-                val task = auth.sendPasswordResetEmail(email).await()
-                emit(Result.Success(task))
+                emit(Result.Success(auth.resetPassword(email)))
             } catch (e: Exception) {
                 emit(Result.Failure(e))
             }
@@ -66,23 +58,22 @@ class AuthRepo @Inject constructor(
         liveData(Dispatchers.IO) {
             emit(Result.Loading())
             try {
-                val result = instanceId.instanceId.await()
-                emit(Result.Success(result))
+                emit(Result.Success(auth.instanceId()))
             } catch (e: Exception) {
                 emit(Result.Failure(e))
             }
         }
 
-    fun isLoggedIn() = auth.currentUser != null
+    fun isLoggedIn() = auth.isLoggedIn()
 
-    fun isUserVerified() = auth.currentUser?.isEmailVerified != null
+    fun isUserVerified() = auth.isUserVerified()
 
-    fun email() = auth.currentUser?.email
+    fun email() = auth.email()
 
     fun signOut() = auth.signOut()
 
-    fun uid() = auth.uid as String
+    fun uid() = auth.uid()
 
-    fun deleteInstanceId() = instanceId.deleteInstanceId()
+    fun deleteInstanceId() = auth.deleteInstanceId()
 
 }

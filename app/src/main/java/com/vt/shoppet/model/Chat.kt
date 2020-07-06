@@ -7,7 +7,7 @@ data class Chat(
     var message: String? = null,
     var uid: List<String> = emptyList(),
     var username: List<String> = emptyList(),
-    var read: List<Boolean> = emptyList(),
+    var read: MutableList<Boolean> = mutableListOf(),
     var empty: Boolean = false,
     var date: Timestamp = Timestamp.now()
 )

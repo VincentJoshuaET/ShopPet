@@ -18,27 +18,22 @@ import com.vt.shoppet.databinding.FragmentChatBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.ui.adapter.ChatAdapter
 import com.vt.shoppet.util.loadProfileImage
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private val binding by viewBinding(FragmentChatBinding::bind)
 
-    private val viewModel: DataViewModel by activityViewModels()
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
-
-    @Inject
-    lateinit var storage: StorageRepo
+    private val firestore: FirestoreViewModel by activityViewModels()
+    private val storage: StorageViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -46,14 +41,14 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val recyclerChats = binding.recyclerChats
         val txtEmpty = binding.txtEmpty
 
-        viewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+        dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
             val adapter = ChatAdapter(user)
             adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             adapter.setActions(object : ChatActions {
                 override fun onClick(chat: Chat) = View.OnClickListener {
                     val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
                     val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
-                    viewModel.setChat(chat)
+                    dataViewModel.setChat(chat)
                     recyclerChats.removeItemDecorationAt(0)
                     val action = ChatFragmentDirections.actionChatToConversation(
                         senderIndex,
@@ -63,13 +58,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 }
 
                 override fun setImage(uid: String, imageView: ImageView) {
-                    firestore.getUserLiveData(uid).observe(viewLifecycleOwner) { result ->
+                    firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
                         when (result) {
                             is Result.Success -> {
                                 val data: User? = result.data.toObject()
                                 data?.let {
                                     val image = data.image
-                                    if (image.isNotEmpty()) {
+                                    if (image != null) {
                                         loadProfileImage(imageView, storage.getUserPhoto(image))
                                     } else imageView.setImageResource(R.drawable.ic_person)
                                 }
@@ -87,7 +82,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 setAdapter(adapter)
             }
 
-            viewModel.getChats().observe(viewLifecycleOwner) { chats ->
+            dataViewModel.getChats().observe(viewLifecycleOwner) { chats ->
                 adapter.submitList(chats)
                 txtEmpty.isVisible = chats.isEmpty()
             }

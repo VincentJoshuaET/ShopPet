@@ -1,10 +1,12 @@
 package com.vt.shoppet.ui.pet
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -15,10 +17,9 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentDetailsBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.util.*
+import com.vt.shoppet.viewmodel.AuthViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.LocalDateTime
 import java.util.*
@@ -33,14 +34,53 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    @Inject
-    lateinit var auth: AuthRepo
+    private val auth: AuthViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by activityViewModels()
 
-    @Inject
-    lateinit var firestore: FirestoreRepo
+    private lateinit var progress: Animatable
+    private lateinit var save: Drawable
+    private lateinit var btnSave: MaterialButton
 
-    @Inject
-    lateinit var storage: StorageRepo
+    private fun updatePet(pet: Pet) =
+        firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnSave.isClickable = false
+                    btnSave.icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    btnSave.icon = save
+                    progress.stop()
+                    val action = DetailsFragmentDirections.actionDetailsToShop(true)
+                    findNavController().navigate(action)
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnSave.isClickable = true
+                    btnSave.icon = save
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun addPet(pet: Pet) =
+        firestore.addPet(pet).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnSave.isClickable = false
+                    btnSave.icon = progress as Drawable
+                }
+                is Result.Success -> updatePet(pet.copy(id = result.data.id))
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    btnSave.isClickable = true
+                    btnSave.icon = save
+                    progress.stop()
+                }
+            }
+        }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -53,6 +93,10 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
+
+        btnSave = binding.btnSave as MaterialButton
+        progress = circularProgress()
+        save = resources.getDrawable(R.drawable.ic_save, context.theme)
 
         val txtName = binding.txtName
         val txtPrice = binding.txtPrice
@@ -67,10 +111,6 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         val txtUnit = binding.txtUnit
         val layoutCatsDogs = binding.layoutCatsDogs
         val txtDescription = binding.txtDescription
-        val btnSave = binding.btnSave as MaterialButton
-
-        val progress = circularProgress(context)
-        val save = resources.getDrawable(R.drawable.ic_save, context.theme)
 
         val types = resources.getStringArray(R.array.type)
         val typeAdapter = getArrayAdapter(types)
@@ -101,30 +141,6 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
         var type = ""
         var custom = false
-
-        fun updatePetId(id: String) =
-            firestore.updatePetId(id)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnSave.isClickable = false
-                            btnSave.icon = progress as Drawable
-                        }
-                        is Result.Success -> {
-                            btnSave.icon = save
-                            progress.stop()
-                            val action = DetailsFragmentDirections.actionDetailsToShop(true)
-                            findNavController().navigate(action)
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnSave.isClickable = true
-                            btnSave.icon = save
-                            progress.stop()
-                        }
-                    }
-                }
 
         fun setBreedDropdown() {
             val array = when (type) {
@@ -245,49 +261,35 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
             if (fail) return@setOnClickListener
 
+            val now = LocalDateTime.now()
+
             val instant = when (unit) {
-                units[0] -> LocalDateTime.now().minusDays(age.toLong()).atZone(zone).toInstant()
-                units[1] -> LocalDateTime.now().minusWeeks(age.toLong()).atZone(zone).toInstant()
-                units[2] -> LocalDateTime.now().minusMonths(age.toLong()).atZone(zone).toInstant()
-                else -> LocalDateTime.now().minusYears(age.toLong()).atZone(zone).toInstant()
+                units[0] -> now.minusDays(age.toLong()).atZone(zone).toInstant()
+                units[1] -> now.minusWeeks(age.toLong()).atZone(zone).toInstant()
+                units[2] -> now.minusMonths(age.toLong()).atZone(zone).toInstant()
+                else -> now.minusYears(age.toLong()).atZone(zone).toInstant()
             }
 
             val dateOfBirth = Timestamp(instant.epochSecond, instant.nano)
 
             val pet = Pet(
-                name,
-                uid,
-                username,
-                image,
-                type,
-                price,
-                sex,
-                dateOfBirth,
-                breed,
-                vaccineStatus,
-                medicalRecords,
-                description,
+                name = name,
+                uid = uid,
+                username = username,
+                image = image,
+                type = type,
+                price = price,
+                sex = sex,
+                dateOfBirth = dateOfBirth,
+                breed = breed,
+                vaccineStatus = vaccineStatus,
+                medicalRecords = medicalRecords,
+                description = description,
                 visible = true,
                 sold = false
             )
 
-            firestore.addPet(pet)
-                .observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnSave.isClickable = false
-                            btnSave.icon = progress as Drawable
-                        }
-                        is Result.Success -> updatePetId(result.data.id)
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            btnSave.isClickable = true
-                            btnSave.icon = save
-                            progress.stop()
-                        }
-                    }
-                }
+            addPet(pet)
         }
     }
 

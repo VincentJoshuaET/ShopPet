@@ -43,10 +43,8 @@ class SortDialog : DialogFragment() {
                     filter.field = "Upload Date"
                     filter.order = "Descending"
                     viewModel.filterPets()
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "filter",
-                        true
-                    )
+                    findNavController().previousBackStackEntry
+                        ?.savedStateHandle?.set("filter", true)
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
@@ -55,10 +53,8 @@ class SortDialog : DialogFragment() {
                     filter.field = txtField.text.toString()
                     filter.order = txtOrder.text.toString()
                     viewModel.filterPets()
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "filter",
-                        true
-                    )
+                    findNavController().previousBackStackEntry
+                        ?.savedStateHandle?.set("filter", true)
                 }
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->

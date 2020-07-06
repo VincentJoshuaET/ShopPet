@@ -25,28 +25,20 @@ import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.StorageRepo
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
+import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
     private val binding by viewBinding(FragmentSelectedBinding::bind)
-    private val viewModel: DataViewModel by activityViewModels()
 
-    @Inject
-    lateinit var auth: AuthRepo
-
-    @Inject
-    lateinit var firestore: FirestoreRepo
-
-    @Inject
-    lateinit var storage: StorageRepo
+    private val firestore: FirestoreViewModel by activityViewModels()
+    private val storage: StorageViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     private lateinit var imagePet: ShapeableImageView
     private lateinit var fabChatSold: FloatingActionButton
@@ -91,7 +83,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.btn_yes) { _, _ ->
-                firestore.markPetAsSold(id).observe(viewLifecycleOwner) { result ->
+                firestore.markSoldPet(id).observe(viewLifecycleOwner) { result ->
                     when (result) {
                         is Result.Loading -> {
                             progress.start()
@@ -161,7 +153,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         firestore.createChat(chat).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
-                    viewModel.setChat(chat)
+                    dataViewModel.setChat(chat)
                     findNavController().navigate(R.id.action_selected_to_conversation)
                 }
                 is Result.Failure -> showSnackbar(result.exception)
@@ -179,17 +171,16 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 is Result.Success -> {
                     if (result.data.isEmpty) {
                         val chat = Chat(
-                            "${user.uid}${pet.uid}",
-                            null,
-                            listOf(user.uid, pet.uid),
-                            listOf(user.username, pet.username),
-                            listOf(true, true),
-                            true
+                            id = "${user.uid}${pet.uid}",
+                            uid = listOf(user.uid, pet.uid),
+                            username = listOf(user.username, pet.username),
+                            read = mutableListOf(true, true),
+                            empty = true
                         )
                         createChat(chat)
                     } else {
                         val chats: List<Chat> = result.data.toObjects()
-                        viewModel.setChat(chats.first())
+                        dataViewModel.setChat(chats.first())
                         val senderIndex = chats.first().uid.indexOf(pet.uid)
                         val receiverIndex = chats.first().uid.indexOf(user.uid)
                         val action =
@@ -210,14 +201,14 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         }
 
     private fun getUser(pet: Pet, user: User) =
-        firestore.getUserLiveData(pet.uid).observe(viewLifecycleOwner) { result ->
+        firestore.getUserSnapshot(pet.uid).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
                     val data: User? = result.data.toObject()
                     if (data != null) {
-                        viewModel.setUser(data)
+                        dataViewModel.setUser(data)
                         val image = data.image
-                        if (image.isNotEmpty()) {
+                        if (image != null) {
                             loadProfileImage(imageSeller, storage.getUserPhoto(image))
                         } else imageSeller.setImageResource(R.drawable.ic_person)
                     } else imageSeller.setImageResource(R.drawable.ic_person)
@@ -308,12 +299,14 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val context = requireContext()
 
-        progress = circularProgress(context)
+        progress = circularProgress()
         btnStar = binding.btnStar as MaterialButton
         imagePet = binding.imagePet
         fabChatSold = binding.fabChatSold
         cardSeller = binding.cardSeller
         imageSeller = binding.imageSeller
+
+        chat = resources.getDrawable(R.drawable.ic_chat, context.theme)
 
         val btnGroup = binding.btnGrp
         val btnEdit = binding.btnEdit
@@ -333,9 +326,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val types = resources.getStringArray(R.array.type)
 
-        chat = resources.getDrawable(R.drawable.ic_chat, context.theme)
-
-        viewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
+        dataViewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
             binding.root.transitionName = pet.id
             layoutCatsDogs.isVisible = pet.type == types[1] || pet.type == types[2]
             fabChatSold.isGone = pet.sold
@@ -355,7 +346,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             txtDate.text = pet.date.calculatePostDuration(pet.sold)
             txtSeller.text = pet.username
 
-            viewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
                 if (user.uid == pet.uid) {
                     btnGroup.isVisible = true
                     fabChatSold.setImageResource(R.drawable.ic_check)
@@ -381,11 +372,6 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 btnGroup.clearChecked()
             }
         }
-    }
-
-    override fun onDestroy() {
-        viewModel.clearUser()
-        super.onDestroy()
     }
 
 }

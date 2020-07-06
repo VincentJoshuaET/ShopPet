@@ -19,7 +19,7 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class FilterDialog : DialogFragment() {
 
-    private val viewModel: DataViewModel by activityViewModels()
+    private val dataViewModel: DataViewModel by activityViewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
@@ -63,13 +63,13 @@ class FilterDialog : DialogFragment() {
         }
 
         sliderAge.setLabelFormatter {
-            when (val value = it.toInt().toString()) {
-                "1" -> value + " " + txtAge.text.toString().dropLast(2)
-                else -> value + " " + txtAge.text.toString().replace("/", "")
+            when (val value = it.toInt()) {
+                1 -> value.toString() + " " + txtAge.text.toString().dropLast(2)
+                else -> value.toString() + " " + txtAge.text.toString().replace("/", "")
             }
         }
 
-        viewModel.getFilter().observe(this) { filter ->
+        dataViewModel.getFilter().observe(this) { filter ->
             txtType.setText(filter.type, false)
             txtSex.setText(filter.sex, false)
             txtPrice.setText(filter.price, false)
@@ -84,7 +84,7 @@ class FilterDialog : DialogFragment() {
             .setTitle(R.string.menu_item_filter)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                viewModel.getFilter().observe(this) { filter ->
+                dataViewModel.getFilter().observe(this) { filter ->
                     filter.enabled = true
                     filter.type = "All"
                     filter.sex = "Both"
@@ -92,15 +92,13 @@ class FilterDialog : DialogFragment() {
                     filter.amounts = listOf(0F, 10000F)
                     filter.age = "No Filter"
                     filter.ages = listOf(0F, 100F)
-                    viewModel.filterPets()
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "filter",
-                        true
-                    )
+                    dataViewModel.filterPets()
+                    findNavController().previousBackStackEntry
+                        ?.savedStateHandle?.set("filter", true)
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                viewModel.getFilter().observe(this) { filter ->
+                dataViewModel.getFilter().observe(this) { filter ->
                     filter.enabled = true
                     filter.type = txtType.text.toString()
                     filter.sex = txtSex.text.toString()
@@ -108,11 +106,9 @@ class FilterDialog : DialogFragment() {
                     filter.amounts = sliderPrice.values
                     filter.age = txtAge.text.toString()
                     filter.ages = sliderAge.values
-                    viewModel.filterPets()
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "filter",
-                        true
-                    )
+                    dataViewModel.filterPets()
+                    findNavController().previousBackStackEntry
+                        ?.savedStateHandle?.set("filter", true)
                 }
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
