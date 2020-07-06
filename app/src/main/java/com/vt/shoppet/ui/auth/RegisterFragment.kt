@@ -131,11 +131,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
         progress = circularProgress()
-        check = resources.getDrawable(R.drawable.ic_check, context.theme)
-        btnRegister = binding.btnRegister as MaterialButton
+        check = getDrawable(R.drawable.ic_check)
+        btnRegister = binding.btnRegister
 
         val txtName = binding.txtName
         val txtEmail = binding.txtEmail

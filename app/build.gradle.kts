@@ -1,7 +1,6 @@
 plugins {
     id("com.android.application")
     kotlin("android")
-    kotlin("android.extensions")
     kotlin("kapt")
     id("com.google.gms.google-services")
     id("dagger.hilt.android.plugin")
@@ -32,10 +31,6 @@ android {
                 "proguard-rules.pro"
             )
         }
-    }
-
-    androidExtensions {
-        features = setOf("parcelize")
     }
 
     compileOptions {

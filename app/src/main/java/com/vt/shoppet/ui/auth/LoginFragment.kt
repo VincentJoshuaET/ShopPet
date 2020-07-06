@@ -37,35 +37,38 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var progress: Animatable
     private lateinit var btnLogin: MaterialButton
 
+    private fun instanceId() =
+        auth.instanceId().observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnLogin.isClickable = false
+                    btnLogin.icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    btnLogin.icon = null
+                    progress.stop()
+                    firestore.addToken(result.data.token)
+                    dataViewModel.initFirebaseData()
+                    findNavController().navigate(R.id.action_auth_to_home)
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    auth.signOut()
+                    btnLogin.isClickable = true
+                    btnLogin.icon = null
+                    progress.stop()
+                }
+            }
+        }
+
     private fun disclaimer(): AlertDialog =
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.app_name)
             .setMessage(R.string.txt_disclaimer)
             .setCancelable(false)
             .setPositiveButton(R.string.btn_agree) { _, _ ->
-                auth.instanceId().observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnLogin.isClickable = false
-                            btnLogin.icon = progress as Drawable
-                        }
-                        is Result.Success -> {
-                            btnLogin.icon = null
-                            progress.stop()
-                            firestore.addToken(result.data.token)
-                            dataViewModel.initFirebaseData()
-                            findNavController().navigate(R.id.action_auth_to_home)
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            auth.signOut()
-                            btnLogin.isClickable = true
-                            btnLogin.icon = null
-                            progress.stop()
-                        }
-                    }
-                }
+                instanceId()
             }
             .setNegativeButton(R.string.btn_cancel) { _, _ ->
                 auth.signOut()
@@ -75,35 +78,38 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }
             .create()
 
+    private fun verifyEmail() =
+        auth.verifyEmail().observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    btnLogin.isClickable = false
+                    btnLogin.icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    showSnackbar(getString(R.string.txt_verification_sent))
+                    auth.signOut()
+                    btnLogin.isClickable = true
+                    btnLogin.icon = null
+                    progress.stop()
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    auth.signOut()
+                    btnLogin.isClickable = true
+                    btnLogin.icon = null
+                    progress.stop()
+                }
+            }
+        }
+
     private fun unverified(): AlertDialog =
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_cannot_log_in)
             .setMessage(R.string.txt_account_unverified)
             .setCancelable(false)
             .setPositiveButton(R.string.btn_resend) { _, _ ->
-                auth.verifyEmail().observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            btnLogin.isClickable = false
-                            btnLogin.icon = progress as Drawable
-                        }
-                        is Result.Success -> {
-                            showSnackbar(getString(R.string.txt_verification_sent))
-                            auth.signOut()
-                            btnLogin.isClickable = true
-                            btnLogin.icon = null
-                            progress.stop()
-                        }
-                        is Result.Failure -> {
-                            showSnackbar(result.exception)
-                            auth.signOut()
-                            btnLogin.isClickable = true
-                            btnLogin.icon = null
-                            progress.stop()
-                        }
-                    }
-                }
+                verifyEmail()
             }
             .setNegativeButton(R.string.btn_no) { _, _ ->
                 auth.signOut()
@@ -138,7 +144,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         super.onViewCreated(view, savedInstanceState)
 
         progress = circularProgress()
-        btnLogin = binding.btnLogin as MaterialButton
+        btnLogin = binding.btnLogin
 
         val txtEmail = binding.txtEmail
         val txtPassword = binding.txtPassword

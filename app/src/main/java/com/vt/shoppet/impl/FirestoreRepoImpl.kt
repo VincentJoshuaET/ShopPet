@@ -1,5 +1,6 @@
 package com.vt.shoppet.impl
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
 import com.vt.shoppet.firebase.AuthRepo
@@ -29,13 +30,13 @@ class FirestoreRepoImpl @Inject constructor(
     override suspend fun getUserSnapshot(uid: String): DocumentSnapshot =
         firestore.collection("users").document(uid).get().await()
 
-    override suspend fun addToken(token: String): Void? =
+    override fun addToken(token: String): Task<Void> =
         firestore.collection("users").document(auth.uid())
-            .update("tokens", FieldValue.arrayUnion(token)).await()
+            .update("tokens", FieldValue.arrayUnion(token))
 
-    override suspend fun removeToken(token: String): Void? =
+    override fun removeToken(token: String): Task<Void> =
         firestore.collection("users").document(auth.uid())
-            .update("tokens", FieldValue.arrayRemove(token)).await()
+            .update("tokens", FieldValue.arrayRemove(token))
 
     override suspend fun getReport(uid: String, currentUid: String): DocumentSnapshot =
         firestore.collection("users/$uid/reports").document(currentUid).get().await()

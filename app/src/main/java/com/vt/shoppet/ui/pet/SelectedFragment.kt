@@ -297,16 +297,14 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
         progress = circularProgress()
-        btnStar = binding.btnStar as MaterialButton
+        btnStar = binding.btnStar
         imagePet = binding.imagePet
         fabChatSold = binding.fabChatSold
         cardSeller = binding.cardSeller
         imageSeller = binding.imageSeller
 
-        chat = resources.getDrawable(R.drawable.ic_chat, context.theme)
+        chat = getDrawable(R.drawable.ic_chat)
 
         val btnGroup = binding.btnGrp
         val btnEdit = binding.btnEdit

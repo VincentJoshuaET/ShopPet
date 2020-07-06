@@ -1,5 +1,6 @@
 package com.vt.shoppet.util
 
+import android.app.Activity
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
 import android.widget.Button
@@ -20,6 +21,9 @@ fun Fragment.circularProgress(): Animatable {
 
 fun Fragment.showSnackbar(message: String) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+
+fun Activity.showSnackbar(message: String) =
+    Snackbar.make(window.decorView.rootView, message, Snackbar.LENGTH_SHORT).show()
 
 fun Fragment.showSnackbar(exception: Exception) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT).show()

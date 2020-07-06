@@ -42,38 +42,39 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val txtEmpty = binding.txtEmpty
 
         dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
-            val adapter = ChatAdapter(user)
-            adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            adapter.setActions(object : ChatActions {
-                override fun onClick(chat: Chat) = View.OnClickListener {
-                    val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
-                    val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
-                    dataViewModel.setChat(chat)
-                    recyclerChats.removeItemDecorationAt(0)
-                    val action = ChatFragmentDirections.actionChatToConversation(
-                        senderIndex,
-                        receiverIndex
-                    )
-                    findNavController().navigate(action)
-                }
+            val adapter = ChatAdapter(user).apply {
+                stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+                setActions(object : ChatActions {
+                    override fun onClick(chat: Chat) = View.OnClickListener {
+                        val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
+                        val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
+                        dataViewModel.setChat(chat)
+                        recyclerChats.removeItemDecorationAt(0)
+                        val action = ChatFragmentDirections.actionChatToConversation(
+                            senderIndex,
+                            receiverIndex
+                        )
+                        findNavController().navigate(action)
+                    }
 
-                override fun setImage(uid: String, imageView: ImageView) {
-                    firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                val data: User? = result.data.toObject()
-                                data?.let {
-                                    val image = data.image
-                                    if (image != null) {
-                                        loadProfileImage(imageView, storage.getUserPhoto(image))
-                                    } else imageView.setImageResource(R.drawable.ic_person)
+                    override fun setImage(uid: String, imageView: ImageView) {
+                        firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
+                            when (result) {
+                                is Result.Success -> {
+                                    val data: User? = result.data.toObject()
+                                    data?.let {
+                                        val image = data.image
+                                        if (image != null) {
+                                            loadProfileImage(imageView, storage.getUserPhoto(image))
+                                        } else imageView.setImageResource(R.drawable.ic_person)
+                                    }
                                 }
+                                is Result.Failure -> imageView.setImageResource(R.drawable.ic_person)
                             }
-                            is Result.Failure -> imageView.setImageResource(R.drawable.ic_person)
                         }
                     }
-                }
-            })
+                })
+            }
 
             recyclerChats.apply {
                 addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))

@@ -28,7 +28,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
     private lateinit var progress: Animatable
     private lateinit var btnReset: MaterialButton
-    private lateinit var emailIcon: Drawable
+    private lateinit var icon: Drawable
 
     private fun resetPassword(email: String) =
         auth.resetPassword(email).observe(viewLifecycleOwner) { result ->
@@ -39,7 +39,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                     btnReset.icon = progress as Drawable
                 }
                 is Result.Success -> {
-                    btnReset.icon = emailIcon
+                    btnReset.icon = icon
                     progress.stop()
                     showSnackbar(getString(R.string.txt_email_sent))
                     findNavController().popBackStack()
@@ -47,7 +47,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                 is Result.Failure -> {
                     showSnackbar(result.exception)
                     btnReset.isClickable = true
-                    btnReset.icon = emailIcon
+                    btnReset.icon = icon
                     progress.stop()
                 }
             }
@@ -56,11 +56,9 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
         progress = circularProgress()
-        btnReset = binding.btnReset as MaterialButton
-        emailIcon = resources.getDrawable(R.drawable.ic_email, context.theme)
+        btnReset = binding.btnReset
+        icon = getDrawable(R.drawable.ic_email)
 
         val txtEmail = binding.txtEmail
         val btnLogin = binding.btnLogin

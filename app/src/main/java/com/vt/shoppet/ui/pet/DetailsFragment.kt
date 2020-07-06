@@ -92,11 +92,9 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
-        btnSave = binding.btnSave as MaterialButton
+        btnSave = binding.btnSave
         progress = circularProgress()
-        save = resources.getDrawable(R.drawable.ic_save, context.theme)
+        save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
         val txtPrice = binding.txtPrice

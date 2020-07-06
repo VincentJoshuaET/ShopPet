@@ -45,14 +45,12 @@ import javax.inject.Inject
 class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     private val binding by viewBinding(FragmentConversationBinding::bind)
+    private val args: ConversationFragmentArgs by navArgs()
 
     private val auth: AuthViewModel by activityViewModels()
     private val storage: StorageViewModel by activityViewModels()
     private val firestore: FirestoreViewModel by activityViewModels()
-
     private val dataViewModel: DataViewModel by activityViewModels()
-
-    private val args: ConversationFragmentArgs by navArgs()
 
     @Inject
     lateinit var keyboard: KeyboardUtils
@@ -74,10 +72,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             when (action) {
                 SELECT_PHOTO -> choosePhoto.launch("image/*")
                 TAKE_PHOTO -> {
-                    uri = requireContext().contentResolver.insert(
-                        EXTERNAL_CONTENT_URI,
-                        ContentValues()
-                    )
+                    val contentResolver = requireContext().contentResolver
+                    uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
                     openCamera.launch(uri)
                 }
                 else -> null
@@ -90,10 +86,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 when (action) {
                     SELECT_PHOTO -> choosePhoto.launch("image/*")
                     TAKE_PHOTO -> {
-                        uri = requireContext().contentResolver.insert(
-                            EXTERNAL_CONTENT_URI,
-                            ContentValues()
-                        )
+                        val contentResolver = requireContext().contentResolver
+                        uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
                         openCamera.launch(uri)
                     }
                 }
@@ -224,7 +218,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
         inputMessage = binding.inputMessage
         txtMessage = binding.txtMessage
         progress = circularProgress()
-        send = resources.getDrawable(R.drawable.ic_send, context.theme)
+        send = getDrawable(R.drawable.ic_send)
 
         val txtEmpty = binding.txtEmpty
         val fabRemove = binding.fabRemove
@@ -276,9 +270,10 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     txtEmpty.isVisible = itemCount == 0
                     if (itemCount != 0) {
                         recyclerMessages.layoutManager?.scrollToPosition(itemCount - 1)
-                        firestore.updateChat(chat.copy(read = chat.read.apply {
+                        val data = chat.copy(read = chat.read.apply {
                             this[args.senderIndex] = true
-                        }))
+                        })
+                        firestore.updateChat(data)
                     }
                 }
             }

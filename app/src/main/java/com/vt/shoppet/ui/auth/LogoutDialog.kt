@@ -9,16 +9,13 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.model.Result
 import com.vt.shoppet.ui.MainActivity
-import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.viewmodel.AuthViewModel
-import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class LogoutDialog : DialogFragment() {
 
     private val auth: AuthViewModel by activityViewModels()
-    private val firestore: FirestoreViewModel by activityViewModels()
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog =
         MaterialAlertDialogBuilder(requireContext())
@@ -28,13 +25,7 @@ class LogoutDialog : DialogFragment() {
                 val activity = requireActivity() as MainActivity
                 auth.instanceId().observe(activity) { result ->
                     when (result) {
-                        is Result.Success -> {
-                            firestore.removeToken(result.data.token)
-                            auth.signOut()
-                            if (auth.isLoggedIn()) showSnackbar(getString(R.string.txt_cannot_log_out))
-                            else activity.restartActivity()
-                        }
-                        is Result.Failure -> showSnackbar(result.exception)
+                        is Result.Success -> activity.signOut(result.data.token)
                     }
                 }
             }

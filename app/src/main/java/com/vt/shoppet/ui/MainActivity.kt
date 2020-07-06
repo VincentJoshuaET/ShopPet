@@ -22,9 +22,11 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
 import com.vt.shoppet.databinding.HeaderMainBinding
 import com.vt.shoppet.util.loadProfileImage
+import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
+import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private val binding by viewBinding(ActivityMainBinding::inflate)
 
     private val auth: AuthViewModel by viewModels()
+    private val firestore: FirestoreViewModel by viewModels()
     private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
 
@@ -104,12 +107,21 @@ class MainActivity : AppCompatActivity() {
         toolbar.menu.clear()
     }
 
-    fun restartActivity() {
-        lifecycleScope.launch(Dispatchers.IO) {
-            auth.deleteInstanceId()
+    fun signOut(token: String) {
+        firestore.removeToken(token)
+        dataViewModel.removeObservers()
+        auth.signOut()
+        if (auth.isLoggedIn()) {
+            showSnackbar(getString(R.string.txt_cannot_log_out))
+            dataViewModel.initFirebaseData()
+            firestore.addToken(token)
+        } else {
+            lifecycleScope.launch(Dispatchers.IO) {
+                auth.deleteInstanceId()
+            }
+            finish()
+            startActivity(Intent(this, MainActivity::class.java))
         }
-        finish()
-        startActivity(Intent(this, MainActivity::class.java))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

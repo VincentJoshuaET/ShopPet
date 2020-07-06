@@ -241,14 +241,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
-        val context = requireContext()
 
         circularProgress = circularProgress()
         toolbar = activity.toolbar
         imageUser = binding.imageUser
         imageUserUpload = binding.imageUserUpload
         fabEdit = binding.fabEdit
-        save = resources.getDrawable(R.drawable.ic_save, context.theme)
+        save = getDrawable(R.drawable.ic_save)
         progress = binding.progress
 
         val txtName = binding.txtName

@@ -66,11 +66,9 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
         progress = circularProgress()
-        btnSave = binding.btnSave as MaterialButton
-        save = resources.getDrawable(R.drawable.ic_save, context.theme)
+        btnSave = binding.btnSave
+        save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
         val txtPrice = binding.txtPrice

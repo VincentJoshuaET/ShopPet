@@ -1,10 +1,7 @@
 package com.vt.shoppet.model
 
-import android.os.Parcelable
 import com.google.firebase.Timestamp
-import kotlinx.android.parcel.Parcelize
 
-@Parcelize
 data class User(
     var uid: String = "",
     var name: String = "",
@@ -16,4 +13,4 @@ data class User(
     var image: String? = null,
     var tokens: MutableList<String> = mutableListOf(),
     var reports: Int = 0
-) : Parcelable
+)

@@ -19,10 +19,7 @@ import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSellBinding
 import com.vt.shoppet.model.Result
-import com.vt.shoppet.util.circularProgress
-import com.vt.shoppet.util.loadImage
-import com.vt.shoppet.util.showSnackbar
-import com.vt.shoppet.util.viewBinding
+import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.LabelerViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
@@ -89,9 +86,9 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         val labels = resources.getStringArray(R.array.labels)
 
         circularProgress = circularProgress()
-        upload = resources.getDrawable(R.drawable.ic_upload, context.theme)
+        upload = getDrawable(R.drawable.ic_upload)
         progress = binding.progress
-        btnUpload = binding.btnUpload as MaterialButton
+        btnUpload = binding.btnUpload
         val txtLabels = binding.txtLabels
         val imagePet = binding.imagePet
 

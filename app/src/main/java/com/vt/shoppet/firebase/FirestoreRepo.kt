@@ -1,5 +1,6 @@
 package com.vt.shoppet.firebase
 
+import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.Query
@@ -18,9 +19,9 @@ interface FirestoreRepo {
 
     suspend fun getUserSnapshot(uid: String): DocumentSnapshot
 
-    suspend fun addToken(token: String): Void?
+    fun addToken(token: String): Task<Void>
 
-    suspend fun removeToken(token: String): Void?
+    fun removeToken(token: String): Task<Void>
 
     suspend fun getReport(uid: String, currentUid: String): DocumentSnapshot
 

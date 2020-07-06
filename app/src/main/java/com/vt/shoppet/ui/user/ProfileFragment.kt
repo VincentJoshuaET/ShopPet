@@ -1,5 +1,6 @@
 package com.vt.shoppet.ui.user
 
+import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -9,6 +10,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentProfileBinding
@@ -37,14 +39,83 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val storage: StorageViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
+    private lateinit var toolbar: MaterialToolbar
+    private lateinit var progress: Animatable
+    private lateinit var report: Drawable
+
+    private fun reportUser(uid: String, currentUid: String) =
+        firestore.reportUser(uid, currentUid).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    toolbar.menu.getItem(0).icon = progress as Drawable
+                }
+                is Result.Success -> {
+                    toolbar.menu.getItem(0).icon = report
+                    progress.stop()
+                    showSnackbar(getString(R.string.txt_reported_user))
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    toolbar.menu.getItem(0).icon = report
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun addReport(uid: String, currentUid: String) =
+        firestore.addReport(uid).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> {
+                    progress.start()
+                    toolbar.menu.getItem(0).icon = progress as Drawable
+                }
+                is Result.Success -> reportUser(uid, currentUid)
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    toolbar.menu.getItem(0).icon = report
+                    progress.stop()
+                }
+            }
+        }
+
+    private fun dialog(uid: String, currentUid: String) =
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle(R.string.title_report_user)
+            .setMessage(R.string.txt_report_user)
+            .setPositiveButton(R.string.btn_confirm) { _, _ ->
+                addReport(uid, currentUid)
+            }
+            .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
+                dialog.dismiss()
+            }
+            .create()
+
+    private fun getReport(uid: String, currentUid: String) =
+        firestore.getReport(uid, currentUid).observe(viewLifecycleOwner) { result ->
+            when (result) {
+                is Result.Loading -> toolbar.menu.getItem(0).icon = progress as Drawable
+                is Result.Success -> {
+                    if (result.data.exists()) {
+                        showSnackbar(getString(R.string.txt_user_already_reported))
+                        toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
+                    } else dialog(uid, currentUid).show()
+                }
+                is Result.Failure -> {
+                    showSnackbar(result.exception)
+                    toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
+                }
+            }
+        }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
-        val toolbar = activity.toolbar
 
-        val context = requireContext()
-        val progress = circularProgress()
+        toolbar = activity.toolbar
+        progress = circularProgress()
+        report = getDrawable(R.drawable.ic_report)
 
         val currentUid = auth.uid()
         val email = auth.email()
@@ -60,29 +131,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val txtDateOfBirthTitle = binding.txtDateOfBirthTitle
         val txtDateOfBirth = binding.txtDateOfBirth
 
-        val report = resources.getDrawable(R.drawable.ic_report, context.theme)
-
         val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-
-        fun reportUser(uid: String, currentUid: String) =
-            firestore.reportUser(uid, currentUid).observe(viewLifecycleOwner) { result ->
-                when (result) {
-                    is Result.Loading -> {
-                        progress.start()
-                        toolbar.menu.getItem(0).icon = progress as Drawable
-                    }
-                    is Result.Success -> {
-                        toolbar.menu.getItem(0).icon = report
-                        progress.stop()
-                        showSnackbar(getString(R.string.txt_reported_user))
-                    }
-                    is Result.Failure -> {
-                        showSnackbar(result.exception)
-                        toolbar.menu.getItem(0).icon = report
-                        progress.stop()
-                    }
-                }
-            }
 
         fun setProfile(user: User) {
             val uid = user.uid
@@ -107,31 +156,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 loadProfileImage(imageUser, storage.getUserPhoto(image))
             } else imageUser.setImageResource(R.drawable.ic_person)
 
-            val dialog =
-                MaterialAlertDialogBuilder(context)
-                    .setTitle(R.string.title_report_user)
-                    .setMessage(R.string.txt_report_user)
-                    .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                        firestore.addReport(uid).observe(viewLifecycleOwner) { result ->
-                            when (result) {
-                                is Result.Loading -> {
-                                    progress.start()
-                                    toolbar.menu.getItem(0).icon = progress as Drawable
-                                }
-                                is Result.Success -> reportUser(uid, currentUid)
-                                is Result.Failure -> {
-                                    showSnackbar(result.exception)
-                                    toolbar.menu.getItem(0).icon = report
-                                    progress.stop()
-                                }
-                            }
-                        }
-                    }
-                    .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
-                        dialog.dismiss()
-                    }
-                    .create()
-
             toolbar.setOnMenuItemClickListener { item ->
                 when (item.itemId) {
                     R.id.item_edit -> {
@@ -139,22 +163,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                         return@setOnMenuItemClickListener true
                     }
                     R.id.item_report -> {
-                        firestore.getReport(uid, currentUid).observe(viewLifecycleOwner) { result ->
-                            when (result) {
-                                is Result.Loading -> item.icon = progress as Drawable
-                                is Result.Success -> {
-                                    if (result.data.exists()) {
-                                        showSnackbar(getString(R.string.txt_user_already_reported))
-                                        item.setIcon(R.drawable.ic_report)
-                                    } else dialog.show()
-                                }
-                                is Result.Failure -> {
-                                    showSnackbar(result.exception)
-                                    item.setIcon(R.drawable.ic_report)
-                                }
-                            }
-                        }
-
+                        getReport(uid, currentUid)
                         return@setOnMenuItemClickListener true
                     }
                     else -> return@setOnMenuItemClickListener false
