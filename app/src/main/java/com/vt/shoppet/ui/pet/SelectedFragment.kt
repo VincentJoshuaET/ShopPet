@@ -326,6 +326,12 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val types = resources.getStringArray(R.array.type)
 
+        val handle = findNavController().currentBackStackEntry?.savedStateHandle
+        handle?.getLiveData<Boolean>("edited")?.observe(viewLifecycleOwner) { edited ->
+            if (edited) showSnackbar(getString(R.string.txt_pet_updated))
+            handle.remove<Boolean>("edited")
+        }
+
         dataViewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
             binding.root.transitionName = pet.id
             layoutCatsDogs.isVisible = pet.type == types[1] || pet.type == types[2]
@@ -370,6 +376,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
             btnEdit.setOnClickListener {
                 btnGroup.clearChecked()
+                findNavController().navigate(R.id.action_selected_to_edit_pet)
             }
         }
     }

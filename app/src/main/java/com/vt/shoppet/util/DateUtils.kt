@@ -21,7 +21,23 @@ fun Timestamp.calculateAge(): String {
         years >= 1 -> if (years == 1) "$years year old" else "$years years old"
         months >= 1 -> if (months == 1) "$months month old" else "$months months old"
         weeks >= 1 -> if (weeks == 1) "$weeks week old" else "$weeks weeks old"
-        else -> if (days == 1) "$days yea old" else "$days days old"
+        else -> if (days == 1) "$days day old" else "$days days old"
+    }
+}
+
+fun Timestamp.calculateEditableAge(): Pair<String, String> {
+    val instant = Instant.ofEpochSecond(seconds)
+    val seconds = Duration.between(instant, Instant.now()).seconds
+    val days = (seconds / 60 / 60 / 24).toInt()
+    val weeks = days / 7
+    val months = weeks / 4
+    val years = months / 12
+
+    return when {
+        years >= 1 -> Pair(years.toString(), if (years == 1) "year" else "years")
+        months >= 1 -> Pair(months.toString(), if (months == 1) "month" else "months")
+        weeks >= 1 -> Pair(weeks.toString(), if (weeks == 1) "week" else "weeks")
+        else -> Pair(days.toString(), if (days == 1) "day" else "days")
     }
 }
 

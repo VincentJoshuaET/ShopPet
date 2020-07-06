@@ -101,6 +101,7 @@
     <string name="txt_remove_image">Are you sure you want to remove your photo?</string>
     <string name="txt_profile_updated">User profile updated!</string>
     <string name="txt_empty_message">Enter message!</string>
+    <string name="txt_pet_updated">Pet details updated!</string>
 
     <string name="lbl_all_fields_required">*All fields are required</string>
     <string name="lbl_sign_up">Sign Up To</string>

@@ -168,12 +168,21 @@
                 android:name="id"
                 app:argType="string" />
             <action
+                android:id="@+id/action_selected_to_edit_pet"
+                app:destination="@id/fragment_edit_pet" />
+            <action
                 android:id="@+id/action_selected_to_profile"
                 app:destination="@id/fragment_profile" />
             <action
                 android:id="@+id/action_selected_to_conversation"
                 app:destination="@id/fragment_conversation" />
         </fragment>
+
+        <fragment
+            android:id="@+id/fragment_edit_pet"
+            android:name="com.vt.shoppet.ui.pet.EditPetFragment"
+            android:label="Edit Pet"
+            tools:layout="@layout/fragment_edit_pet" />
 
         <fragment
             android:id="@+id/fragment_profile"

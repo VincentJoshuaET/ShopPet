@@ -147,6 +147,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.fragment_camera -> setupToolbar()
                 R.id.fragment_sell -> setupToolbar()
                 R.id.fragment_selected -> setupToolbar()
+                R.id.fragment_edit_pet -> setupToolbar()
                 R.id.fragment_edit_profile -> {
                     setupToolbar()
                     toolbar.inflateMenu(R.menu.menu_edit_profile)
