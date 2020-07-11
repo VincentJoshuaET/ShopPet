@@ -9,7 +9,7 @@ plugins {
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.0"
+    buildToolsVersion = "30.0.1"
     ndkVersion = "21.3.6528147"
 
     defaultConfig {
@@ -86,10 +86,10 @@ dependencies {
     implementation("androidx.camera:camera-view:1.0.0-alpha13")
 
     // Firebase
-    implementation("com.google.firebase:firebase-auth-ktx:19.3.1")
-    implementation("com.google.firebase:firebase-core:17.4.3")
-    implementation("com.google.firebase:firebase-firestore-ktx:21.4.3")
-    implementation("com.google.firebase:firebase-messaging:20.2.1")
+    implementation("com.google.firebase:firebase-auth-ktx:19.3.2")
+    implementation("com.google.firebase:firebase-core:17.4.4")
+    implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
+    implementation("com.google.firebase:firebase-messaging:20.2.3")
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
     // Firebase-UI
