@@ -63,7 +63,9 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                     }
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        uploadImage(uri)
+                    }
                     btnUpload.isClickable = true
                     btnUpload.icon = upload
                     circularProgress.stop()

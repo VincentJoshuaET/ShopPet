@@ -148,7 +148,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             txtLocation.text = user.location
             txtSex.text = user.sex
             val dateOfBirth =
-                LocalDateTime.ofInstant(Instant.ofEpochSecond(user.dateOfBirth.seconds), zone)
+                LocalDateTime.ofInstant(
+                    Instant.ofEpochSecond(user.dateOfBirth.seconds),
+                    localZoneId
+                )
             txtDateOfBirth.text = dateTimeFormatter.format(dateOfBirth)
 
             val image = user.image

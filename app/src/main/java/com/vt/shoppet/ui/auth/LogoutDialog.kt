@@ -24,9 +24,7 @@ class LogoutDialog : DialogFragment() {
             .setPositiveButton(R.string.btn_confirm) { _, _ ->
                 val activity = requireActivity() as MainActivity
                 auth.instanceId().observe(activity) { result ->
-                    when (result) {
-                        is Result.Success -> activity.signOut(result.data.token)
-                    }
+                    if (result is Result.Success) activity.signOut(result.data.token)
                 }
             }
             .setNegativeButton(R.string.btn_no) { dialog, _ ->

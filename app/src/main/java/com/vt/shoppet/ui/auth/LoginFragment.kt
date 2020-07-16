@@ -37,7 +37,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var progress: Animatable
     private lateinit var btnLogin: MaterialButton
 
-    private fun instanceId() =
+    private fun instanceId() {
         auth.instanceId().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -53,7 +53,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     findNavController().navigate(R.id.action_auth_to_home)
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        instanceId()
+                    }
                     auth.signOut()
                     btnLogin.isClickable = true
                     btnLogin.icon = null
@@ -61,6 +63,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 }
             }
         }
+    }
 
     private fun disclaimer(): AlertDialog =
         MaterialAlertDialogBuilder(requireContext())
@@ -78,7 +81,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }
             .create()
 
-    private fun verifyEmail() =
+    private fun verifyEmail() {
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -94,7 +97,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     progress.stop()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        verifyEmail()
+                    }
                     auth.signOut()
                     btnLogin.isClickable = true
                     btnLogin.icon = null
@@ -102,6 +107,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 }
             }
         }
+    }
 
     private fun unverified(): AlertDialog =
         MaterialAlertDialogBuilder(requireContext())
@@ -119,7 +125,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             }
             .create()
 
-    private fun signIn(email: String, password: String) =
+    private fun signIn(email: String, password: String) {
         auth.signIn(email, password).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -132,13 +138,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                     else unverified().show()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        signIn(email, password)
+                    }
                     btnLogin.isClickable = true
                     btnLogin.icon = null
                     progress.stop()
                 }
             }
         }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

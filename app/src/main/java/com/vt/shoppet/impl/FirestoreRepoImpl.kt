@@ -18,6 +18,7 @@ class FirestoreRepoImpl @Inject constructor(
     private val auth: AuthRepo,
     private val firestore: FirebaseFirestore
 ) : FirestoreRepo {
+
     override suspend fun checkUsername(username: String): QuerySnapshot =
         firestore.collection("users").whereEqualTo("username", username).get().await()
 
@@ -123,4 +124,5 @@ class FirestoreRepoImpl @Inject constructor(
     override suspend fun sendMessage(chat: Chat, message: Message): Void? =
         firestore.collection("chats").document(chat.id).collection("messages").document()
             .set(message).await()
+
 }

@@ -3,7 +3,6 @@ package com.vt.shoppet.ui.pet
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -18,6 +17,7 @@ import com.vt.shoppet.databinding.FragmentStarredBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.loadFirebaseImage
+import com.vt.shoppet.util.setOnLayoutChangeListener
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
@@ -34,21 +34,18 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
-        view.doOnPreDraw { startPostponedEnterTransition() }
 
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.run {
-            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
-                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
-                remove<Boolean>("removed")
-            }
-            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
-                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
-                remove<Boolean>("sold")
-            }
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        savedStateHandle?.getLiveData<Boolean>("removed")?.observe(viewLifecycleOwner) { removed ->
+            if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+            savedStateHandle.remove<Boolean>("removed")
+        }
+        savedStateHandle?.getLiveData<Boolean>("sold")?.observe(viewLifecycleOwner) { sold ->
+            if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+            savedStateHandle.remove<Boolean>("sold")
         }
 
         val adapter = PetAdapter().apply {
@@ -73,9 +70,7 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
-            addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
-                if (top < oldTop) smoothScrollToPosition(oldTop)
-            }
+            setOnLayoutChangeListener()
             setAdapter(adapter)
         }
 

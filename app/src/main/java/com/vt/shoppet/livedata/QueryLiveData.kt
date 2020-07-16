@@ -14,7 +14,7 @@ class QueryLiveData(private val query: Query) :
         value = when {
             snapshot != null -> Result.Success(snapshot)
             exception != null -> Result.Failure(exception)
-            else -> Result.Loading()
+            else -> Result.Loading
         }
     }
 

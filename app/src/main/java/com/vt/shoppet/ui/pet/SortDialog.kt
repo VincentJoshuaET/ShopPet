@@ -26,6 +26,8 @@ class SortDialog : DialogFragment() {
         val fieldAdapter = getArrayAdapter(resources.getStringArray(R.array.field))
         val orderAdapter = getArrayAdapter(resources.getStringArray(R.array.order))
 
+        val savedStateHandle = findNavController().previousBackStackEntry?.savedStateHandle
+
         txtField.setAdapter(fieldAdapter)
         txtOrder.setAdapter(orderAdapter)
 
@@ -43,8 +45,7 @@ class SortDialog : DialogFragment() {
                     filter.field = "Upload Date"
                     filter.order = "Descending"
                     viewModel.filterPets()
-                    findNavController().previousBackStackEntry
-                        ?.savedStateHandle?.set("filter", true)
+                    savedStateHandle?.set("filter", true)
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
@@ -53,8 +54,7 @@ class SortDialog : DialogFragment() {
                     filter.field = txtField.text.toString()
                     filter.order = txtOrder.text.toString()
                     viewModel.filterPets()
-                    findNavController().previousBackStackEntry
-                        ?.savedStateHandle?.set("filter", true)
+                    savedStateHandle?.set("filter", true)
                 }
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->

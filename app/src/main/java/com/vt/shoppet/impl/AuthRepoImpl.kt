@@ -14,6 +14,7 @@ class AuthRepoImpl @Inject constructor(
     private val auth: FirebaseAuth,
     private val instanceId: FirebaseInstanceId
 ) : AuthRepo {
+
     override suspend fun signIn(email: String, password: String): AuthResult =
         auth.signInWithEmailAndPassword(email, password).await()
 
@@ -40,4 +41,5 @@ class AuthRepoImpl @Inject constructor(
     override fun uid() = auth.uid as String
 
     override fun deleteInstanceId() = instanceId.deleteInstanceId()
+
 }

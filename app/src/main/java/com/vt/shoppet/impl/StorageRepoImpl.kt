@@ -10,6 +10,7 @@ import javax.inject.Singleton
 
 @Singleton
 class StorageRepoImpl @Inject constructor(private val storage: FirebaseStorage) : StorageRepo {
+
     override fun getUserPhoto(id: String) = storage.reference.child("users/$id.jpg")
 
     override fun getPetPhoto(id: String) = storage.reference.child("pets/$id.jpg")
@@ -30,4 +31,5 @@ class StorageRepoImpl @Inject constructor(private val storage: FirebaseStorage) 
 
     override suspend fun removeUserPhoto(id: String): Void? =
         storage.reference.child("users/$id.jpg").delete().await()
+
 }

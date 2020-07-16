@@ -41,7 +41,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     private lateinit var save: Drawable
     private lateinit var btnSave: MaterialButton
 
-    private fun updatePet(pet: Pet) =
+    private fun updatePet(pet: Pet) {
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -56,15 +56,18 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                     findNavController().navigate(action)
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        updatePet(pet)
+                    }
                     btnSave.isClickable = true
                     btnSave.icon = save
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun addPet(pet: Pet) =
+    private fun addPet(pet: Pet) {
         firestore.addPet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -74,13 +77,16 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 }
                 is Result.Success -> updatePet(pet.copy(id = result.data.id))
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        addPet(pet)
+                    }
                     btnSave.isClickable = true
                     btnSave.icon = save
                     progress.stop()
                 }
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -259,13 +265,14 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
             if (fail) return@setOnClickListener
 
-            val now = LocalDateTime.now()
-
             val instant = when (unit) {
-                units[0] -> now.minusDays(age.toLong()).atZone(zone).toInstant()
-                units[1] -> now.minusWeeks(age.toLong()).atZone(zone).toInstant()
-                units[2] -> now.minusMonths(age.toLong()).atZone(zone).toInstant()
-                else -> now.minusYears(age.toLong()).atZone(zone).toInstant()
+                units[0] -> LocalDateTime.now().minusDays(age.toLong()).atZone(localZoneId)
+                    .toInstant()
+                units[1] -> LocalDateTime.now().minusWeeks(age.toLong()).atZone(localZoneId)
+                    .toInstant()
+                units[2] -> LocalDateTime.now().minusMonths(age.toLong()).atZone(localZoneId)
+                    .toInstant()
+                else -> LocalDateTime.now().minusYears(age.toLong()).atZone(localZoneId).toInstant()
             }
 
             val dateOfBirth = Timestamp(instant.epochSecond, instant.nano)

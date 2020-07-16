@@ -46,6 +46,7 @@
     <string name="btn_agree">I Agree</string>
     <string name="btn_cancel">Cancel</string>
     <string name="btn_resend">Resend</string>
+    <string name="btn_retry">Retry</string>
     <string name="btn_no">No</string>
     <string name="btn_ok">OK</string>
     <string name="btn_yes">Yes</string>

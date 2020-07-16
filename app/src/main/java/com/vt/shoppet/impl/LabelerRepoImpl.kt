@@ -10,6 +10,8 @@ import javax.inject.Singleton
 
 @Singleton
 class LabelerRepoImpl @Inject constructor(private val labeler: ImageLabeler) : LabelerRepo {
+
     override suspend fun process(image: InputImage): List<ImageLabel> =
         labeler.process(image).await()
+
 }

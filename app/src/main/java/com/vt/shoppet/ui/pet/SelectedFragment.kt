@@ -4,6 +4,7 @@ import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
+import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isGone
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -64,19 +65,22 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             text = getString(R.string.lbl_unstarred)
         }
 
-    private fun removePetPhoto(id: String) =
+    private fun removePetPhoto(id: String) {
         storage.removePetPhoto(id).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> findNavController().run {
                     previousBackStackEntry?.savedStateHandle?.set("removed", true)
                     popBackStack()
                 }
-                is Result.Failure -> showSnackbar(result.exception)
+                is Result.Failure -> showActionSnackbar(result.exception) {
+                    removePetPhoto(id)
+                }
             }
         }
+    }
 
-    private fun soldDialog(id: String) =
-        MaterialAlertDialogBuilder(requireContext())
+    private fun soldDialog(id: String): AlertDialog {
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_mark_as_sold)
             .setMessage(R.string.txt_mark_pet_sold)
             .setPositiveButton(R.string.btn_no) { dialog, _ ->
@@ -95,7 +99,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                             popBackStack()
                         }
                         is Result.Failure -> {
-                            showSnackbar(result.exception)
+                            showActionSnackbar(result.exception) {
+                                soldDialog(id).show()
+                            }
                             fabChatSold.setImageDrawable(chat)
                             fabChatSold.isClickable = true
                             progress.stop()
@@ -104,9 +110,10 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 }
             }
             .create()
+    }
 
-    private fun removeDialog(id: String, image: String) =
-        MaterialAlertDialogBuilder(requireContext())
+    private fun removeDialog(id: String, image: String): AlertDialog {
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_remove)
             .setMessage(R.string.txt_remove_pet)
             .setPositiveButton(R.string.btn_no) { dialog, _ ->
@@ -116,13 +123,16 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 firestore.removePet(id).observe(viewLifecycleOwner) { result ->
                     when (result) {
                         is Result.Success -> removePetPhoto(image)
-                        is Result.Failure -> showSnackbar(result.exception)
+                        is Result.Failure -> showActionSnackbar(result.exception) {
+                            removeDialog(id, image).show()
+                        }
                     }
                 }
             }
             .create()
+    }
 
-    private fun checkStarredPet(id: String) =
+    private fun checkStarredPet(id: String) {
         firestore.checkStarredPet(id).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -142,25 +152,32 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     }
                 }
                 is Result.Failure -> {
+                    showActionSnackbar(result.exception) {
+                        checkStarredPet(id)
+                    }
                     btnStar.isClickable = false
                     progress.stop()
                     unstarPetButton()
                 }
             }
         }
+    }
 
-    private fun createChat(chat: Chat) =
+    private fun createChat(chat: Chat) {
         firestore.createChat(chat).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
                     dataViewModel.setChat(chat)
                     findNavController().navigate(R.id.action_selected_to_conversation)
                 }
-                is Result.Failure -> showSnackbar(result.exception)
+                is Result.Failure -> showActionSnackbar(result.exception) {
+                    createChat(chat)
+                }
             }
         }
+    }
 
-    private fun checkChat(pet: Pet, user: User) =
+    private fun checkChat(pet: Pet, user: User) {
         firestore.checkChat(user.uid, pet.uid).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -192,15 +209,18 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     }
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        checkChat(pet, user)
+                    }
                     fabChatSold.setImageDrawable(chat)
                     fabChatSold.isClickable = true
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun getUser(pet: Pet, user: User) =
+    private fun getUser(pet: Pet, user: User) {
         firestore.getUserSnapshot(pet.uid).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Success -> {
@@ -224,11 +244,17 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         findNavController().navigate(action)
                     }
                 }
-                is Result.Failure -> imageSeller.setImageResource(R.drawable.ic_person)
+                is Result.Failure -> {
+                    showActionSnackbar(result.exception) {
+                        getUser(pet, user)
+                    }
+                    imageSeller.setImageResource(R.drawable.ic_person)
+                }
             }
         }
+    }
 
-    private fun starPet(pet: Pet) =
+    private fun starPet(pet: Pet) {
         firestore.starPet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -244,15 +270,18 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     progress.stop()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        starPet(pet)
+                    }
                     starred = false
                     unstarPetButton()
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun unstarPet(id: String) =
+    private fun unstarPet(id: String) {
         firestore.unstarPet(id).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -268,13 +297,16 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     progress.stop()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        unstarPet(id)
+                    }
                     starred = true
                     starPetButton()
                     progress.stop()
                 }
             }
         }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -324,10 +356,10 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val types = resources.getStringArray(R.array.type)
 
-        val handle = findNavController().currentBackStackEntry?.savedStateHandle
-        handle?.getLiveData<Boolean>("edited")?.observe(viewLifecycleOwner) { edited ->
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
+        savedStateHandle?.getLiveData<Boolean>("edited")?.observe(viewLifecycleOwner) { edited ->
             if (edited) showSnackbar(getString(R.string.txt_pet_updated))
-            handle.remove<Boolean>("edited")
+            savedStateHandle.remove<Boolean>("edited")
         }
 
         dataViewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->

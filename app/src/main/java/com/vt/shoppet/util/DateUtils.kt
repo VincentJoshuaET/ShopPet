@@ -1,5 +1,6 @@
 package com.vt.shoppet.util
 
+import com.google.android.material.datepicker.CalendarConstraints
 import com.google.firebase.Timestamp
 import java.time.Duration
 import java.time.Instant
@@ -7,7 +8,9 @@ import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 
-val zone: ZoneId = ZoneId.of("Asia/Manila")
+val localZoneId: ZoneId = ZoneId.of("Asia/Manila")
+val dateOfBirthFormatter: DateTimeFormatter =
+    DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(localZoneId)
 
 fun Timestamp.calculateAge(): String {
     val instant = Instant.ofEpochSecond(seconds)
@@ -70,7 +73,7 @@ private fun Timestamp.calculateDate(
     longDateFormat: DateTimeFormatter
 ): String {
     val instant = Instant.ofEpochSecond(seconds)
-    val date = LocalDateTime.ofInstant(instant, zone)
+    val date = LocalDateTime.ofInstant(instant, localZoneId)
     val seconds = Duration.between(date, LocalDateTime.now()).seconds
     val minutes = (seconds / 60).toInt()
     val hours = minutes / 60
@@ -101,3 +104,9 @@ fun Timestamp.calculateMessageDate(): String {
 
     return calculateDate(timeFormat, shortDateFormat, longDateFormat)
 }
+
+fun setCalendarConstraints(date: Long) =
+    CalendarConstraints.Builder()
+        .setOpenAt(date)
+        .setEnd(LocalDateTime.now().minusYears(18).atZone(localZoneId).toInstant().toEpochMilli())
+        .build()

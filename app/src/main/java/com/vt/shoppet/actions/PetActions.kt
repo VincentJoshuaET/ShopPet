@@ -6,5 +6,5 @@ import com.vt.shoppet.model.Pet
 
 interface PetActions {
     fun onClick(pet: Pet, view: View): View.OnClickListener
-    fun setImage(id: String, imageView: ImageView)
+    fun setImage(id: String, imageView: ImageView): Any
 }

@@ -16,7 +16,7 @@ class LabelerViewModel @ViewModelInject constructor(
 
     fun process(image: InputImage): LiveData<Result<List<ImageLabel>>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(labeler.process(image)))
             } catch (e: Exception) {

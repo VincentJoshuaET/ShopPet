@@ -31,15 +31,15 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     inner class ImageSavedCallback(private val cameraProvider: ProcessCameraProvider) :
         ImageCapture.OnImageSavedCallback {
+
         override fun onImageSaved(results: ImageCapture.OutputFileResults) {
             cameraProvider.unbindAll()
             val action = CameraFragmentDirections.actionCameraToSell(results.savedUri.toString())
             findNavController().navigate(action)
         }
 
-        override fun onError(exception: ImageCaptureException) {
+        override fun onError(exception: ImageCaptureException) =
             showSnackbar(exception)
-        }
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

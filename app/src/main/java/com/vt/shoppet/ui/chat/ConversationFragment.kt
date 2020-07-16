@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
@@ -70,7 +71,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     private fun checkPermissions() =
         if (checkSelfPermissions()) {
             when (action) {
-                SELECT_PHOTO -> choosePhoto.launch("image/*")
+                SELECT_PHOTO -> selectPhoto.launch("image/*")
                 TAKE_PHOTO -> {
                     val contentResolver = requireContext().contentResolver
                     uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
@@ -80,21 +81,25 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             }
         } else requestPermissions.launch(permissions)
 
-    private val requestPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            if (permissions.checkAllPermissions()) {
+    private val requestPermissions: ActivityResultLauncher<Array<String>>
+        get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (it.checkAllPermissions()) {
                 when (action) {
-                    SELECT_PHOTO -> choosePhoto.launch("image/*")
+                    SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> {
                         val contentResolver = requireContext().contentResolver
                         uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
                         openCamera.launch(uri)
                     }
                 }
-            } else showSnackbar(getString(R.string.txt_permission_denied))
+            } else {
+                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                    requestPermissions.launch(permissions)
+                }
+            }
         }
 
-    private val choosePhoto =
+    private val selectPhoto =
         registerForActivityResult(ActivityResultContracts.GetContent()) {
             if (it != null) {
                 uri = it
@@ -122,7 +127,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
         recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
-    private fun sendChat(chat: Chat) =
+    private fun sendChat(chat: Chat) {
         firestore.updateChat(chat).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -137,15 +142,18 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     progress.stop()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        sendChat(chat)
+                    }
                     txtMessage.isEnabled = true
                     inputMessage.endIconDrawable = send
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun sendTextMessage(chat: Chat, message: Message) =
+    private fun sendTextMessage(chat: Chat, message: Message) {
         firestore.sendMessage(chat, message).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -165,15 +173,18 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     sendChat(data)
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        sendTextMessage(chat, message)
+                    }
                     txtMessage.isEnabled = true
                     inputMessage.endIconDrawable = send
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun uploadMessagePhoto(chat: Chat, text: String, image: String) =
+    private fun uploadMessagePhoto(chat: Chat, text: String, image: String) {
         storage.uploadMessagePhoto(image, uri).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -198,13 +209,16 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     sendTextMessage(chat, message)
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        uploadMessagePhoto(chat, text, image)
+                    }
                     txtMessage.isEnabled = true
                     inputMessage.endIconDrawable = send
                     progress.stop()
                 }
             }
         }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -270,17 +284,18 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     txtEmpty.isVisible = itemCount == 0
                     if (itemCount != 0) {
                         recyclerMessages.layoutManager?.scrollToPosition(itemCount - 1)
-                        val data = chat.copy(read = chat.read.apply {
-                            this[args.senderIndex] = true
-                        })
+                        val data = chat.copy(
+                            read = chat.read.apply {
+                                this[args.senderIndex] = true
+                            }
+                        )
                         firestore.updateChat(data)
                     }
                 }
             }
             adapter.setActions(object : MessageActions {
-                override fun setImage(id: String, imageView: ImageView) {
+                override fun setImage(id: String, imageView: ImageView) =
                     loadFirebaseImage(imageView, storage.getMessagePhoto(id))
-                }
             })
 
             recyclerMessages.apply {

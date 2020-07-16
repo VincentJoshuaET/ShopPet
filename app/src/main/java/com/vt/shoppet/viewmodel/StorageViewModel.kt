@@ -22,7 +22,7 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun uploadPetPhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(storage.uploadPetPhoto(id, uri)))
             } catch (e: Exception) {
@@ -32,7 +32,7 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun uploadUserPhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(storage.uploadUserPhoto(id, uri)))
             } catch (e: Exception) {
@@ -42,7 +42,7 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun uploadMessagePhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(storage.uploadMessagePhoto(id, uri)))
             } catch (e: Exception) {
@@ -52,7 +52,7 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun removePetPhoto(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(storage.removePetPhoto(id)))
             } catch (e: Exception) {
@@ -62,7 +62,7 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun removeUserPhoto(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(storage.removeUserPhoto(id)))
             } catch (e: Exception) {

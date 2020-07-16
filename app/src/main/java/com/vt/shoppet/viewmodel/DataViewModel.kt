@@ -10,7 +10,7 @@ import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.livedata.DocumentLiveData
 import com.vt.shoppet.livedata.QueryLiveData
 import com.vt.shoppet.model.*
-import com.vt.shoppet.util.zone
+import com.vt.shoppet.util.localZoneId
 import java.time.Instant
 import java.time.LocalDateTime
 
@@ -59,27 +59,27 @@ class DataViewModel @ViewModelInject constructor(
             val now = LocalDateTime.now()
 
             val fromInstant = when (filter.age) {
-                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(zone)
+                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(zone)
+                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(zone)
+                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(zone)
+                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(localZoneId)
                     .toInstant()
-                else -> now.atZone(zone).toInstant()
+                else -> now.atZone(localZoneId).toInstant()
             }
 
             val toInstant = when (filter.age) {
-                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(zone)
+                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(zone)
+                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(zone)
+                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(localZoneId)
                     .toInstant()
-                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(zone)
+                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(localZoneId)
                     .toInstant()
-                else -> now.atZone(zone).toInstant()
+                else -> now.atZone(localZoneId).toInstant()
             }
 
             val ageList =
@@ -144,42 +144,37 @@ class DataViewModel @ViewModelInject constructor(
         starredPetsLiveData?.removeObservers(ProcessLifecycleOwner.get())
         ownPetsLiveData?.removeObservers(ProcessLifecycleOwner.get())
         chatsLiveData?.removeObservers(ProcessLifecycleOwner.get())
+        userLiveData = null
+        petsLiveData = null
+        starredPetsLiveData = null
+        ownPetsLiveData = null
+        chatsLiveData = null
     }
 
     fun initFirebaseData() {
         userLiveData = DocumentLiveData(firestore.getUserReference(auth.uid()))
         userLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> currentUser.value = result.data.toObject()
-            }
+            if (result is Result.Success) currentUser.value = result.data.toObject()
         }
 
         petsLiveData = QueryLiveData(firestore.getPets())
         petsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> pets.value = result.data.toObjects()
-            }
+            if (result is Result.Success) pets.value = result.data.toObjects()
         }
 
         starredPetsLiveData = QueryLiveData(firestore.getStarredPets())
         starredPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> starredPets.value = result.data.toObjects()
-            }
+            if (result is Result.Success) starredPets.value = result.data.toObjects()
         }
 
         ownPetsLiveData = QueryLiveData(firestore.getOwnPets())
         ownPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> ownPets.value = result.data.toObjects()
-            }
+            if (result is Result.Success) ownPets.value = result.data.toObjects()
         }
 
         chatsLiveData = QueryLiveData(firestore.getChats())
         chatsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> chats.value = result.data.toObjects()
-            }
+            if (result is Result.Success) chats.value = result.data.toObjects()
         }
 
         handle.set("initFirebaseData", true)

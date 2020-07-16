@@ -3,11 +3,13 @@ package com.vt.shoppet.ui.pet
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.core.view.doOnPreDraw
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -48,14 +50,18 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
         } else requestPermissions.launch(permissions)
 
-    private val requestPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            if (permissions.checkAllPermissions()) {
+    private val requestPermissions: ActivityResultLauncher<Array<String>>
+        get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (it.checkAllPermissions()) {
                 when (action) {
                     SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> findNavController().navigate(R.id.action_shop_to_camera)
                 }
-            } else showSnackbar(getString(R.string.txt_permission_denied))
+            } else {
+                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                    requestPermissions.launch(permissions)
+                }
+            }
         }
 
     private val selectPhoto =
@@ -68,8 +74,6 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        postponeEnterTransition()
-        view.doOnPreDraw { startPostponedEnterTransition() }
 
         val context = requireContext()
         val activity = requireActivity() as MainActivity
@@ -96,17 +100,14 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                         findNavController().navigate(action, extras)
                     }
 
-                override fun setImage(id: String, imageView: ImageView) {
+                override fun setImage(id: String, imageView: ImageView) =
                     loadFirebaseImage(imageView, storage.getPetPhoto(id))
-                }
             })
         }
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
-            addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
-                if (top < oldTop) smoothScrollToPosition(oldTop)
-            }
+            setOnLayoutChangeListener()
             setAdapter(adapter)
         }
 
@@ -130,7 +131,9 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                 }
                 .create()
 
-        findNavController().currentBackStackEntry?.savedStateHandle?.run {
+        val navBackStackEntry = findNavController().currentBackStackEntry
+        val savedStateHandle = navBackStackEntry?.savedStateHandle
+        savedStateHandle?.run {
             getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
                 if (removed) showSnackbar(getString(R.string.txt_removed_pet))
                 remove<Boolean>("removed")
@@ -139,16 +142,29 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                 if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
                 remove<Boolean>("sold")
             }
-            getLiveData<Boolean>("filter").observe(viewLifecycleOwner) { filter ->
+        }
+
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                val filter =
+                    savedStateHandle?.get<Boolean>("filter") ?: return@LifecycleEventObserver
                 if (filter) {
                     dataViewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
                         adapter.submitList(filtered)
                         txtEmpty.isVisible = filtered.isEmpty()
                     }
                 }
-                remove<Boolean>("filter")
+                savedStateHandle.remove<Boolean>("filter")
             }
         }
+
+        navBackStackEntry?.lifecycle?.addObserver(observer)
+
+        viewLifecycleOwner.lifecycle.addObserver(LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_DESTROY) {
+                navBackStackEntry?.lifecycle?.removeObserver(observer)
+            }
+        })
 
         dataViewModel.getFilter().observe(viewLifecycleOwner) { filter ->
             if (filter.enabled) {

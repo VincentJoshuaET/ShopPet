@@ -36,7 +36,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
     private lateinit var save: Drawable
     private lateinit var btnSave: MaterialButton
 
-    private fun updatePet(pet: Pet) =
+    private fun updatePet(pet: Pet) {
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -48,19 +48,23 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                     btnSave.icon = save
                     progress.stop()
                     dataViewModel.setCurrentPet(pet)
-                    findNavController().run {
-                        previousBackStackEntry?.savedStateHandle?.set("edited", true)
-                        popBackStack()
-                    }
+                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
+                        "edited",
+                        true
+                    )
+                    findNavController().popBackStack()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        updatePet(pet)
+                    }
                     btnSave.isClickable = true
                     btnSave.icon = save
                     progress.stop()
                 }
             }
         }
+    }
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

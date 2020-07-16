@@ -50,29 +50,29 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
                         dataViewModel.setChat(chat)
                         recyclerChats.removeItemDecorationAt(0)
-                        val action = ChatFragmentDirections.actionChatToConversation(
-                            senderIndex,
-                            receiverIndex
-                        )
+                        val action =
+                            ChatFragmentDirections
+                                .actionChatToConversation(senderIndex, receiverIndex)
                         findNavController().navigate(action)
                     }
 
-                    override fun setImage(uid: String, imageView: ImageView) {
+                    override fun setImage(uid: String, imageView: ImageView) =
                         firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
                             when (result) {
                                 is Result.Success -> {
                                     val data: User? = result.data.toObject()
-                                    data?.let {
-                                        val image = data.image
+                                    data?.apply {
+                                        val image = image
                                         if (image != null) {
                                             loadProfileImage(imageView, storage.getUserPhoto(image))
-                                        } else imageView.setImageResource(R.drawable.ic_person)
+                                        } else {
+                                            imageView.setImageResource(R.drawable.ic_person)
+                                        }
                                     }
                                 }
                                 is Result.Failure -> imageView.setImageResource(R.drawable.ic_person)
                             }
                         }
-                    }
                 })
             }
 

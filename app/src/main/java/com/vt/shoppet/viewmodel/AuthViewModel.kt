@@ -16,7 +16,7 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun signIn(email: String, password: String): LiveData<Result<AuthResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(auth.signIn(email, password)))
             } catch (e: Exception) {
@@ -26,7 +26,7 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun createUser(email: String, password: String): LiveData<Result<AuthResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(auth.createUser(email, password)))
             } catch (e: Exception) {
@@ -36,7 +36,7 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun verifyEmail(): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(auth.verifyEmail()))
             } catch (e: Exception) {
@@ -46,7 +46,7 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun resetPassword(email: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(auth.resetPassword(email)))
             } catch (e: Exception) {
@@ -56,7 +56,7 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun instanceId(): LiveData<Result<InstanceIdResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading())
+            emit(Result.Loading)
             try {
                 emit(Result.Success(auth.instanceId()))
             } catch (e: Exception) {

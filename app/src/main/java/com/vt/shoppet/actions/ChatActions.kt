@@ -5,6 +5,6 @@ import android.widget.ImageView
 import com.vt.shoppet.model.Chat
 
 interface ChatActions {
-    fun onClick(chat: Chat) : View.OnClickListener
-    fun setImage(uid: String, imageView: ImageView)
+    fun onClick(chat: Chat): View.OnClickListener
+    fun setImage(uid: String, imageView: ImageView): Any
 }

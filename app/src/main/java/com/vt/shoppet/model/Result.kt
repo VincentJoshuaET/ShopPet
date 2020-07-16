@@ -1,7 +1,7 @@
 package com.vt.shoppet.model
 
 sealed class Result<out T> {
-    class Loading<out T> : Result<T>()
+    object Loading : Result<Nothing>()
     data class Success<out T>(val data: T) : Result<T>()
-    data class Failure<out T>(val exception: Exception) : Result<T>()
+    data class Failure(val exception: Exception) : Result<Nothing>()
 }

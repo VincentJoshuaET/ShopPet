@@ -30,7 +30,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private lateinit var btnReset: MaterialButton
     private lateinit var icon: Drawable
 
-    private fun resetPassword(email: String) =
+    private fun resetPassword(email: String) {
         auth.resetPassword(email).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -45,13 +45,16 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                     findNavController().popBackStack()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        resetPassword(email)
+                    }
                     btnReset.isClickable = true
                     btnReset.icon = icon
                     progress.stop()
                 }
             }
         }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

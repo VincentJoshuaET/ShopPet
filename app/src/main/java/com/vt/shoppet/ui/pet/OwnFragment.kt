@@ -18,6 +18,7 @@ import com.vt.shoppet.databinding.FragmentOwnBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.ui.adapter.PetAdapter
 import com.vt.shoppet.util.loadFirebaseImage
+import com.vt.shoppet.util.setOnLayoutChangeListener
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
@@ -40,15 +41,15 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
 
-        val handle = findNavController().currentBackStackEntry?.savedStateHandle
+        val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
 
-        handle?.getLiveData<Boolean>("removed")?.observe(viewLifecycleOwner) { removed ->
+        savedStateHandle?.getLiveData<Boolean>("removed")?.observe(viewLifecycleOwner) { removed ->
             if (removed) showSnackbar(getString(R.string.txt_removed_pet))
-            handle.remove<Boolean>("removed")
+            savedStateHandle.remove<Boolean>("removed")
         }
-        handle?.getLiveData<Boolean>("sold")?.observe(viewLifecycleOwner) { sold ->
+        savedStateHandle?.getLiveData<Boolean>("sold")?.observe(viewLifecycleOwner) { sold ->
             if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
-            handle.remove<Boolean>("sold")
+            savedStateHandle.remove<Boolean>("sold")
         }
 
         val adapter = PetAdapter().apply {
@@ -64,18 +65,15 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
                         findNavController().navigate(action, extras)
                     }
 
-                override fun setImage(id: String, imageView: ImageView) {
+                override fun setImage(id: String, imageView: ImageView) =
                     loadFirebaseImage(imageView, storage.getPetPhoto(id))
-                }
             })
         }
 
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = GridLayoutManager(context, 2)
-            addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
-                if (top < oldTop) smoothScrollToPosition(oldTop)
-            }
+            setOnLayoutChangeListener()
             setAdapter(adapter)
         }
 

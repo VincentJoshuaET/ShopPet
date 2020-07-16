@@ -3,10 +3,13 @@ package com.vt.shoppet.util
 import android.app.Activity
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
+import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
+import com.vt.shoppet.R
 
 fun Fragment.circularProgress(): Animatable {
     val value = TypedValue()
@@ -28,6 +31,15 @@ fun Activity.showSnackbar(message: String) =
 fun Fragment.showSnackbar(exception: Exception) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT).show()
 
+fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).show()
+
+fun Fragment.showActionSnackbar(exception: Exception, action: (View) -> Unit) =
+    Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).show()
+
+
 fun Button.popBackStackOnClick() = setOnClickListener {
     findNavController().popBackStack()
 }
@@ -35,3 +47,8 @@ fun Button.popBackStackOnClick() = setOnClickListener {
 fun Button.navigateOnClick(id: Int) = setOnClickListener {
     findNavController().navigate(id)
 }
+
+fun RecyclerView.setOnLayoutChangeListener() =
+    addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
+        if (top < oldTop) smoothScrollToPosition(oldTop)
+    }

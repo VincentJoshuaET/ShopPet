@@ -8,6 +8,7 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.view.View
+import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isInvisible
@@ -17,7 +18,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
-import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -75,30 +75,30 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             when (action) {
                 SELECT_PHOTO -> selectPhoto.launch("image/*")
                 TAKE_PHOTO -> {
-                    uri = requireContext().contentResolver.insert(
-                        EXTERNAL_CONTENT_URI,
-                        ContentValues()
-                    )
+                    val contentResolver = requireContext().contentResolver
+                    uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
                     openCamera.launch(uri)
                 }
                 else -> null
             }
         } else requestPermissions.launch(permissions)
 
-    private val requestPermissions =
-        registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { permissions ->
-            if (permissions.checkAllPermissions()) {
+    private val requestPermissions: ActivityResultLauncher<Array<String>>
+        get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
+            if (it.checkAllPermissions()) {
                 when (action) {
                     SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> {
-                        uri = requireContext().contentResolver.insert(
-                            EXTERNAL_CONTENT_URI,
-                            ContentValues()
-                        )
+                        val contentResolver = requireContext().contentResolver
+                        uri = contentResolver.insert(EXTERNAL_CONTENT_URI, ContentValues())
                         openCamera.launch(uri)
                     }
                 }
-            } else showSnackbar(getString(R.string.txt_permission_denied))
+            } else {
+                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                    requestPermissions.launch(permissions)
+                }
+            }
         }
 
     private val selectPhoto =
@@ -127,8 +127,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         image = null
     }
 
-    private fun removeDialog(id: String) =
-        MaterialAlertDialogBuilder(requireContext())
+    private fun removeDialog(id: String): AlertDialog {
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_remove_image)
             .setMessage(R.string.txt_remove_image)
             .setPositiveButton(R.string.btn_confirm) { _, _ ->
@@ -148,7 +148,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                             findNavController().popBackStack()
                         }
                         is Result.Failure -> {
-                            showSnackbar(result.exception)
+                            showActionSnackbar(result.exception) {
+                                removeDialog(id).show()
+                            }
                             toolbar.menu.getItem(0).icon = save
                             circularProgress.stop()
                             fabEdit.isClickable = true
@@ -160,6 +162,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 dialog.dismiss()
             }
             .create()
+    }
 
     private fun editDialog(): AlertDialog {
         val context = requireContext()
@@ -190,7 +193,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             .create()
     }
 
-    private fun updateUser(user: User) =
+    private fun updateUser(user: User) {
         firestore.updateUser(user).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -205,13 +208,16 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     findNavController().popBackStack()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        updateUser(user)
+                    }
                     toolbar.menu.getItem(0).icon = save
                     fabEdit.isClickable = true
                     circularProgress.stop()
                 }
             }
         }
+    }
 
     private fun uploadUserPhoto(user: User, id: String) {
         storage.uploadUserPhoto(id, uri).observe(viewLifecycleOwner) { result ->
@@ -227,7 +233,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     updateUser(user.copy(image = id))
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        uploadUserPhoto(user, id)
+                    }
                     toolbar.menu.getItem(0).icon = save
                     fabEdit.isClickable = true
                     progress.isInvisible = true
@@ -262,8 +270,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val provinceAdapter = getArrayAdapter(provinces)
         val sexAdapter = getArrayAdapter(resources.getStringArray(R.array.sex))
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(zone)
-        val max = LocalDateTime.now().minusYears(18).atZone(zone).toInstant().toEpochMilli()
+        val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(localZoneId)
 
         txtName.setErrorListener()
         txtMobile.setErrorListener()
@@ -297,14 +304,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             txtSex.setText(user.sex, false)
             txtProvince.setText(user.location, false)
             val instant = Instant.ofEpochSecond(user.dateOfBirth.seconds)
-            val dateTime = LocalDateTime.ofInstant(instant, zone)
+            val dateTime = LocalDateTime.ofInstant(instant, localZoneId)
             dateOfBirth = instant.toEpochMilli()
             txtDateOfBirth.setText(dateTimeFormatter.format(dateTime))
 
             txtDateOfBirth.setOnClickListener {
                 keyboard.hide(this)
-                val constraints =
-                    CalendarConstraints.Builder().setOpenAt(dateOfBirth).setEnd(max).build()
+                val constraints = setCalendarConstraints(dateOfBirth)
                 val builder = MaterialDatePicker.Builder.datePicker().apply {
                     setCalendarConstraints(constraints)
                     setSelection(dateOfBirth)

@@ -10,7 +10,6 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
@@ -23,7 +22,6 @@ import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -41,7 +39,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private lateinit var check: Drawable
     private lateinit var btnRegister: MaterialButton
 
-    private fun verifyEmail() =
+    private fun verifyEmail() {
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -57,15 +55,18 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     findNavController().popBackStack()
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        verifyEmail()
+                    }
                     btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun addUser(user: User) =
+    private fun addUser(user: User) {
         firestore.addUser(user).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -75,15 +76,18 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 }
                 is Result.Success -> verifyEmail()
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        addUser(user)
+                    }
                     btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun createUser(user: User, email: String, password: String) =
+    private fun createUser(user: User, email: String, password: String) {
         auth.createUser(email, password).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -93,15 +97,18 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 }
                 is Result.Success -> addUser(user.copy(uid = auth.uid()))
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        createUser(user, email, password)
+                    }
                     btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
         }
+    }
 
-    private fun checkUsername(user: User, email: String, password: String) =
+    private fun checkUsername(user: User, email: String, password: String) {
         firestore.checkUsername(user.username).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
@@ -119,13 +126,16 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     }
                 }
                 is Result.Failure -> {
-                    showSnackbar(result.exception)
+                    showActionSnackbar(result.exception) {
+                        checkUsername(user, email, password)
+                    }
                     binding.btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
         }
+    }
 
     @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -149,9 +159,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val provinceAdapter = getArrayAdapter(resources.getStringArray(R.array.province))
         val sexAdapter = getArrayAdapter(resources.getStringArray(R.array.sex))
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(zone)
-        val max = LocalDateTime.now().minusYears(18).atZone(zone).toInstant().toEpochMilli()
-        var dateOfBirth = max
+        var dateOfBirth =
+            LocalDateTime.now().minusYears(18).atZone(localZoneId).toInstant().toEpochMilli()
 
         txtName.setErrorListener()
         txtEmail.setErrorListener()
@@ -177,8 +186,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
         txtDateOfBirth.setOnClickListener {
             keyboard.hide(this)
-            val constraints =
-                CalendarConstraints.Builder().setOpenAt(dateOfBirth).setEnd(max).build()
+            val constraints = setCalendarConstraints(dateOfBirth)
             val builder =
                 MaterialDatePicker.Builder.datePicker().apply {
                     setCalendarConstraints(constraints)
@@ -190,7 +198,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                     addOnPositiveButtonClickListener { long ->
                         dateOfBirth = long
                         val instant = Instant.ofEpochMilli(dateOfBirth)
-                        txtDateOfBirth.setText(dateTimeFormatter.format(instant))
+                        txtDateOfBirth.setText(dateOfBirthFormatter.format(instant))
                     }
                 }
             picker.show(parentFragmentManager, picker.toString())

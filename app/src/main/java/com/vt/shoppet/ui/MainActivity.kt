@@ -139,7 +139,9 @@ class MainActivity : AppCompatActivity() {
             val image = user.image
             if (image != null) {
                 loadProfileImage(imageUser, storage.getUserPhoto(image))
-            } else imageUser.setImageResource(R.drawable.ic_person)
+            } else {
+                imageUser.setImageResource(R.drawable.ic_person)
+            }
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->

@@ -40,6 +40,8 @@ class FilterDialog : DialogFragment() {
         val priceAdapter = getArrayAdapter(resources.getStringArray(R.array.price_filter))
         val ageAdapter = getArrayAdapter(resources.getStringArray(R.array.age_unit_filter))
 
+        val savedStateHandle = findNavController().previousBackStackEntry?.savedStateHandle
+
         txtType.setAdapter(typeAdapter)
         txtSex.setAdapter(sexAdapter)
 
@@ -93,8 +95,7 @@ class FilterDialog : DialogFragment() {
                     filter.age = "No Filter"
                     filter.ages = listOf(0F, 100F)
                     dataViewModel.filterPets()
-                    findNavController().previousBackStackEntry
-                        ?.savedStateHandle?.set("filter", true)
+                    savedStateHandle?.set("filter", true)
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
@@ -107,8 +108,7 @@ class FilterDialog : DialogFragment() {
                     filter.age = txtAge.text.toString()
                     filter.ages = sliderAge.values
                     dataViewModel.filterPets()
-                    findNavController().previousBackStackEntry
-                        ?.savedStateHandle?.set("filter", true)
+                    savedStateHandle?.set("filter", true)
                 }
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
