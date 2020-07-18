@@ -63,63 +63,63 @@ class DataViewModel @ViewModelInject constructor(
         _chat.value = chat
     }
 
-    private var userLiveData: DocumentLiveData? = null
-    private var petsLiveData: QueryLiveData? = null
-    private var starredPetsLiveData: QueryLiveData? = null
-    private var ownPetsLiveData: QueryLiveData? = null
-    private var chatsLiveData: QueryLiveData? = null
+    private lateinit var userLiveData: DocumentLiveData
+    private lateinit var petsLiveData: QueryLiveData
+    private lateinit var starredPetsLiveData: QueryLiveData
+    private lateinit var ownPetsLiveData: QueryLiveData
+    private lateinit var chatsLiveData: QueryLiveData
 
     fun removeFirebaseData() {
-        userLiveData?.removeObservers(ProcessLifecycleOwner.get())
-        petsLiveData?.removeObservers(ProcessLifecycleOwner.get())
-        starredPetsLiveData?.removeObservers(ProcessLifecycleOwner.get())
-        ownPetsLiveData?.removeObservers(ProcessLifecycleOwner.get())
-        chatsLiveData?.removeObservers(ProcessLifecycleOwner.get())
-        userLiveData = null
-        petsLiveData = null
-        starredPetsLiveData = null
-        ownPetsLiveData = null
-        chatsLiveData = null
+        userLiveData.removeObservers(ProcessLifecycleOwner.get())
+        petsLiveData.removeObservers(ProcessLifecycleOwner.get())
+        starredPetsLiveData.removeObservers(ProcessLifecycleOwner.get())
+        ownPetsLiveData.removeObservers(ProcessLifecycleOwner.get())
+        chatsLiveData.removeObservers(ProcessLifecycleOwner.get())
     }
 
     fun initFirebaseData() {
-        userLiveData = DocumentLiveData(firestore.getUserReference(auth.uid()))
-        userLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> _currentUser.value = result.data.toObject()
-                is Result.Failure -> _currentUser.value = User()
+        userLiveData = DocumentLiveData(firestore.getUserReference(auth.uid())).apply {
+            observe(ProcessLifecycleOwner.get()) { result ->
+                when (result) {
+                    is Result.Success -> _currentUser.value = result.data.toObject()
+                    is Result.Failure -> _currentUser.value = User()
+                }
             }
         }
 
-        petsLiveData = QueryLiveData(firestore.getPets())
-        petsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> _pets.value = result.data.toObjects()
-                is Result.Failure -> _pets.value = listOf()
+        petsLiveData = QueryLiveData(firestore.getPets()).apply {
+            observe(ProcessLifecycleOwner.get()) { result ->
+                when (result) {
+                    is Result.Success -> _pets.value = result.data.toObjects()
+                    is Result.Failure -> _pets.value = listOf()
+                }
             }
         }
 
-        starredPetsLiveData = QueryLiveData(firestore.getStarredPets())
-        starredPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> _starredPets.value = result.data.toObjects()
-                is Result.Failure -> _starredPets.value = listOf()
+        starredPetsLiveData = QueryLiveData(firestore.getStarredPets()).apply {
+            observe(ProcessLifecycleOwner.get()) { result ->
+                when (result) {
+                    is Result.Success -> _starredPets.value = result.data.toObjects()
+                    is Result.Failure -> _starredPets.value = listOf()
+                }
             }
         }
 
-        ownPetsLiveData = QueryLiveData(firestore.getOwnPets())
-        ownPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> _ownPets.value = result.data.toObjects()
-                is Result.Failure -> _ownPets.value = listOf()
+        ownPetsLiveData = QueryLiveData(firestore.getOwnPets()).apply {
+            observe(ProcessLifecycleOwner.get()) { result ->
+                when (result) {
+                    is Result.Success -> _ownPets.value = result.data.toObjects()
+                    is Result.Failure -> _ownPets.value = listOf()
+                }
             }
         }
 
-        chatsLiveData = QueryLiveData(firestore.getChats())
-        chatsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            when (result) {
-                is Result.Success -> _chats.value = result.data.toObjects()
-                is Result.Failure -> _chats.value = listOf()
+        chatsLiveData = QueryLiveData(firestore.getChats()).apply {
+            observe(ProcessLifecycleOwner.get()) { result ->
+                when (result) {
+                    is Result.Success -> _chats.value = result.data.toObjects()
+                    is Result.Failure -> _chats.value = listOf()
+                }
             }
         }
 
