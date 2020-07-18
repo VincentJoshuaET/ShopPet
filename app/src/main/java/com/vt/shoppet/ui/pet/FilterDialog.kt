@@ -11,6 +11,7 @@ import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.DialogFilterBinding
 import com.vt.shoppet.util.KeyboardUtils
+import com.vt.shoppet.util.filter
 import com.vt.shoppet.util.getArrayAdapter
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -71,7 +72,7 @@ class FilterDialog : DialogFragment() {
             }
         }
 
-        dataViewModel.getFilter().observe(this) { filter ->
+        dataViewModel.filter.observe(this) { filter ->
             txtType.setText(filter.type, false)
             txtSex.setText(filter.sex, false)
             txtPrice.setText(filter.price, false)
@@ -86,29 +87,33 @@ class FilterDialog : DialogFragment() {
             .setTitle(R.string.menu_item_filter)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                dataViewModel.getFilter().observe(this) { filter ->
-                    filter.enabled = true
-                    filter.type = "All"
-                    filter.sex = "Both"
-                    filter.price = "No Filter"
-                    filter.amounts = listOf(0F, 10000F)
-                    filter.age = "No Filter"
-                    filter.ages = listOf(0F, 100F)
-                    dataViewModel.filterPets()
-                    savedStateHandle?.set("filter", true)
+                dataViewModel.filter.observe(requireActivity()) { filter ->
+                    dataViewModel.pets.observe(requireActivity()) { pets ->
+                        filter.enabled = true
+                        filter.type = "All"
+                        filter.sex = "Both"
+                        filter.price = "No Filter"
+                        filter.amounts = listOf(0F, 10000F)
+                        filter.age = "No Filter"
+                        filter.ages = listOf(0F, 100F)
+                        dataViewModel.setFilteredPets(pets.filter(filter))
+                        savedStateHandle?.set("filter", true)
+                    }
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                dataViewModel.getFilter().observe(this) { filter ->
-                    filter.enabled = true
-                    filter.type = txtType.text.toString()
-                    filter.sex = txtSex.text.toString()
-                    filter.price = txtPrice.text.toString()
-                    filter.amounts = sliderPrice.values
-                    filter.age = txtAge.text.toString()
-                    filter.ages = sliderAge.values
-                    dataViewModel.filterPets()
-                    savedStateHandle?.set("filter", true)
+                dataViewModel.filter.observe(requireActivity()) { filter ->
+                    dataViewModel.pets.observe(requireActivity()) { pets ->
+                        filter.enabled = true
+                        filter.type = txtType.text.toString()
+                        filter.sex = txtSex.text.toString()
+                        filter.price = txtPrice.text.toString()
+                        filter.amounts = sliderPrice.values
+                        filter.age = txtAge.text.toString()
+                        filter.ages = sliderAge.values
+                        dataViewModel.setFilteredPets(pets.filter(filter))
+                        savedStateHandle?.set("filter", true)
+                    }
                 }
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->

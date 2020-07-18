@@ -10,9 +10,6 @@ import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.livedata.DocumentLiveData
 import com.vt.shoppet.livedata.QueryLiveData
 import com.vt.shoppet.model.*
-import com.vt.shoppet.util.localZoneId
-import java.time.Instant
-import java.time.LocalDateTime
 
 class DataViewModel @ViewModelInject constructor(
     private val auth: AuthRepo,
@@ -20,116 +17,50 @@ class DataViewModel @ViewModelInject constructor(
     @Assisted private val handle: SavedStateHandle
 ) : ViewModel() {
 
-    private val currentPet = MutableLiveData<Pet>()
-    private val currentUser = MutableLiveData<User>()
-    private val user = MutableLiveData<User>()
-    private val chat = MutableLiveData<Chat>()
+    private val _currentPet = MutableLiveData<Pet>()
+    private val _currentUser = MutableLiveData<User>()
+    private val _user = MutableLiveData<User>()
+    private val _chat = MutableLiveData<Chat>()
 
-    private val pets = MutableLiveData<List<Pet>>()
-    private val starredPets = MutableLiveData<List<Pet>>()
-    private val ownPets = MutableLiveData<List<Pet>>()
-    private val chats = MutableLiveData<List<Chat>>()
+    private val _pets = MutableLiveData<List<Pet>>()
+    private val _starredPets = MutableLiveData<List<Pet>>()
+    private val _ownPets = MutableLiveData<List<Pet>>()
+    private val _chats = MutableLiveData<List<Chat>>()
 
-    private val filtered = MutableLiveData<List<Pet>>()
-    private val filter = MutableLiveData(Filter())
+    private val _filteredPets = MutableLiveData<List<Pet>>()
+    private val _filter = MutableLiveData<Filter>()
 
-    fun getPets(): LiveData<List<Pet>> = pets
-    fun getOwnPets(): LiveData<List<Pet>> = ownPets
-    fun getStarredPets(): LiveData<List<Pet>> = starredPets
-    fun getChats(): LiveData<List<Chat>> = chats
+    val currentPet: LiveData<Pet> = _currentPet
+    val currentUser: LiveData<User> = _currentUser
+    val user: LiveData<User> = _user
+    val chat: LiveData<Chat> = _chat
 
-    fun getFilteredPets(): LiveData<List<Pet>> = filtered
+    val pets: LiveData<List<Pet>> = _pets
+    val starredPets: LiveData<List<Pet>> = _starredPets
+    val ownPets: LiveData<List<Pet>> = _ownPets
+    val chats: LiveData<List<Chat>> = _chats
 
-    fun filterPets() {
-        pets.observe(ProcessLifecycleOwner.get()) { pets ->
-            val filter = this.filter.value ?: return@observe
-
-            val typeList =
-                if (filter.type == "All") pets
-                else pets.filter { it.type == filter.type }
-
-            val sexList =
-                if (filter.sex == "Both") typeList
-                else typeList.filter { it.sex == filter.sex }
-
-            val priceList =
-                if (filter.price == "No Filter") sexList
-                else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
-
-            val now = LocalDateTime.now()
-
-            val fromInstant = when (filter.age) {
-                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(localZoneId)
-                    .toInstant()
-                else -> now.atZone(localZoneId).toInstant()
-            }
-
-            val toInstant = when (filter.age) {
-                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(localZoneId)
-                    .toInstant()
-                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(localZoneId)
-                    .toInstant()
-                else -> now.atZone(localZoneId).toInstant()
-            }
-
-            val ageList =
-                if (filter.age == "No Filter") priceList
-                else priceList.filter { Instant.ofEpochSecond(it.dateOfBirth.seconds) in toInstant..fromInstant }
-
-            val list = when (filter.order) {
-                "Ascending" -> when (filter.field) {
-                    "Age" -> ageList.sortedByDescending { it.dateOfBirth }
-                    "Breed" -> ageList.sortedBy { it.breed }
-                    "Price" -> ageList.sortedBy { it.price }
-                    "Type" -> ageList.sortedBy { it.type }
-                    else -> ageList.sortedBy { it.date }
-                }
-                else -> when (filter.field) {
-                    "Age" -> ageList.sortedBy { it.dateOfBirth }
-                    "Breed" -> ageList.sortedByDescending { it.breed }
-                    "Price" -> ageList.sortedByDescending { it.price }
-                    "Type" -> ageList.sortedByDescending { it.type }
-                    else -> ageList.sortedByDescending { it.date }
-                }
-            }
-            filtered.value = list
-        }
-    }
-
-    fun getFilter(): LiveData<Filter> = filter
+    val filteredPets: LiveData<List<Pet>> = _filteredPets
+    val filter: LiveData<Filter> = _filter
 
     fun resetFilter() {
-        filter.value = Filter()
+        _filter.value = Filter()
     }
 
-    fun getCurrentUser(): LiveData<User> = currentUser
-
-    fun getUser(): LiveData<User> = user
+    fun setFilteredPets(pets: List<Pet>) {
+        _filteredPets.value = pets
+    }
 
     fun setUser(user: User) {
-        this.user.value = user
+        _user.value = user
     }
-
-    fun getCurrentPet(): LiveData<Pet> = currentPet
 
     fun setCurrentPet(pet: Pet) {
-        currentPet.value = pet
+        _currentPet.value = pet
     }
 
-    fun getChat(): LiveData<Chat> = chat
-
     fun setChat(chat: Chat) {
-        this.chat.value = chat
+        _chat.value = chat
     }
 
     private var userLiveData: DocumentLiveData? = null
@@ -138,7 +69,7 @@ class DataViewModel @ViewModelInject constructor(
     private var ownPetsLiveData: QueryLiveData? = null
     private var chatsLiveData: QueryLiveData? = null
 
-    fun removeObservers() {
+    fun removeFirebaseData() {
         userLiveData?.removeObservers(ProcessLifecycleOwner.get())
         petsLiveData?.removeObservers(ProcessLifecycleOwner.get())
         starredPetsLiveData?.removeObservers(ProcessLifecycleOwner.get())
@@ -154,33 +85,49 @@ class DataViewModel @ViewModelInject constructor(
     fun initFirebaseData() {
         userLiveData = DocumentLiveData(firestore.getUserReference(auth.uid()))
         userLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            if (result is Result.Success) currentUser.value = result.data.toObject()
+            when (result) {
+                is Result.Success -> _currentUser.value = result.data.toObject()
+                is Result.Failure -> _currentUser.value = User()
+            }
         }
 
         petsLiveData = QueryLiveData(firestore.getPets())
         petsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            if (result is Result.Success) pets.value = result.data.toObjects()
+            when (result) {
+                is Result.Success -> _pets.value = result.data.toObjects()
+                is Result.Failure -> _pets.value = listOf()
+            }
         }
 
         starredPetsLiveData = QueryLiveData(firestore.getStarredPets())
         starredPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            if (result is Result.Success) starredPets.value = result.data.toObjects()
+            when (result) {
+                is Result.Success -> _starredPets.value = result.data.toObjects()
+                is Result.Failure -> _starredPets.value = listOf()
+            }
         }
 
         ownPetsLiveData = QueryLiveData(firestore.getOwnPets())
         ownPetsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            if (result is Result.Success) ownPets.value = result.data.toObjects()
+            when (result) {
+                is Result.Success -> _ownPets.value = result.data.toObjects()
+                is Result.Failure -> _ownPets.value = listOf()
+            }
         }
 
         chatsLiveData = QueryLiveData(firestore.getChats())
         chatsLiveData?.observe(ProcessLifecycleOwner.get()) { result ->
-            if (result is Result.Success) chats.value = result.data.toObjects()
+            when (result) {
+                is Result.Success -> _chats.value = result.data.toObjects()
+                is Result.Failure -> _chats.value = listOf()
+            }
         }
 
         handle.set("initFirebaseData", true)
     }
 
     init {
+        resetFilter()
         handle.get<Boolean>("initFirebaseData")?.let { boolean ->
             if (boolean) initFirebaseData()
         }

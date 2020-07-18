@@ -74,7 +74,7 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
             setAdapter(adapter)
         }
 
-        viewModel.getStarredPets().observe(viewLifecycleOwner) { pets ->
+        viewModel.starredPets.observe(viewLifecycleOwner) { pets ->
             adapter.submitList(pets)
             txtEmpty.isVisible = pets.isEmpty()
         }

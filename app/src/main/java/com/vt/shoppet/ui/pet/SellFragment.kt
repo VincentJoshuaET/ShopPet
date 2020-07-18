@@ -56,7 +56,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                     btnUpload.icon = upload
                     circularProgress.stop()
                     progress.isVisible = false
-                    dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+                    dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
                         val action =
                             SellFragmentDirections.actionSellToDetails(image, user.username)
                         findNavController().navigate(action)

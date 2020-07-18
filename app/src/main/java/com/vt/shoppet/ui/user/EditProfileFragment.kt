@@ -291,7 +291,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             keyboard.hide(this)
         }
 
-        dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+        dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             image = user.image
             image?.let { id ->
                 loadProfileImage(imageUser, storage.getUserPhoto(id))

@@ -41,7 +41,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val recyclerChats = binding.recyclerChats
         val txtEmpty = binding.txtEmpty
 
-        dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+        dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             val adapter = ChatAdapter(user).apply {
                 stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
                 setActions(object : ChatActions {
@@ -83,7 +83,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                 setAdapter(adapter)
             }
 
-            dataViewModel.getChats().observe(viewLifecycleOwner) { chats ->
+            dataViewModel.chats.observe(viewLifecycleOwner) { chats ->
                 adapter.submitList(chats)
                 txtEmpty.isVisible = chats.isEmpty()
             }

@@ -22,11 +22,15 @@ fun Fragment.circularProgress(): Animatable {
     return drawable as Animatable
 }
 
-fun Fragment.showSnackbar(message: String) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
-
 fun Activity.showSnackbar(message: String) =
     Snackbar.make(window.decorView.rootView, message, Snackbar.LENGTH_SHORT).show()
+
+fun Activity.showActionSnackbar(exception: Exception, action: (View) -> Unit) =
+    Snackbar.make(window.decorView.rootView, exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).show()
+
+fun Fragment.showSnackbar(message: String) =
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
 
 fun Fragment.showSnackbar(exception: Exception) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT).show()

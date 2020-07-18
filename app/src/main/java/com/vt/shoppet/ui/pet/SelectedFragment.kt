@@ -362,7 +362,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             savedStateHandle.remove<Boolean>("edited")
         }
 
-        dataViewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
+        dataViewModel.currentPet.observe(viewLifecycleOwner) { pet ->
             binding.root.transitionName = pet.id
             layoutCatsDogs.isVisible = pet.type == types[1] || pet.type == types[2]
             fabChatSold.isGone = pet.sold
@@ -382,7 +382,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             txtDate.text = pet.date.calculatePostDuration(pet.sold)
             txtSeller.text = pet.username
 
-            dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
                 if (user.uid == pet.uid) {
                     btnGroup.isVisible = true
                     fabChatSold.setImageResource(R.drawable.ic_check)

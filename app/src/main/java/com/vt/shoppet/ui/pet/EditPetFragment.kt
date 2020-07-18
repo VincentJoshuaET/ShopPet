@@ -48,11 +48,9 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                     btnSave.icon = save
                     progress.stop()
                     dataViewModel.setCurrentPet(pet)
-                    findNavController().previousBackStackEntry?.savedStateHandle?.set(
-                        "edited",
-                        true
-                    )
-                    findNavController().popBackStack()
+                    findNavController().run {
+                        previousBackStackEntry?.savedStateHandle?.set("edited", true)
+                    }
                 }
                 is Result.Failure -> {
                     showActionSnackbar(result.exception) {
@@ -108,7 +106,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
             keyboard.hide(this)
         }
 
-        dataViewModel.getCurrentPet().observe(viewLifecycleOwner) { pet ->
+        dataViewModel.currentPet.observe(viewLifecycleOwner) { pet ->
             val type = pet.type
             txtName.setText(pet.name)
             txtPrice.setText(pet.price.toString())

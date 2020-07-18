@@ -77,7 +77,7 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
             setAdapter(adapter)
         }
 
-        dataViewModel.getOwnPets().observe(viewLifecycleOwner) { pets ->
+        dataViewModel.ownPets.observe(viewLifecycleOwner) { pets ->
             adapter.submitList(pets)
             txtEmpty.isVisible = pets.isEmpty()
         }

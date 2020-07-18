@@ -109,7 +109,7 @@ class MainActivity : AppCompatActivity() {
 
     fun signOut(token: String) {
         firestore.removeToken(token)
-        dataViewModel.removeObservers()
+        dataViewModel.removeFirebaseData()
         auth.signOut()
         if (auth.isLoggedIn()) {
             showSnackbar(getString(R.string.txt_cannot_log_out))
@@ -131,7 +131,7 @@ class MainActivity : AppCompatActivity() {
 
         bindViews()
 
-        dataViewModel.getCurrentUser().observe(this) { user ->
+        dataViewModel.currentUser.observe(this) { user ->
             txtName.text = user.name
             txtUsername.text = user.username
             txtEmail.text = auth.email()

@@ -149,9 +149,9 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                 val filter =
                     savedStateHandle?.get<Boolean>("filter") ?: return@LifecycleEventObserver
                 if (filter) {
-                    dataViewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
-                        adapter.submitList(filtered)
-                        txtEmpty.isVisible = filtered.isEmpty()
+                    dataViewModel.filteredPets.observe(viewLifecycleOwner) { filteredPets ->
+                        adapter.submitList(filteredPets)
+                        txtEmpty.isVisible = filteredPets.isEmpty()
                     }
                 }
                 savedStateHandle.remove<Boolean>("filter")
@@ -166,14 +166,14 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
         })
 
-        dataViewModel.getFilter().observe(viewLifecycleOwner) { filter ->
+        dataViewModel.filter.observe(viewLifecycleOwner) { filter ->
             if (filter.enabled) {
-                dataViewModel.getFilteredPets().observe(viewLifecycleOwner) { filtered ->
-                    adapter.submitList(filtered)
-                    txtEmpty.isVisible = filtered.isEmpty()
+                dataViewModel.filteredPets.observe(viewLifecycleOwner) { filteredPets ->
+                    adapter.submitList(filteredPets)
+                    txtEmpty.isVisible = filteredPets.isEmpty()
                 }
             } else {
-                dataViewModel.getPets().observe(viewLifecycleOwner) { pets ->
+                dataViewModel.pets.observe(viewLifecycleOwner) { pets ->
                     adapter.submitList(pets)
                     txtEmpty.isVisible = pets.isEmpty()
                 }
@@ -185,7 +185,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             upload.show()
         }
 
-        dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+        dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
         }
 

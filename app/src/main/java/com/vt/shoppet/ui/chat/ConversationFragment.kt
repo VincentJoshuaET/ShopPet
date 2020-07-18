@@ -266,7 +266,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             clearImageView()
         }
 
-        dataViewModel.getChat().observe(viewLifecycleOwner) { chat ->
+        dataViewModel.chat.observe(viewLifecycleOwner) { chat ->
             val query = firestore.getMessages(chat.id)
 
             val options =

@@ -176,12 +176,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         if (args.current) {
             toolbar.inflateMenu(R.menu.menu_current_profile)
-            dataViewModel.getCurrentUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
                 setProfile(user)
             }
         } else {
             toolbar.inflateMenu(R.menu.menu_profile)
-            dataViewModel.getUser().observe(viewLifecycleOwner) { user ->
+            dataViewModel.user.observe(viewLifecycleOwner) { user ->
                 setProfile(user)
             }
         }
