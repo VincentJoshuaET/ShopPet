@@ -2,6 +2,6 @@ package com.vt.shoppet.actions
 
 import android.widget.ImageView
 
-interface MessageActions {
-    fun setImage(id: String, imageView: ImageView): Any
+class MessageActions(val action: (id: String, imageView: ImageView) -> Unit) {
+    fun setImage(id: String, imageView: ImageView) = action(id, imageView)
 }

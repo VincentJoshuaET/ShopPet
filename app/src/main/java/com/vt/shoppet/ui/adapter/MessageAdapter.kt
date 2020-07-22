@@ -8,10 +8,11 @@ import com.vt.shoppet.actions.MessageActions
 import com.vt.shoppet.model.Message
 import com.vt.shoppet.ui.holder.MessageHolder
 
-open class MessageAdapter(options: FirestoreRecyclerOptions<Message>) :
+open class MessageAdapter(
+    options: FirestoreRecyclerOptions<Message>,
+    private val actions: MessageActions
+) :
     FirestoreRecyclerAdapter<Message, MessageHolder>(options) {
-
-    private lateinit var actions: MessageActions
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder =
         MessageHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))
@@ -19,7 +20,4 @@ open class MessageAdapter(options: FirestoreRecyclerOptions<Message>) :
     override fun onBindViewHolder(holder: MessageHolder, position: Int, model: Message) =
         holder.bindView(model, actions)
 
-    fun setActions(actions: MessageActions) {
-        this.actions = actions
-    }
 }

@@ -7,7 +7,6 @@ import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.view.View
-import android.widget.ImageView
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -275,7 +274,11 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     .setQuery(query, Message::class.java)
                     .build()
 
-            val adapter = object : MessageAdapter(options) {
+            val actions = MessageActions { id, imageView ->
+                loadFirebaseImage(imageView, storage.getMessagePhoto(id))
+            }
+
+            val adapter = object : MessageAdapter(options, actions) {
                 override fun getItemViewType(position: Int): Int =
                     if (uid == getItem(position).senderid) R.layout.item_message_from
                     else R.layout.item_message_to
@@ -293,10 +296,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     }
                 }
             }
-            adapter.setActions(object : MessageActions {
-                override fun setImage(id: String, imageView: ImageView) =
-                    loadFirebaseImage(imageView, storage.getMessagePhoto(id))
-            })
 
             recyclerMessages.apply {
                 setHasFixedSize(true)

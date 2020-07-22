@@ -110,23 +110,24 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         gridLayoutManager = setLayout(resources.configuration.orientation)
 
-        val adapter = PetAdapter().apply {
-            stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-            setActions(object : PetActions {
-                override fun onClick(pet: Pet, view: View): View.OnClickListener =
-                    View.OnClickListener {
-                        dataViewModel.setCurrentPet(pet)
-                        val id = pet.id
-                        view.transitionName = id
-                        val extras = FragmentNavigatorExtras(view to id)
-                        val action = ShopFragmentDirections.actionShopToSelected(id, pet.name)
-                        findNavController().navigate(action, extras)
-                    }
+        val actions = object : PetActions {
+            override fun onClick(pet: Pet, view: View): View.OnClickListener =
+                View.OnClickListener {
+                    dataViewModel.setCurrentPet(pet)
+                    val id = pet.id
+                    view.transitionName = id
+                    val extras = FragmentNavigatorExtras(view to id)
+                    val action = ShopFragmentDirections.actionShopToSelected(id, pet.name)
+                    findNavController().navigate(action, extras)
+                }
 
-                override fun setImage(id: String, imageView: ImageView) =
-                    loadFirebaseImage(imageView, storage.getPetPhoto(id))
-            })
+            override fun setImage(id: String, imageView: ImageView) =
+                loadFirebaseImage(imageView, storage.getPetPhoto(id))
         }
+
+        val adapter = PetAdapter(actions)
+        adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
+
         recyclerPets.apply {
             setHasFixedSize(true)
             layoutManager = gridLayoutManager

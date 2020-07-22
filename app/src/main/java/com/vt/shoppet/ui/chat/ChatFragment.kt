@@ -20,6 +20,7 @@ import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
 import com.vt.shoppet.ui.adapter.ChatAdapter
 import com.vt.shoppet.util.loadProfileImage
+import com.vt.shoppet.util.showActionSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
@@ -42,41 +43,47 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
         val txtEmpty = binding.txtEmpty
 
         dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
-            val adapter = ChatAdapter(user).apply {
-                stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
-                setActions(object : ChatActions {
-                    override fun onClick(chat: Chat) = View.OnClickListener {
-                        val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
-                        val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
-                        val username =
-                            if (user.uid == chat.uid[0]) chat.username[1] else chat.username[0]
-                        dataViewModel.setChat(chat)
-                        recyclerChats.removeItemDecorationAt(0)
-                        val action =
-                            ChatFragmentDirections
-                                .actionChatToConversation(senderIndex, receiverIndex, username)
-                        findNavController().navigate(action)
-                    }
+            val action = object : ChatActions {
+                override fun onClick(chat: Chat): View.OnClickListener = View.OnClickListener {
+                    val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
+                    val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
+                    val username =
+                        if (user.uid == chat.uid[0]) chat.username[1] else chat.username[0]
+                    dataViewModel.setChat(chat)
+                    recyclerChats.removeItemDecorationAt(0)
+                    val action =
+                        ChatFragmentDirections
+                            .actionChatToConversation(senderIndex, receiverIndex, username)
+                    findNavController().navigate(action)
+                }
 
-                    override fun setImage(uid: String, imageView: ImageView) =
-                        firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
-                            when (result) {
-                                is Result.Success -> {
-                                    val data: User? = result.data.toObject()
-                                    data?.apply {
-                                        val image = image
-                                        if (image != null) {
-                                            loadProfileImage(imageView, storage.getUserPhoto(image))
-                                        } else {
-                                            imageView.setImageResource(R.drawable.ic_person)
-                                        }
+                override fun setImage(uid: String, imageView: ImageView) {
+                    firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
+                        when (result) {
+                            is Result.Success -> {
+                                val data: User? = result.data.toObject()
+                                data?.apply {
+                                    val image = image
+                                    if (image != null) {
+                                        loadProfileImage(imageView, storage.getUserPhoto(image))
+                                    } else {
+                                        imageView.setImageResource(R.drawable.ic_person)
                                     }
                                 }
-                                is Result.Failure -> imageView.setImageResource(R.drawable.ic_person)
+                            }
+                            is Result.Failure -> {
+                                imageView.setImageResource(R.drawable.ic_person)
+                                showActionSnackbar(result.exception) {
+                                    setImage(uid, imageView)
+                                }
                             }
                         }
-                })
+                    }
+                }
             }
+
+            val adapter = ChatAdapter(user, action)
+            adapter.stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
 
             recyclerChats.apply {
                 addItemDecoration(DividerItemDecoration(context, LinearLayoutManager.VERTICAL))
