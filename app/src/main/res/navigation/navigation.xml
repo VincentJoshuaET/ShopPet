@@ -74,10 +74,6 @@
             android:name="com.vt.shoppet.ui.pet.ShopFragment"
             android:label="Shop"
             tools:layout="@layout/fragment_shop">
-            <argument
-                android:name="posted"
-                app:argType="boolean"
-                android:defaultValue="false" />
             <action
                 android:id="@+id/action_shop_to_filter"
                 app:destination="@id/dialog_filter" />
@@ -152,11 +148,6 @@
             <argument
                 android:name="username"
                 app:argType="string" />
-            <action
-                android:id="@+id/action_details_to_shop"
-                app:destination="@id/fragment_shop"
-                app:popUpTo="@id/fragment_shop"
-                app:popUpToInclusive="true" />
         </fragment>
 
         <fragment

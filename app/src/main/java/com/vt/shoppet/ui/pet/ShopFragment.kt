@@ -14,7 +14,6 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView.Adapter.StateRestorationPolicy
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -35,7 +34,6 @@ import dagger.hilt.android.AndroidEntryPoint
 class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val binding by viewBinding(FragmentShopBinding::bind)
-    private val args: ShopFragmentArgs by navArgs()
 
     private val storage: StorageViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
@@ -93,11 +91,13 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         val toolbar = activity.toolbar
 
-        if (args.posted) showSnackbar(getString(R.string.txt_upload_success))
-
         val navBackStackEntry = findNavController().currentBackStackEntry
         val savedStateHandle = navBackStackEntry?.savedStateHandle
         savedStateHandle?.run {
+            getLiveData<Boolean>("posted").observe(viewLifecycleOwner) { posted ->
+                if (posted) showSnackbar(getString(R.string.txt_upload_success))
+                remove<Boolean>("posted")
+            }
             getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
                 if (removed) showSnackbar(getString(R.string.txt_removed_pet))
                 remove<Boolean>("removed")

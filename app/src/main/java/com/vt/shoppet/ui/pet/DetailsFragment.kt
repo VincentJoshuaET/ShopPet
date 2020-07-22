@@ -52,8 +52,11 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 is Result.Success -> {
                     btnSave.icon = save
                     progress.stop()
-                    val action = DetailsFragmentDirections.actionDetailsToShop(true)
-                    findNavController().navigate(action)
+                    findNavController().getBackStackEntry(R.id.fragment_shop).savedStateHandle.set(
+                        "posted",
+                        true
+                    )
+                    findNavController().popBackStack(R.id.fragment_shop, false)
                 }
                 is Result.Failure -> {
                     showActionSnackbar(result.exception) {
