@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.auth
 
-import android.graphics.Paint
 import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
@@ -159,8 +158,6 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         val txtPassword = binding.txtPassword
         val btnForgot = binding.btnForgot
         val btnRegister = binding.btnRegister
-
-        btnRegister.paintFlags = btnRegister.paintFlags or Paint.UNDERLINE_TEXT_FLAG
 
         txtEmail.setErrorListener()
         txtPassword.setErrorListener()

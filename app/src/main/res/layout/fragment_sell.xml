@@ -7,11 +7,12 @@
     android:orientation="vertical"
     tools:context=".ui.pet.SellFragment">
 
-    <com.google.android.material.progressindicator.ProgressIndicator
+    <androidx.core.widget.ContentLoadingProgressBar
         android:id="@+id/progress"
-        style="@style/Widget.MaterialComponents.ProgressIndicator.Linear.Indeterminate"
+        style="@style/Widget.AppCompat.ProgressBar.Horizontal"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:indeterminate="true"
         android:visibility="invisible"
         tools:visibility="visible" />
 
@@ -24,7 +25,7 @@
         <com.google.android.material.card.MaterialCardView
             android:id="@+id/cardPet"
             android:layout_width="match_parent"
-            android:layout_height="420dp"
+            android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_margin="24dp"
             app:cardCornerRadius="8dp">
@@ -32,7 +33,7 @@
             <com.google.android.material.imageview.ShapeableImageView
                 android:id="@+id/imagePet"
                 android:layout_width="match_parent"
-                android:layout_height="420dp"
+                android:layout_height="wrap_content"
                 android:adjustViewBounds="true"
                 android:scaleType="fitCenter" />
 

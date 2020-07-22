@@ -7,13 +7,13 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
@@ -39,7 +39,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private lateinit var circularProgress: Animatable
     private lateinit var upload: Drawable
-    private lateinit var progress: ProgressIndicator
+    private lateinit var progress: ContentLoadingProgressBar
     private lateinit var btnUpload: MaterialButton
 
     private fun uploadImage(uri: Uri) {

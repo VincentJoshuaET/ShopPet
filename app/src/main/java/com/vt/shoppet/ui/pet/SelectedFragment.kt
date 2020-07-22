@@ -200,11 +200,10 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         dataViewModel.setChat(chats.first())
                         val senderIndex = chats.first().uid.indexOf(pet.uid)
                         val receiverIndex = chats.first().uid.indexOf(user.uid)
+                        val username = chats.first().username[senderIndex]
                         val action =
-                            SelectedFragmentDirections.actionSelectedToConversation(
-                                senderIndex,
-                                receiverIndex
-                            )
+                            SelectedFragmentDirections
+                                .actionSelectedToConversation(senderIndex, receiverIndex, username)
                         findNavController().navigate(action)
                     }
                 }

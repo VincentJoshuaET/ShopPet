@@ -162,10 +162,13 @@
         <fragment
             android:id="@+id/fragment_selected"
             android:name="com.vt.shoppet.ui.pet.SelectedFragment"
-            android:label="Selected Pet"
+            android:label="{name}"
             tools:layout="@layout/fragment_selected">
             <argument
                 android:name="id"
+                app:argType="string" />
+            <argument
+                android:name="name"
                 app:argType="string" />
             <action
                 android:id="@+id/action_selected_to_edit_pet"
@@ -227,7 +230,7 @@
         <fragment
             android:id="@+id/fragment_conversation"
             android:name="com.vt.shoppet.ui.chat.ConversationFragment"
-            android:label="Conversation"
+            android:label="{username}"
             tools:layout="@layout/fragment_conversation">
             <argument
                 android:name="senderIndex"
@@ -237,6 +240,9 @@
                 android:name="receiverIndex"
                 android:defaultValue="1"
                 app:argType="integer" />
+            <argument
+                android:name="username"
+                app:argType="string" />
         </fragment>
 
         <dialog

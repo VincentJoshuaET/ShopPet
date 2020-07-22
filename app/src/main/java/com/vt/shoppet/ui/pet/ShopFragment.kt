@@ -1,5 +1,6 @@
 package com.vt.shoppet.ui.pet
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -72,6 +73,13 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             }
         }
 
+    private lateinit var gridLayoutManager: GridLayoutManager
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        gridLayoutManager = setLayout(newConfig.orientation)
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -87,6 +95,21 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         if (args.posted) showSnackbar(getString(R.string.txt_upload_success))
 
+        val navBackStackEntry = findNavController().currentBackStackEntry
+        val savedStateHandle = navBackStackEntry?.savedStateHandle
+        savedStateHandle?.run {
+            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
+                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+                remove<Boolean>("removed")
+            }
+            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
+                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+                remove<Boolean>("sold")
+            }
+        }
+
+        gridLayoutManager = setLayout(resources.configuration.orientation)
+
         val adapter = PetAdapter().apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             setActions(object : PetActions {
@@ -96,7 +119,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                         val id = pet.id
                         view.transitionName = id
                         val extras = FragmentNavigatorExtras(view to id)
-                        val action = ShopFragmentDirections.actionShopToSelected(id)
+                        val action = ShopFragmentDirections.actionShopToSelected(id, pet.name)
                         findNavController().navigate(action, extras)
                     }
 
@@ -106,7 +129,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         }
         recyclerPets.apply {
             setHasFixedSize(true)
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = gridLayoutManager
             setOnLayoutChangeListener()
             setAdapter(adapter)
         }
@@ -130,19 +153,6 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                     fabSell.show()
                 }
                 .create()
-
-        val navBackStackEntry = findNavController().currentBackStackEntry
-        val savedStateHandle = navBackStackEntry?.savedStateHandle
-        savedStateHandle?.run {
-            getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
-                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
-                remove<Boolean>("removed")
-            }
-            getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
-                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
-                remove<Boolean>("sold")
-            }
-        }
 
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {

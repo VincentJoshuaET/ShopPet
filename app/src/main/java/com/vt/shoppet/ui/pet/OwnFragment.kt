@@ -1,5 +1,6 @@
 package com.vt.shoppet.ui.pet
 
+import android.content.res.Configuration
 import android.os.Bundle
 import android.view.View
 import android.widget.ImageView
@@ -17,10 +18,7 @@ import com.vt.shoppet.actions.PetActions
 import com.vt.shoppet.databinding.FragmentOwnBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.ui.adapter.PetAdapter
-import com.vt.shoppet.util.loadFirebaseImage
-import com.vt.shoppet.util.setOnLayoutChangeListener
-import com.vt.shoppet.util.showSnackbar
-import com.vt.shoppet.util.viewBinding
+import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,6 +30,13 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
     private val dataViewModel: DataViewModel by activityViewModels()
 
     private val storage: StorageViewModel by activityViewModels()
+
+    private lateinit var gridLayoutManager: GridLayoutManager
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        gridLayoutManager = setLayout(newConfig.orientation)
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,6 +57,8 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
             savedStateHandle.remove<Boolean>("sold")
         }
 
+        gridLayoutManager = setLayout(resources.configuration.orientation)
+
         val adapter = PetAdapter().apply {
             stateRestorationPolicy = StateRestorationPolicy.PREVENT_WHEN_EMPTY
             setActions(object : PetActions {
@@ -61,7 +68,7 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
                         val id = pet.id
                         view.transitionName = id
                         val extras = FragmentNavigatorExtras(view to id)
-                        val action = OwnFragmentDirections.actionOwnToSelected(id)
+                        val action = OwnFragmentDirections.actionOwnToSelected(id, pet.name)
                         findNavController().navigate(action, extras)
                     }
 
@@ -72,7 +79,7 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
 
         recyclerPets.apply {
             setHasFixedSize(true)
-            layoutManager = GridLayoutManager(context, 2)
+            layoutManager = gridLayoutManager
             setOnLayoutChangeListener()
             setAdapter(adapter)
         }

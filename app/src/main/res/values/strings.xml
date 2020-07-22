@@ -52,7 +52,7 @@
     <string name="btn_yes">Yes</string>
     <string name="btn_confirm">Confirm</string>
     <string name="btn_save">Save</string>
-    <string name="txt_btn_register">Register Here</string>
+    <string name="txt_btn_register"><u>Register Here</u></string>
     <string name="txt_btn_forgot">Forgot Password</string>
     <string name="txt_btn_login">Already have an account?</string>
     <string name="btn_edit">Edit</string>

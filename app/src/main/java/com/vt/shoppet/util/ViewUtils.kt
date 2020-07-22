@@ -1,12 +1,14 @@
 package com.vt.shoppet.util
 
 import android.app.Activity
+import android.content.res.Configuration
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
@@ -43,6 +45,10 @@ fun Fragment.showActionSnackbar(exception: Exception, action: (View) -> Unit) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
 
+fun Fragment.setLayout(orientation: Int) = when (orientation) {
+    Configuration.ORIENTATION_LANDSCAPE -> GridLayoutManager(context, 3)
+    else -> GridLayoutManager(context, 2)
+}
 
 fun Button.popBackStackOnClick() = setOnClickListener {
     findNavController().popBackStack()

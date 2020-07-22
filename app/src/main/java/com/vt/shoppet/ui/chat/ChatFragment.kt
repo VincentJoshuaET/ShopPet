@@ -48,11 +48,13 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     override fun onClick(chat: Chat) = View.OnClickListener {
                         val senderIndex = if (user.uid == chat.uid[0]) 0 else 1
                         val receiverIndex = if (user.uid == chat.uid[0]) 1 else 0
+                        val username =
+                            if (user.uid == chat.uid[0]) chat.username[1] else chat.username[0]
                         dataViewModel.setChat(chat)
                         recyclerChats.removeItemDecorationAt(0)
                         val action =
                             ChatFragmentDirections
-                                .actionChatToConversation(senderIndex, receiverIndex)
+                                .actionChatToConversation(senderIndex, receiverIndex, username)
                         findNavController().navigate(action)
                     }
 

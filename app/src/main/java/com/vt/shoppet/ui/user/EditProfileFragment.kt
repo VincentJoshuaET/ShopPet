@@ -13,6 +13,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
+import androidx.core.widget.ContentLoadingProgressBar
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
@@ -22,7 +23,6 @@ import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditProfileBinding
@@ -57,7 +57,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     lateinit var keyboard: KeyboardUtils
 
     private lateinit var circularProgress: Animatable
-    private lateinit var progress: ProgressIndicator
+    private lateinit var progress: ContentLoadingProgressBar
     private lateinit var imageUser: ShapeableImageView
     private lateinit var imageUserUpload: ShapeableImageView
     private lateinit var toolbar: MaterialToolbar
