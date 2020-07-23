@@ -58,7 +58,6 @@ android {
             isUniversalApk = true
         }
     }
-
 }
 
 dependencies {
@@ -70,20 +69,20 @@ dependencies {
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.9")
 
     // Android Architecture Components
-    implementation("androidx.activity:activity-ktx:1.2.0-alpha06")
+    implementation("androidx.activity:activity-ktx:1.2.0-alpha07")
     implementation("androidx.appcompat:appcompat:1.1.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
-    implementation("androidx.core:core-ktx:1.3.0")
-    implementation("androidx.fragment:fragment-ktx:1.3.0-alpha06")
+    implementation("androidx.core:core-ktx:1.3.1")
+    implementation("androidx.fragment:fragment-ktx:1.3.0-alpha07")
     implementation("androidx.preference:preference-ktx:1.1.1")
-    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha04")
+    implementation("androidx.recyclerview:recyclerview:1.2.0-alpha05")
 
     // CameraX
-    val cameraVersion = "1.0.0-beta06"
+    val cameraVersion = "1.0.0-beta07"
     implementation("androidx.camera:camera-camera2:$cameraVersion")
     implementation("androidx.camera:camera-core:$cameraVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraVersion")
-    implementation("androidx.camera:camera-view:1.0.0-alpha13")
+    implementation("androidx.camera:camera-view:1.0.0-alpha14")
 
     // Firebase
     implementation("com.google.firebase:firebase-auth-ktx:19.3.2")
@@ -106,8 +105,8 @@ dependencies {
     implementation("com.google.guava:guava:29.0-jre")
 
     // Hilt
-    val hiltVersion = "1.0.0-alpha01"
-    val hiltAndroidVersion = "2.28.1-alpha"
+    val hiltVersion = "1.0.0-alpha02"
+    val hiltAndroidVersion = "2.28.3-alpha"
     implementation("androidx.hilt:hilt-lifecycle-viewmodel:$hiltVersion")
     implementation("com.google.dagger:hilt-android:$hiltAndroidVersion")
     implementation("com.google.dagger:hilt-android:$hiltAndroidVersion")
@@ -139,4 +138,8 @@ dependencies {
     androidTestImplementation("androidx.test.ext:junit-ktx:1.1.1")
     androidTestImplementation("androidx.test.espresso:espresso-core:3.2.0")
 
+}
+
+kapt {
+    correctErrorTypes = true
 }
