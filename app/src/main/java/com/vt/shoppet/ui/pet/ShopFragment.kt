@@ -203,8 +203,8 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         toolbar.setOnMenuItemClickListener { item ->
             when (item.itemId) {
                 R.id.item_refresh -> {
-                    recyclerPets.smoothScrollToPosition(0)
                     dataViewModel.resetFilter()
+                    recyclerPets.smoothScrollToPosition(0)
                     return@setOnMenuItemClickListener true
                 }
                 R.id.item_filter -> {

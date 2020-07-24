@@ -41,8 +41,8 @@ class SortDialog : DialogFragment() {
             .setTitle(R.string.menu_item_sort)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                viewModel.filter.observe(requireActivity()) { filter ->
-                    viewModel.pets.observe(requireActivity()) { pets ->
+                viewModel.filter.observe(this) { filter ->
+                    viewModel.pets.observe(this) { pets ->
                         filter.enabled = true
                         filter.field = "Upload Date"
                         filter.order = "Descending"
@@ -52,8 +52,8 @@ class SortDialog : DialogFragment() {
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                viewModel.filter.observe(requireActivity()) { filter ->
-                    viewModel.pets.observe(requireActivity()) { pets ->
+                viewModel.filter.observe(this) { filter ->
+                    viewModel.pets.observe(this) { pets ->
                         filter.enabled = true
                         filter.field = txtField.text.toString()
                         filter.order = txtOrder.text.toString()

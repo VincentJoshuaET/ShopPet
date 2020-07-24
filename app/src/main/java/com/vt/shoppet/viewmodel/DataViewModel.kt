@@ -63,11 +63,21 @@ class DataViewModel @ViewModelInject constructor(
         _chat.value = chat
     }
 
-    private lateinit var userLiveData: DocumentLiveData
-    private lateinit var petsLiveData: QueryLiveData
-    private lateinit var starredPetsLiveData: QueryLiveData
-    private lateinit var ownPetsLiveData: QueryLiveData
-    private lateinit var chatsLiveData: QueryLiveData
+    private val userLiveData by lazy {
+        DocumentLiveData(firestore.getUserReference(auth.uid()))
+    }
+    private val petsLiveData by lazy {
+        QueryLiveData(firestore.getPets())
+    }
+    private val starredPetsLiveData by lazy {
+        QueryLiveData(firestore.getStarredPets())
+    }
+    private val ownPetsLiveData by lazy {
+        QueryLiveData(firestore.getOwnPets())
+    }
+    private val chatsLiveData by lazy {
+        QueryLiveData(firestore.getChats())
+    }
 
     fun removeFirebaseData() {
         userLiveData.removeObservers(ProcessLifecycleOwner.get())
@@ -78,48 +88,38 @@ class DataViewModel @ViewModelInject constructor(
     }
 
     fun initFirebaseData() {
-        userLiveData = DocumentLiveData(firestore.getUserReference(auth.uid())).apply {
-            observe(ProcessLifecycleOwner.get()) { result ->
-                when (result) {
-                    is Result.Success -> _currentUser.value = result.data.toObject()
-                    is Result.Failure -> _currentUser.value = User()
-                }
+        userLiveData.observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> _currentUser.value = result.data.toObject()
+                is Result.Failure -> _currentUser.value = User()
             }
         }
 
-        petsLiveData = QueryLiveData(firestore.getPets()).apply {
-            observe(ProcessLifecycleOwner.get()) { result ->
-                when (result) {
-                    is Result.Success -> _pets.value = result.data.toObjects()
-                    is Result.Failure -> _pets.value = listOf()
-                }
+        petsLiveData.observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> _pets.value = result.data.toObjects()
+                is Result.Failure -> _pets.value = listOf()
             }
         }
 
-        starredPetsLiveData = QueryLiveData(firestore.getStarredPets()).apply {
-            observe(ProcessLifecycleOwner.get()) { result ->
-                when (result) {
-                    is Result.Success -> _starredPets.value = result.data.toObjects()
-                    is Result.Failure -> _starredPets.value = listOf()
-                }
+        starredPetsLiveData.observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> _starredPets.value = result.data.toObjects()
+                is Result.Failure -> _starredPets.value = listOf()
             }
         }
 
-        ownPetsLiveData = QueryLiveData(firestore.getOwnPets()).apply {
-            observe(ProcessLifecycleOwner.get()) { result ->
-                when (result) {
-                    is Result.Success -> _ownPets.value = result.data.toObjects()
-                    is Result.Failure -> _ownPets.value = listOf()
-                }
+        ownPetsLiveData.observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> _ownPets.value = result.data.toObjects()
+                is Result.Failure -> _ownPets.value = listOf()
             }
         }
 
-        chatsLiveData = QueryLiveData(firestore.getChats()).apply {
-            observe(ProcessLifecycleOwner.get()) { result ->
-                when (result) {
-                    is Result.Success -> _chats.value = result.data.toObjects()
-                    is Result.Failure -> _chats.value = listOf()
-                }
+        chatsLiveData.observe(ProcessLifecycleOwner.get()) { result ->
+            when (result) {
+                is Result.Success -> _chats.value = result.data.toObjects()
+                is Result.Failure -> _chats.value = listOf()
             }
         }
 

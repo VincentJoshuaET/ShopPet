@@ -87,8 +87,8 @@ class FilterDialog : DialogFragment() {
             .setTitle(R.string.menu_item_filter)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                dataViewModel.filter.observe(requireActivity()) { filter ->
-                    dataViewModel.pets.observe(requireActivity()) { pets ->
+                dataViewModel.filter.observe(this) { filter ->
+                    dataViewModel.pets.observe(this) { pets ->
                         filter.enabled = true
                         filter.type = "All"
                         filter.sex = "Both"
@@ -102,8 +102,8 @@ class FilterDialog : DialogFragment() {
                 }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                dataViewModel.filter.observe(requireActivity()) { filter ->
-                    dataViewModel.pets.observe(requireActivity()) { pets ->
+                dataViewModel.filter.observe(this) { filter ->
+                    dataViewModel.pets.observe(this) { pets ->
                         filter.enabled = true
                         filter.type = txtType.text.toString()
                         filter.sex = txtSex.text.toString()
