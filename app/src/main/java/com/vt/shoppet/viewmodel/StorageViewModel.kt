@@ -6,8 +6,8 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.storage.UploadTask
-import com.vt.shoppet.firebase.StorageRepo
 import com.vt.shoppet.model.Result
+import com.vt.shoppet.repo.StorageRepo
 import kotlinx.coroutines.Dispatchers
 
 class StorageViewModel @ViewModelInject constructor(

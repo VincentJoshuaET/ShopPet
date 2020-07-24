@@ -3,7 +3,7 @@ package com.vt.shoppet.impl
 import android.net.Uri
 import com.google.firebase.storage.FirebaseStorage
 import com.google.firebase.storage.UploadTask
-import com.vt.shoppet.firebase.StorageRepo
+import com.vt.shoppet.repo.StorageRepo
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton

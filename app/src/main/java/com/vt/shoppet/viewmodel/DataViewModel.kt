@@ -5,11 +5,11 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.*
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
-import com.vt.shoppet.firebase.AuthRepo
-import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.livedata.DocumentLiveData
 import com.vt.shoppet.livedata.QueryLiveData
 import com.vt.shoppet.model.*
+import com.vt.shoppet.repo.AuthRepo
+import com.vt.shoppet.repo.FirestoreRepo
 
 class DataViewModel @ViewModelInject constructor(
     private val auth: AuthRepo,

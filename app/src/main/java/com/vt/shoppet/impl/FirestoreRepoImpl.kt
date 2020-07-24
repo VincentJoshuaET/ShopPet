@@ -3,12 +3,12 @@ package com.vt.shoppet.impl
 import com.google.android.gms.tasks.Task
 import com.google.firebase.Timestamp
 import com.google.firebase.firestore.*
-import com.vt.shoppet.firebase.AuthRepo
-import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Message
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
+import com.vt.shoppet.repo.AuthRepo
+import com.vt.shoppet.repo.FirestoreRepo
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton

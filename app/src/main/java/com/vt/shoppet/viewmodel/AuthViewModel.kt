@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.iid.InstanceIdResult
-import com.vt.shoppet.firebase.AuthRepo
 import com.vt.shoppet.model.Result
+import com.vt.shoppet.repo.AuthRepo
 import kotlinx.coroutines.Dispatchers
 
 class AuthViewModel @ViewModelInject constructor(

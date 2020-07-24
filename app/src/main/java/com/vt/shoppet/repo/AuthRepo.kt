@@ -1,4 +1,4 @@
-package com.vt.shoppet.firebase
+package com.vt.shoppet.repo
 
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.iid.InstanceIdResult

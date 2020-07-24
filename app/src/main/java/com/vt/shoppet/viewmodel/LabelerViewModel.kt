@@ -6,8 +6,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabel
-import com.vt.shoppet.firebase.LabelerRepo
 import com.vt.shoppet.model.Result
+import com.vt.shoppet.repo.LabelerRepo
 import kotlinx.coroutines.Dispatchers
 
 class LabelerViewModel @ViewModelInject constructor(

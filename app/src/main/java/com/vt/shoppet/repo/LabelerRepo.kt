@@ -1,4 +1,4 @@
-package com.vt.shoppet.firebase
+package com.vt.shoppet.repo
 
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.label.ImageLabel

@@ -1,8 +1,8 @@
 package com.vt.shoppet.service
 
 import com.google.firebase.messaging.FirebaseMessagingService
-import com.vt.shoppet.firebase.AuthRepo
-import com.vt.shoppet.firebase.FirestoreRepo
+import com.vt.shoppet.repo.AuthRepo
+import com.vt.shoppet.repo.FirestoreRepo
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 

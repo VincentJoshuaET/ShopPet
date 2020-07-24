@@ -7,8 +7,8 @@ import androidx.lifecycle.liveData
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
-import com.vt.shoppet.firebase.FirestoreRepo
 import com.vt.shoppet.model.*
+import com.vt.shoppet.repo.FirestoreRepo
 import kotlinx.coroutines.Dispatchers
 
 class FirestoreViewModel @ViewModelInject constructor(private val firestore: FirestoreRepo) :

@@ -1,4 +1,4 @@
-package com.vt.shoppet.firebase
+package com.vt.shoppet.repo
 
 import android.net.Uri
 import com.google.firebase.storage.StorageReference

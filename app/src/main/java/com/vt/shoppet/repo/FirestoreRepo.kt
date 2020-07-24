@@ -1,4 +1,4 @@
-package com.vt.shoppet.firebase
+package com.vt.shoppet.repo
 
 import com.google.android.gms.tasks.Task
 import com.google.firebase.firestore.DocumentReference
