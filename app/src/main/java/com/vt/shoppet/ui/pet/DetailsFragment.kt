@@ -10,13 +10,14 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentDetailsBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.Result
+import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
@@ -39,31 +40,28 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
 
     private lateinit var progress: Animatable
     private lateinit var save: Drawable
-    private lateinit var btnSave: MaterialButton
+    private lateinit var toolbar: MaterialToolbar
 
     private fun updatePet(pet: Pet) {
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
                     progress.start()
-                    btnSave.isClickable = false
-                    btnSave.icon = progress as Drawable
+                    toolbar.menu.getItem(0).icon = progress as Drawable
                 }
                 is Result.Success -> {
-                    btnSave.icon = save
+                    toolbar.menu.getItem(0).icon = save
                     progress.stop()
-                    findNavController().getBackStackEntry(R.id.fragment_shop).savedStateHandle.set(
-                        "posted",
-                        true
-                    )
-                    findNavController().popBackStack(R.id.fragment_shop, false)
+                    findNavController().run {
+                        getBackStackEntry(R.id.fragment_shop).savedStateHandle.set("posted", true)
+                        popBackStack(R.id.fragment_shop, false)
+                    }
                 }
                 is Result.Failure -> {
                     showActionSnackbar(result.exception) {
                         updatePet(pet)
                     }
-                    btnSave.isClickable = true
-                    btnSave.icon = save
+                    toolbar.menu.getItem(0).icon = save
                     progress.stop()
                 }
             }
@@ -75,16 +73,14 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
             when (result) {
                 is Result.Loading -> {
                     progress.start()
-                    btnSave.isClickable = false
-                    btnSave.icon = progress as Drawable
+                    toolbar.menu.getItem(0).icon = progress as Drawable
                 }
                 is Result.Success -> updatePet(pet.copy(id = result.data.id))
                 is Result.Failure -> {
                     showActionSnackbar(result.exception) {
                         addPet(pet)
                     }
-                    btnSave.isClickable = true
-                    btnSave.icon = save
+                    toolbar.menu.getItem(0).icon = save
                     progress.stop()
                 }
             }
@@ -101,8 +97,10 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        btnSave = binding.btnSave
+        val activity = requireActivity() as MainActivity
+
         progress = circularProgress()
+        toolbar = activity.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
@@ -210,94 +208,102 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
             keyboard.hide(this)
         }
 
-        btnSave.setOnClickListener {
+
+        toolbar.setOnMenuItemClickListener { item ->
             keyboard.hide(this)
+            when (item.itemId) {
+                R.id.item_save -> {
+                    val name = txtName.text.toString().capitalizeWords()
+                    val price = txtPrice.text.toString().toIntOrNull() ?: 0
+                    val vaccineStatus = txtVaccineStatus.text.toString()
+                    val medicalRecords = txtMedicalRecords.text.toString()
+                    val sex = txtSex.text.toString()
+                    val age = txtAge.text.toString().toIntOrNull() ?: 0
+                    val unit = txtUnit.text.toString()
+                    val description = txtDescription.text.toString().capitalize(Locale.ROOT)
+                    val breed =
+                        if (custom) txtCustomBreed.text.toString().capitalizeWords()
+                        else txtBreed.text.toString()
+                    var fail = false
 
-            val name = txtName.text.toString().capitalizeWords()
-            val price = txtPrice.text.toString().toIntOrNull() ?: 0
-            val vaccineStatus = txtVaccineStatus.text.toString()
-            val medicalRecords = txtMedicalRecords.text.toString()
-            val sex = txtSex.text.toString()
-            val age = txtAge.text.toString().toIntOrNull() ?: 0
-            val unit = txtUnit.text.toString()
-            val description = txtDescription.text.toString().capitalize(Locale.ROOT)
-            val breed =
-                if (custom) txtCustomBreed.text.toString().capitalizeWords()
-                else txtBreed.text.toString()
-            var fail = false
+                    if (name.isEmpty()) {
+                        txtName.showError(getString(R.string.txt_enter_name))
+                        fail = true
+                    }
+                    if (price == 0) {
+                        txtPrice.showError(getString(R.string.txt_enter_price))
+                        fail = true
+                    }
+                    if (type.isEmpty()) {
+                        txtType.showError(getString(R.string.txt_select_type))
+                        fail = true
+                    }
+                    if (breed.isEmpty()) {
+                        if (custom) txtCustomBreed.showError(getString(R.string.txt_enter_breed))
+                        else txtBreed.showError(getString(R.string.txt_enter_breed))
+                        fail = true
+                    }
+                    if (type == types[1] || type == types[2]) {
+                        if (vaccineStatus.isEmpty()) {
+                            txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
+                            fail = true
+                        }
+                        if (medicalRecords.isEmpty()) {
+                            txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
+                            fail = true
+                        }
+                    }
+                    if (sex.isEmpty()) {
+                        txtSex.showError(getString(R.string.txt_enter_sex))
+                        fail = true
+                    }
+                    if (age == 0) {
+                        txtAge.showError(getString(R.string.txt_enter_age))
+                        fail = true
+                    }
+                    if (unit.isEmpty()) {
+                        txtUnit.showError(getString(R.string.txt_enter_age_unit))
+                        fail = true
+                    }
 
-            if (name.isEmpty()) {
-                txtName.showError(getString(R.string.txt_enter_name))
-                fail = true
-            }
-            if (price == 0) {
-                txtPrice.showError(getString(R.string.txt_enter_price))
-                fail = true
-            }
-            if (type.isEmpty()) {
-                txtType.showError(getString(R.string.txt_select_type))
-                fail = true
-            }
-            if (breed.isEmpty()) {
-                if (custom) txtCustomBreed.showError(getString(R.string.txt_enter_breed))
-                else txtBreed.showError(getString(R.string.txt_enter_breed))
-                fail = true
-            }
-            if (type == types[1] || type == types[2]) {
-                if (vaccineStatus.isEmpty()) {
-                    txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
-                    fail = true
+                    if (fail) return@setOnMenuItemClickListener false
+
+                    val instant = when (unit) {
+                        units[0] -> LocalDateTime.now().minusDays(age.toLong()).atZone(localZoneId)
+                            .toInstant()
+                        units[1] -> LocalDateTime.now().minusWeeks(age.toLong()).atZone(localZoneId)
+                            .toInstant()
+                        units[2] -> LocalDateTime.now().minusMonths(age.toLong())
+                            .atZone(localZoneId)
+                            .toInstant()
+                        else -> LocalDateTime.now().minusYears(age.toLong()).atZone(localZoneId)
+                            .toInstant()
+                    }
+
+                    val dateOfBirth = Timestamp(instant.epochSecond, instant.nano)
+
+                    val pet = Pet(
+                        name = name,
+                        uid = uid,
+                        username = username,
+                        image = image,
+                        type = type,
+                        price = price,
+                        sex = sex,
+                        dateOfBirth = dateOfBirth,
+                        breed = breed,
+                        vaccineStatus = vaccineStatus,
+                        medicalRecords = medicalRecords,
+                        description = description,
+                        visible = true,
+                        sold = false
+                    )
+
+                    addPet(pet)
+                    return@setOnMenuItemClickListener true
                 }
-                if (medicalRecords.isEmpty()) {
-                    txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
-                    fail = true
-                }
+                else -> return@setOnMenuItemClickListener false
             }
-            if (sex.isEmpty()) {
-                txtSex.showError(getString(R.string.txt_enter_sex))
-                fail = true
-            }
-            if (age == 0) {
-                txtAge.showError(getString(R.string.txt_enter_age))
-                fail = true
-            }
-            if (unit.isEmpty()) {
-                txtUnit.showError(getString(R.string.txt_enter_age_unit))
-                fail = true
-            }
-
-            if (fail) return@setOnClickListener
-
-            val instant = when (unit) {
-                units[0] -> LocalDateTime.now().minusDays(age.toLong()).atZone(localZoneId)
-                    .toInstant()
-                units[1] -> LocalDateTime.now().minusWeeks(age.toLong()).atZone(localZoneId)
-                    .toInstant()
-                units[2] -> LocalDateTime.now().minusMonths(age.toLong()).atZone(localZoneId)
-                    .toInstant()
-                else -> LocalDateTime.now().minusYears(age.toLong()).atZone(localZoneId).toInstant()
-            }
-
-            val dateOfBirth = Timestamp(instant.epochSecond, instant.nano)
-
-            val pet = Pet(
-                name = name,
-                uid = uid,
-                username = username,
-                image = image,
-                type = type,
-                price = price,
-                sex = sex,
-                dateOfBirth = dateOfBirth,
-                breed = breed,
-                vaccineStatus = vaccineStatus,
-                medicalRecords = medicalRecords,
-                description = description,
-                visible = true,
-                sold = false
-            )
-
-            addPet(pet)
         }
     }
 

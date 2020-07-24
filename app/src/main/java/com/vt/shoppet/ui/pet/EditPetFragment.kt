@@ -9,11 +9,12 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
+import com.google.android.material.appbar.MaterialToolbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditPetBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.Result
+import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
@@ -34,30 +35,29 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
 
     private lateinit var progress: Animatable
     private lateinit var save: Drawable
-    private lateinit var btnSave: MaterialButton
+    private lateinit var toolbar: MaterialToolbar
 
     private fun updatePet(pet: Pet) {
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
             when (result) {
                 is Result.Loading -> {
                     progress.start()
-                    btnSave.isClickable = false
-                    btnSave.icon = progress as Drawable
+                    toolbar.menu.getItem(0).icon = progress as Drawable
                 }
                 is Result.Success -> {
-                    btnSave.icon = save
+                    toolbar.menu.getItem(0).icon = save
                     progress.stop()
                     dataViewModel.setCurrentPet(pet)
                     findNavController().run {
                         previousBackStackEntry?.savedStateHandle?.set("edited", true)
+                        popBackStack()
                     }
                 }
                 is Result.Failure -> {
                     showActionSnackbar(result.exception) {
                         updatePet(pet)
                     }
-                    btnSave.isClickable = true
-                    btnSave.icon = save
+                    toolbar.menu.getItem(0).icon = save
                     progress.stop()
                 }
             }
@@ -68,8 +68,10 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
+        val activity = requireActivity() as MainActivity
+
         progress = circularProgress()
-        btnSave = binding.btnSave
+        toolbar = activity.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
@@ -121,46 +123,52 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
             txtUnit.setText(age.second)
             txtDescription.setText(pet.description)
 
-            btnSave.setOnClickListener {
+            toolbar.setOnMenuItemClickListener { item ->
                 keyboard.hide(this)
+                when (item.itemId) {
+                    R.id.item_save -> {
+                        val name = txtName.text.toString().capitalizeWords()
+                        val price = txtPrice.text.toString().toIntOrNull() ?: 0
+                        val vaccineStatus = txtVaccineStatus.text.toString()
+                        val medicalRecords = txtMedicalRecords.text.toString()
+                        val description = txtDescription.text.toString().capitalize(Locale.ROOT)
+                        var fail = false
 
-                val name = txtName.text.toString().capitalizeWords()
-                val price = txtPrice.text.toString().toIntOrNull() ?: 0
-                val vaccineStatus = txtVaccineStatus.text.toString()
-                val medicalRecords = txtMedicalRecords.text.toString()
-                val description = txtDescription.text.toString().capitalize(Locale.ROOT)
-                var fail = false
+                        if (name.isEmpty()) {
+                            txtName.showError(getString(R.string.txt_enter_name))
+                            fail = true
+                        }
+                        if (price == 0) {
+                            txtPrice.showError(getString(R.string.txt_enter_price))
+                            fail = true
+                        }
+                        if (type == types[1] || type == types[2]) {
+                            if (vaccineStatus.isEmpty()) {
+                                txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
+                                fail = true
+                            }
+                            if (medicalRecords.isEmpty()) {
+                                txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
+                                fail = true
+                            }
+                        }
 
-                if (name.isEmpty()) {
-                    txtName.showError(getString(R.string.txt_enter_name))
-                    fail = true
-                }
-                if (price == 0) {
-                    txtPrice.showError(getString(R.string.txt_enter_price))
-                    fail = true
-                }
-                if (type == types[1] || type == types[2]) {
-                    if (vaccineStatus.isEmpty()) {
-                        txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
-                        fail = true
+                        if (fail) return@setOnMenuItemClickListener false
+
+                        val data = pet.copy(
+                            name = name,
+                            price = price,
+                            vaccineStatus = vaccineStatus,
+                            medicalRecords = medicalRecords,
+                            description = description
+                        )
+
+                        updatePet(data)
+
+                        return@setOnMenuItemClickListener true
                     }
-                    if (medicalRecords.isEmpty()) {
-                        txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
-                        fail = true
-                    }
+                    else -> return@setOnMenuItemClickListener false
                 }
-
-                if (fail) return@setOnClickListener
-
-                val data = pet.copy(
-                    name = name,
-                    price = price,
-                    vaccineStatus = vaccineStatus,
-                    medicalRecords = medicalRecords,
-                    description = description
-                )
-
-                updatePet(data)
             }
         }
     }
