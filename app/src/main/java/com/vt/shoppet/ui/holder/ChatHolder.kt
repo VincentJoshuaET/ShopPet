@@ -21,10 +21,6 @@ class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.roo
     private val txtMessage = binding.txtMessage
     private val txtDate = binding.txtDate
 
-    init {
-
-    }
-
     fun bindView(
         chat: Chat,
         user: User,

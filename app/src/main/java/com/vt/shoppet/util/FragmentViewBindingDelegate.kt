@@ -1,8 +1,6 @@
 package com.vt.shoppet.util
 
-import android.view.LayoutInflater
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.Lifecycle
@@ -38,20 +36,11 @@ class FragmentViewBindingDelegate<T : ViewBinding>(
         val binding = _binding
         if (binding != null) return binding
 
-        val isNotInitialized =
-            !fragment.viewLifecycleOwner.lifecycle.currentState.isAtLeast(Lifecycle.State.INITIALIZED)
-        if (isNotInitialized) {
+        val currentState = fragment.viewLifecycleOwner.lifecycle.currentState
+        if (!currentState.isAtLeast(Lifecycle.State.INITIALIZED)) {
             throw IllegalStateException("Should not attempt to get bindings when Fragment views are destroyed.")
         }
 
         return factory(thisRef.requireView()).also { _binding = it }
     }
 }
-
-fun <T : ViewBinding> Fragment.viewBinding(factory: (View) -> T) =
-    FragmentViewBindingDelegate(this, factory)
-
-inline fun <T : ViewBinding> AppCompatActivity.viewBinding(crossinline inflater: (LayoutInflater) -> T) =
-    lazy(LazyThreadSafetyMode.NONE) {
-        inflater.invoke(layoutInflater)
-    }
