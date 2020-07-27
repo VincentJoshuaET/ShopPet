@@ -54,10 +54,6 @@ fun Button.popBackStackOnClick() = setOnClickListener {
     findNavController().popBackStack()
 }
 
-fun Button.navigateOnClick(id: Int) = setOnClickListener {
-    findNavController().navigate(id)
-}
-
 fun RecyclerView.setOnLayoutChangeListener() =
     addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
         if (top < oldTop) smoothScrollToPosition(oldTop)

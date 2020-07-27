@@ -12,6 +12,7 @@
         android:layout_height="72dp"
         android:layout_margin="8dp"
         android:src="@drawable/logo"
+        android:transitionName="logo"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

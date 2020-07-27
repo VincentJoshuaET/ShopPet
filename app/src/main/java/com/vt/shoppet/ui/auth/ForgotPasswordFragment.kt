@@ -9,6 +9,7 @@ import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.transition.MaterialContainerTransform
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentForgotPasswordBinding
 import com.vt.shoppet.model.Result
@@ -54,6 +55,12 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
                 }
             }
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        sharedElementEnterTransition = MaterialContainerTransform()
+        sharedElementReturnTransition = MaterialContainerTransform()
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

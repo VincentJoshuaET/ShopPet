@@ -8,6 +8,7 @@ import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
+import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
@@ -154,6 +155,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         progress = circularProgress()
         btnLogin = binding.btnLogin
 
+        val imageLogo = binding.imageLogo
         val txtEmail = binding.txtEmail
         val txtPassword = binding.txtPassword
         val btnForgot = binding.btnForgot
@@ -161,9 +163,17 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
         txtEmail.setErrorListener()
         txtPassword.setErrorListener()
+        val extras = FragmentNavigatorExtras(imageLogo to "logo")
 
-        btnRegister.navigateOnClick(R.id.action_login_to_register)
-        btnForgot.navigateOnClick(R.id.action_login_to_forgot_password)
+        btnRegister.setOnClickListener {
+            val action = LoginFragmentDirections.actionLoginToRegister()
+            findNavController().navigate(action, extras)
+        }
+
+        btnForgot.setOnClickListener {
+            val action = LoginFragmentDirections.actionLoginToForgotPassword()
+            findNavController().navigate(action, extras)
+        }
 
         btnLogin.setOnClickListener {
             keyboard.hide(this)
