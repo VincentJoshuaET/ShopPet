@@ -14,15 +14,16 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentLoginBinding
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private val binding by viewBinding(FragmentLoginBinding::bind)
@@ -38,29 +39,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     private lateinit var btnLogin: MaterialButton
 
     private fun instanceId() {
+        progress.start()
+        btnLogin.isClickable = false
+        btnLogin.icon = progress as Drawable
         auth.instanceId().observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnLogin.isClickable = false
-                    btnLogin.icon = progress as Drawable
+            result.onSuccess { instanceIdResult ->
+                btnLogin.icon = null
+                progress.stop()
+                firestore.addToken(instanceIdResult.token)
+                dataViewModel.initFirebaseData()
+                findNavController().navigate(R.id.action_auth_to_home)
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    instanceId()
                 }
-                is Result.Success -> {
-                    btnLogin.icon = null
-                    progress.stop()
-                    firestore.addToken(result.data.token)
-                    dataViewModel.initFirebaseData()
-                    findNavController().navigate(R.id.action_auth_to_home)
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        instanceId()
-                    }
-                    auth.signOut()
-                    btnLogin.isClickable = true
-                    btnLogin.icon = null
-                    progress.stop()
-                }
+                auth.signOut()
+                btnLogin.isClickable = true
+                btnLogin.icon = null
+                progress.stop()
             }
         }
     }
@@ -82,29 +79,25 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             .create()
 
     private fun verifyEmail() {
+        progress.start()
+        btnLogin.isClickable = false
+        btnLogin.icon = progress as Drawable
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnLogin.isClickable = false
-                    btnLogin.icon = progress as Drawable
+            result.onSuccess {
+                showSnackbar(getString(R.string.txt_verification_sent))
+                auth.signOut()
+                btnLogin.isClickable = true
+                btnLogin.icon = null
+                progress.stop()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    verifyEmail()
                 }
-                is Result.Success -> {
-                    showSnackbar(getString(R.string.txt_verification_sent))
-                    auth.signOut()
-                    btnLogin.isClickable = true
-                    btnLogin.icon = null
-                    progress.stop()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        verifyEmail()
-                    }
-                    auth.signOut()
-                    btnLogin.isClickable = true
-                    btnLogin.icon = null
-                    progress.stop()
-                }
+                auth.signOut()
+                btnLogin.isClickable = true
+                btnLogin.icon = null
+                progress.stop()
             }
         }
     }
@@ -126,25 +119,21 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             .create()
 
     private fun signIn(email: String, password: String) {
+        progress.start()
+        btnLogin.isClickable = false
+        btnLogin.icon = progress as Drawable
         auth.signIn(email, password).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnLogin.isClickable = false
-                    btnLogin.icon = progress as Drawable
+            result.onSuccess {
+                if (auth.isUserVerified()) disclaimer().show()
+                else unverified().show()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    signIn(email, password)
                 }
-                is Result.Success -> {
-                    if (auth.isUserVerified()) disclaimer().show()
-                    else unverified().show()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        signIn(email, password)
-                    }
-                    btnLogin.isClickable = true
-                    btnLogin.icon = null
-                    progress.stop()
-                }
+                btnLogin.isClickable = true
+                btnLogin.icon = null
+                progress.stop()
             }
         }
     }

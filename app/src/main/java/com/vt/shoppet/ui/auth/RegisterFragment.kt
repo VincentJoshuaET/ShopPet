@@ -15,7 +15,6 @@ import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentRegisterBinding
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
@@ -41,99 +40,87 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     private lateinit var btnRegister: MaterialButton
 
     private fun verifyEmail() {
+        progress.start()
+        btnRegister.isClickable = false
+        btnRegister.icon = progress as Drawable
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnRegister.isClickable = false
-                    btnRegister.icon = progress as Drawable
+            result.onSuccess {
+                btnRegister.icon = check
+                progress.stop()
+                showSnackbar(getString(R.string.txt_verification_sent))
+                auth.signOut()
+                findNavController().popBackStack()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    verifyEmail()
                 }
-                is Result.Success -> {
-                    btnRegister.icon = check
-                    progress.stop()
-                    showSnackbar(getString(R.string.txt_verification_sent))
-                    auth.signOut()
-                    findNavController().popBackStack()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        verifyEmail()
-                    }
-                    btnRegister.isClickable = true
-                    btnRegister.icon = check
-                    progress.stop()
-                }
+                btnRegister.isClickable = true
+                btnRegister.icon = check
+                progress.stop()
             }
         }
     }
 
     private fun addUser(user: User) {
+        progress.start()
+        btnRegister.isClickable = false
+        btnRegister.icon = progress as Drawable
         firestore.addUser(user).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnRegister.isClickable = false
-                    btnRegister.icon = progress as Drawable
+            result.onSuccess {
+                verifyEmail()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    addUser(user)
                 }
-                is Result.Success -> verifyEmail()
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        addUser(user)
-                    }
-                    btnRegister.isClickable = true
-                    btnRegister.icon = check
-                    progress.stop()
-                }
+                btnRegister.isClickable = true
+                btnRegister.icon = check
+                progress.stop()
             }
         }
     }
 
     private fun createUser(user: User, email: String, password: String) {
+        progress.start()
+        btnRegister.isClickable = false
+        btnRegister.icon = progress as Drawable
         auth.createUser(email, password).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnRegister.isClickable = false
-                    btnRegister.icon = progress as Drawable
+            result.onSuccess {
+                addUser(user.copy(uid = auth.uid()))
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    createUser(user, email, password)
                 }
-                is Result.Success -> addUser(user.copy(uid = auth.uid()))
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        createUser(user, email, password)
-                    }
-                    btnRegister.isClickable = true
-                    btnRegister.icon = check
-                    progress.stop()
-                }
+                btnRegister.isClickable = true
+                btnRegister.icon = check
+                progress.stop()
             }
         }
     }
 
     private fun checkUsername(user: User, email: String, password: String) {
+        progress.start()
+        btnRegister.isClickable = false
+        btnRegister.icon = progress as Drawable
         firestore.checkUsername(user.username).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnRegister.isClickable = false
-                    btnRegister.icon = progress as Drawable
-                }
-                is Result.Success -> {
-                    if (result.data.isEmpty) createUser(user, email, password)
-                    else {
-                        showSnackbar(getString(R.string.txt_username_exists))
-                        btnRegister.isClickable = true
-                        btnRegister.icon = check
-                        progress.stop()
-                    }
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        checkUsername(user, email, password)
-                    }
-                    binding.btnRegister.isClickable = true
+            result.onSuccess { snapshot ->
+                if (snapshot.isEmpty) createUser(user, email, password)
+                else {
+                    showSnackbar(getString(R.string.txt_username_exists))
+                    btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    checkUsername(user, email, password)
+                }
+                binding.btnRegister.isClickable = true
+                btnRegister.icon = check
+                progress.stop()
             }
         }
     }

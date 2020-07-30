@@ -1,17 +1,12 @@
 package com.vt.shoppet.di
 
-import com.vt.shoppet.impl.AuthRepoImpl
-import com.vt.shoppet.impl.FirestoreRepoImpl
-import com.vt.shoppet.impl.LabelerRepoImpl
-import com.vt.shoppet.impl.StorageRepoImpl
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.repo.LabelerRepo
-import com.vt.shoppet.repo.StorageRepo
+import com.vt.shoppet.impl.*
+import com.vt.shoppet.repo.*
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
@@ -21,6 +16,11 @@ abstract class RepoModule {
     @Binds
     @Singleton
     abstract fun bindAuthRepo(authRepoImpl: AuthRepoImpl): AuthRepo
+
+    @Binds
+    @ExperimentalCoroutinesApi
+    @Singleton
+    abstract fun bindDataRepo(dataRepoImpl: DataRepoImpl): DataRepo
 
     @Binds
     @Singleton

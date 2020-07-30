@@ -6,12 +6,16 @@ import android.graphics.drawable.Animatable
 import android.util.TypedValue
 import android.view.View
 import android.widget.Button
+import androidx.annotation.MenuRes
+import androidx.core.view.isVisible
+import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
+import com.vt.shoppet.databinding.ActivityMainBinding
 
 fun Fragment.circularProgress(): Animatable {
     val value = TypedValue()
@@ -27,21 +31,21 @@ fun Fragment.circularProgress(): Animatable {
 fun Activity.showSnackbar(message: String) =
     Snackbar.make(window.decorView.rootView, message, Snackbar.LENGTH_SHORT).show()
 
-fun Activity.showActionSnackbar(exception: Exception, action: (View) -> Unit) =
+fun Activity.showActionSnackbar(exception: Throwable, action: (View) -> Unit) =
     Snackbar.make(window.decorView.rootView, exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
 
 fun Fragment.showSnackbar(message: String) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
 
-fun Fragment.showSnackbar(exception: Exception) =
+fun Fragment.showSnackbar(exception: Throwable) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT).show()
 
 fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
 
-fun Fragment.showActionSnackbar(exception: Exception, action: (View) -> Unit) =
+fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) =
     Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
 
@@ -57,4 +61,46 @@ fun Button.popBackStackOnClick() = setOnClickListener {
 fun RecyclerView.setOnLayoutChangeListener() =
     addOnLayoutChangeListener { _, _, top, _, _, _, oldTop, _, _ ->
         if (top < oldTop) smoothScrollToPosition(oldTop)
+    }
+
+fun ActivityMainBinding.setupAuthView() =
+    apply {
+        appbar.isVisible = false
+        bottomNavigationView.isVisible = false
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        toolbar.menu.clear()
+    }
+
+fun ActivityMainBinding.setupHomeNavigationView() =
+    apply {
+        appbar.isVisible = true
+        bottomNavigationView.isVisible = true
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        toolbar.menu.clear()
+    }
+
+fun ActivityMainBinding.setupHomeNavigationView(@MenuRes menu: Int) =
+    apply {
+        appbar.isVisible = true
+        bottomNavigationView.isVisible = true
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        toolbar.menu.clear()
+        toolbar.inflateMenu(menu)
+    }
+
+fun ActivityMainBinding.setupToolbar() =
+    apply {
+        appbar.isVisible = true
+        bottomNavigationView.isVisible = false
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        toolbar.menu.clear()
+    }
+
+fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
+    apply {
+        appbar.isVisible = true
+        bottomNavigationView.isVisible = false
+        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        toolbar.menu.clear()
+        toolbar.inflateMenu(menu)
     }

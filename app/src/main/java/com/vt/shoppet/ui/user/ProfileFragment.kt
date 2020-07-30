@@ -14,7 +14,6 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentProfileBinding
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
@@ -23,11 +22,13 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val binding by viewBinding(FragmentProfileBinding::bind)
@@ -43,41 +44,41 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private lateinit var progress: Animatable
     private lateinit var report: Drawable
 
-    private fun reportUser(uid: String, currentUid: String) =
+    private fun reportUser(uid: String, currentUid: String) {
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.reportUser(uid, currentUid).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    toolbar.menu.getItem(0).icon = progress as Drawable
+            result.onSuccess {
+                toolbar.menu.getItem(0).icon = report
+                progress.stop()
+                showSnackbar(getString(R.string.txt_reported_user))
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    reportUser(uid, currentUid)
                 }
-                is Result.Success -> {
-                    toolbar.menu.getItem(0).icon = report
-                    progress.stop()
-                    showSnackbar(getString(R.string.txt_reported_user))
-                }
-                is Result.Failure -> {
-                    showSnackbar(result.exception)
-                    toolbar.menu.getItem(0).icon = report
-                    progress.stop()
-                }
+                toolbar.menu.getItem(0).icon = report
+                progress.stop()
             }
         }
+    }
 
-    private fun addReport(uid: String, currentUid: String) =
+    private fun addReport(uid: String, currentUid: String) {
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.addReport(uid).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    toolbar.menu.getItem(0).icon = progress as Drawable
+            result.onSuccess {
+                reportUser(uid, currentUid)
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    addReport(uid, currentUid)
                 }
-                is Result.Success -> reportUser(uid, currentUid)
-                is Result.Failure -> {
-                    showSnackbar(result.exception)
-                    toolbar.menu.getItem(0).icon = report
-                    progress.stop()
-                }
+                toolbar.menu.getItem(0).icon = report
+                progress.stop()
             }
         }
+    }
 
     private fun dialog(uid: String, currentUid: String) =
         MaterialAlertDialogBuilder(requireContext())
@@ -91,29 +92,30 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             }
             .create()
 
-    private fun getReport(uid: String, currentUid: String) =
+    private fun getReport(uid: String, currentUid: String) {
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.getReport(uid, currentUid).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> toolbar.menu.getItem(0).icon = progress as Drawable
-                is Result.Success -> {
-                    if (result.data.exists()) {
-                        showSnackbar(getString(R.string.txt_user_already_reported))
-                        toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
-                    } else dialog(uid, currentUid).show()
-                }
-                is Result.Failure -> {
-                    showSnackbar(result.exception)
+            result.onSuccess { document ->
+                if (document.exists()) {
+                    showSnackbar(getString(R.string.txt_user_already_reported))
                     toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
+                } else dialog(uid, currentUid).show()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    getReport(uid, currentUid)
                 }
+                toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
             }
         }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
 
-        toolbar = activity.toolbar
+        toolbar = activity.binding.toolbar
         progress = circularProgress()
         report = getDrawable(R.drawable.ic_report)
 

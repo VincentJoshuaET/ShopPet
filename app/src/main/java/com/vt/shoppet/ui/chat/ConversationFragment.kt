@@ -28,7 +28,6 @@ import com.vt.shoppet.actions.MessageActions
 import com.vt.shoppet.databinding.FragmentConversationBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Message
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.ui.adapter.MessageAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
@@ -38,10 +37,12 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     private val binding by viewBinding(FragmentConversationBinding::bind)
@@ -127,94 +128,82 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     }
 
     private fun sendChat(chat: Chat) {
+        txtMessage.text = null
+        txtMessage.isEnabled = false
+        progress.start()
+        inputMessage.endIconDrawable = progress as Drawable
         firestore.updateChat(chat).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    txtMessage.text = null
-                    txtMessage.isEnabled = false
-                    progress.start()
-                    inputMessage.endIconDrawable = progress as Drawable
+            result.onSuccess {
+                txtMessage.isEnabled = true
+                inputMessage.endIconDrawable = send
+                progress.stop()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    sendChat(chat)
                 }
-                is Result.Success -> {
-                    txtMessage.isEnabled = true
-                    inputMessage.endIconDrawable = send
-                    progress.stop()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        sendChat(chat)
-                    }
-                    txtMessage.isEnabled = true
-                    inputMessage.endIconDrawable = send
-                    progress.stop()
-                }
+                txtMessage.isEnabled = true
+                inputMessage.endIconDrawable = send
+                progress.stop()
             }
         }
     }
 
     private fun sendTextMessage(chat: Chat, message: Message) {
+        txtMessage.text = null
+        txtMessage.isEnabled = false
+        progress.start()
+        inputMessage.endIconDrawable = progress as Drawable
         firestore.sendMessage(chat, message).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    txtMessage.text = null
-                    txtMessage.isEnabled = false
-                    progress.start()
-                    inputMessage.endIconDrawable = progress as Drawable
+            result.onSuccess {
+                val text = if (message.message.isEmpty()) "Image" else message.message
+                val read = chat.read.apply {
+                    this[args.senderIndex] = true
+                    this[args.receiverIndex] = false
                 }
-                is Result.Success -> {
-                    val text = if (message.message.isEmpty()) "Image" else message.message
-                    val read = chat.read.apply {
-                        this[args.senderIndex] = true
-                        this[args.receiverIndex] = false
-                    }
-                    val data =
-                        chat.copy(empty = false, message = text, read = read, date = message.date)
-                    sendChat(data)
+                val data =
+                    chat.copy(empty = false, message = text, read = read, date = message.date)
+                sendChat(data)
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    sendTextMessage(chat, message)
                 }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        sendTextMessage(chat, message)
-                    }
-                    txtMessage.isEnabled = true
-                    inputMessage.endIconDrawable = send
-                    progress.stop()
-                }
+                txtMessage.isEnabled = true
+                inputMessage.endIconDrawable = send
+                progress.stop()
             }
         }
     }
 
     private fun uploadMessagePhoto(chat: Chat, text: String, image: String) {
+        txtMessage.text = null
+        txtMessage.isEnabled = false
+        progress.start()
+        inputMessage.endIconDrawable = progress as Drawable
         storage.uploadMessagePhoto(image, uri).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    txtMessage.text = null
-                    txtMessage.isEnabled = false
-                    progress.start()
-                    inputMessage.endIconDrawable = progress as Drawable
+            result.onSuccess {
+                clearImageView()
+                val date = Timestamp.now()
+                val message = Message(
+                    message = text,
+                    chatid = chat.id,
+                    senderid = chat.uid[args.senderIndex],
+                    recipientid = chat.uid[args.receiverIndex],
+                    senderusername = chat.username[args.senderIndex],
+                    recipientusername = chat.username[args.receiverIndex],
+                    image = image,
+                    date = date
+                )
+                sendTextMessage(chat, message)
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    uploadMessagePhoto(chat, text, image)
                 }
-                is Result.Success -> {
-                    clearImageView()
-                    val date = Timestamp.now()
-                    val message = Message(
-                        message = text,
-                        chatid = chat.id,
-                        senderid = chat.uid[args.senderIndex],
-                        recipientid = chat.uid[args.receiverIndex],
-                        senderusername = chat.username[args.senderIndex],
-                        recipientusername = chat.username[args.receiverIndex],
-                        image = image,
-                        date = date
-                    )
-                    sendTextMessage(chat, message)
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        uploadMessagePhoto(chat, text, image)
-                    }
-                    txtMessage.isEnabled = true
-                    inputMessage.endIconDrawable = send
-                    progress.stop()
-                }
+                txtMessage.isEnabled = true
+                inputMessage.endIconDrawable = send
+                progress.stop()
             }
         }
     }

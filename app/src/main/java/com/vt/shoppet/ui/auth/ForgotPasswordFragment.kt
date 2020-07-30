@@ -12,7 +12,6 @@ import com.google.android.material.button.MaterialButton
 import com.google.android.material.transition.MaterialContainerTransform
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentForgotPasswordBinding
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -32,28 +31,25 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     private lateinit var icon: Drawable
 
     private fun resetPassword(email: String) {
+        progress.start()
+        btnReset.isClickable = false
+        btnReset.icon = progress as Drawable
         auth.resetPassword(email).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnReset.isClickable = false
-                    btnReset.icon = progress as Drawable
-                }
-                is Result.Success -> {
-                    btnReset.icon = icon
-                    progress.stop()
-                    showSnackbar(getString(R.string.txt_email_sent))
-                    findNavController().popBackStack()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        resetPassword(email)
-                    }
-                    btnReset.isClickable = true
-                    btnReset.icon = icon
-                    progress.stop()
-                }
+            result.onSuccess {
+                btnReset.icon = icon
+                progress.stop()
+                showSnackbar(getString(R.string.txt_email_sent))
+                findNavController().popBackStack()
             }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    resetPassword(email)
+                }
+                btnReset.isClickable = true
+                btnReset.icon = icon
+                progress.stop()
+            }
+
         }
     }
 

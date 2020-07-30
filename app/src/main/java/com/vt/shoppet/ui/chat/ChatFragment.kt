@@ -16,7 +16,6 @@ import com.vt.shoppet.R
 import com.vt.shoppet.actions.ChatActions
 import com.vt.shoppet.databinding.FragmentChatBinding
 import com.vt.shoppet.model.Chat
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
 import com.vt.shoppet.ui.adapter.ChatAdapter
 import com.vt.shoppet.util.loadProfileImage
@@ -26,8 +25,10 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private val binding by viewBinding(FragmentChatBinding::bind)
@@ -59,23 +60,16 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
                 override fun setImage(uid: String, imageView: ImageView) {
                     firestore.getUserSnapshot(uid).observe(viewLifecycleOwner) { result ->
-                        when (result) {
-                            is Result.Success -> {
-                                val data: User? = result.data.toObject()
-                                data?.apply {
-                                    val image = image
-                                    if (image != null) {
-                                        loadProfileImage(imageView, storage.getUserPhoto(image))
-                                    } else {
-                                        imageView.setImageResource(R.drawable.ic_person)
-                                    }
-                                }
-                            }
-                            is Result.Failure -> {
-                                imageView.setImageResource(R.drawable.ic_person)
-                                showActionSnackbar(result.exception) {
-                                    setImage(uid, imageView)
-                                }
+                        result.onSuccess { document ->
+                            val data: User = document.toObject() ?: return@onSuccess
+                            val image = data.image
+                                ?: return@onSuccess imageView.setImageResource(R.drawable.ic_person)
+                            loadProfileImage(imageView, storage.getUserPhoto(image))
+                        }
+                        result.onFailure { exception ->
+                            imageView.setImageResource(R.drawable.ic_person)
+                            showActionSnackbar(exception) {
+                                setImage(uid, imageView)
                             }
                         }
                     }

@@ -13,16 +13,17 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditPetBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
 
     private val binding by viewBinding(FragmentEditPetBinding::bind)
@@ -38,28 +39,24 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
     private lateinit var toolbar: MaterialToolbar
 
     private fun updatePet(pet: Pet) {
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    toolbar.menu.getItem(0).icon = progress as Drawable
+            result.onSuccess {
+                toolbar.menu.getItem(0).icon = save
+                progress.stop()
+                dataViewModel.setCurrentPet(pet)
+                findNavController().run {
+                    previousBackStackEntry?.savedStateHandle?.set("edited", true)
+                    popBackStack()
                 }
-                is Result.Success -> {
-                    toolbar.menu.getItem(0).icon = save
-                    progress.stop()
-                    dataViewModel.setCurrentPet(pet)
-                    findNavController().run {
-                        previousBackStackEntry?.savedStateHandle?.set("edited", true)
-                        popBackStack()
-                    }
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    updatePet(pet)
                 }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        updatePet(pet)
-                    }
-                    toolbar.menu.getItem(0).icon = save
-                    progress.stop()
-                }
+                toolbar.menu.getItem(0).icon = save
+                progress.stop()
             }
         }
     }
@@ -71,7 +68,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
         val activity = requireActivity() as MainActivity
 
         progress = circularProgress()
-        toolbar = activity.toolbar
+        toolbar = activity.binding.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName

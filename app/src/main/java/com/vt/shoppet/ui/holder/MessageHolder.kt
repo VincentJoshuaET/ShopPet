@@ -42,9 +42,8 @@ class MessageHolder(view: View) : RecyclerView.ViewHolder(view) {
         }
 
         imageMessage.isVisible = message.image != null
-        message.image?.let { image ->
-            actions.setImage(image, imageMessage)
-        }
+        val image = message.image ?: return
+        actions.setImage(image, imageMessage)
     }
 
 }

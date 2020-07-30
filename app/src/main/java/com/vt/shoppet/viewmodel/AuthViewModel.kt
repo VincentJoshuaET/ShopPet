@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.iid.InstanceIdResult
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.repo.AuthRepo
 import kotlinx.coroutines.Dispatchers
 
@@ -16,52 +15,42 @@ class AuthViewModel @ViewModelInject constructor(
 
     fun signIn(email: String, password: String): LiveData<Result<AuthResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(auth.signIn(email, password)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                auth.signIn(email, password)
             }
+            emit(result)
         }
 
     fun createUser(email: String, password: String): LiveData<Result<AuthResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(auth.createUser(email, password)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                auth.createUser(email, password)
             }
+            emit(result)
         }
 
     fun verifyEmail(): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(auth.verifyEmail()))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                auth.verifyEmail()
             }
+            emit(result)
         }
 
     fun resetPassword(email: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(auth.resetPassword(email)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                auth.resetPassword(email)
             }
+            emit(result)
         }
 
     fun instanceId(): LiveData<Result<InstanceIdResult>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(auth.instanceId()))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                auth.instanceId()
             }
+            emit(result)
         }
 
     fun isLoggedIn() = auth.isLoggedIn()

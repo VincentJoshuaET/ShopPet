@@ -11,8 +11,7 @@ import com.vt.shoppet.ui.holder.MessageHolder
 open class MessageAdapter(
     options: FirestoreRecyclerOptions<Message>,
     private val actions: MessageActions
-) :
-    FirestoreRecyclerAdapter<Message, MessageHolder>(options) {
+) : FirestoreRecyclerAdapter<Message, MessageHolder>(options) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder =
         MessageHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))

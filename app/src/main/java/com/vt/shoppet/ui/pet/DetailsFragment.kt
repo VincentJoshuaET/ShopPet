@@ -16,17 +16,18 @@ import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentDetailsBinding
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class DetailsFragment : Fragment(R.layout.fragment_details) {
 
     private val binding by viewBinding(FragmentDetailsBinding::bind)
@@ -43,46 +44,40 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     private lateinit var toolbar: MaterialToolbar
 
     private fun updatePet(pet: Pet) {
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.updatePet(pet).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    toolbar.menu.getItem(0).icon = progress as Drawable
+            result.onSuccess {
+                toolbar.menu.getItem(0).icon = save
+                progress.stop()
+                findNavController().run {
+                    getBackStackEntry(R.id.fragment_shop).savedStateHandle.set("posted", true)
+                    popBackStack(R.id.fragment_shop, false)
                 }
-                is Result.Success -> {
-                    toolbar.menu.getItem(0).icon = save
-                    progress.stop()
-                    findNavController().run {
-                        getBackStackEntry(R.id.fragment_shop).savedStateHandle.set("posted", true)
-                        popBackStack(R.id.fragment_shop, false)
-                    }
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    updatePet(pet)
                 }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        updatePet(pet)
-                    }
-                    toolbar.menu.getItem(0).icon = save
-                    progress.stop()
-                }
+                toolbar.menu.getItem(0).icon = save
+                progress.stop()
             }
         }
     }
 
     private fun addPet(pet: Pet) {
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.addPet(pet).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    toolbar.menu.getItem(0).icon = progress as Drawable
+            result.onSuccess { reference ->
+                updatePet(pet.copy(id = reference.id))
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    addPet(pet)
                 }
-                is Result.Success -> updatePet(pet.copy(id = result.data.id))
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        addPet(pet)
-                    }
-                    toolbar.menu.getItem(0).icon = save
-                    progress.stop()
-                }
+                toolbar.menu.getItem(0).icon = save
+                progress.stop()
             }
         }
     }
@@ -100,7 +95,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         val activity = requireActivity() as MainActivity
 
         progress = circularProgress()
-        toolbar = activity.toolbar
+        toolbar = activity.binding.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName

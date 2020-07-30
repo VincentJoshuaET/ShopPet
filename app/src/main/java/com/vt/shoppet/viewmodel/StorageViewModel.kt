@@ -6,7 +6,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
 import com.google.firebase.storage.UploadTask
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.repo.StorageRepo
 import kotlinx.coroutines.Dispatchers
 
@@ -22,52 +21,42 @@ class StorageViewModel @ViewModelInject constructor(
 
     fun uploadPetPhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(storage.uploadPetPhoto(id, uri)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                storage.uploadPetPhoto(id, uri)
             }
+            emit(result)
         }
 
     fun uploadUserPhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(storage.uploadUserPhoto(id, uri)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                storage.uploadUserPhoto(id, uri)
             }
+            emit(result)
         }
 
     fun uploadMessagePhoto(id: String, uri: Uri): LiveData<Result<UploadTask.TaskSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(storage.uploadMessagePhoto(id, uri)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                storage.uploadMessagePhoto(id, uri)
             }
+            emit(result)
         }
 
     fun removePetPhoto(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(storage.removePetPhoto(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                storage.removePetPhoto(id)
             }
+            emit(result)
         }
 
     fun removeUserPhoto(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(storage.removeUserPhoto(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                storage.removeUserPhoto(id)
             }
+            emit(result)
         }
 
 }

@@ -7,15 +7,17 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
-import com.vt.shoppet.livedata.DocumentLiveData
-import com.vt.shoppet.livedata.QueryLiveData
-import com.vt.shoppet.model.*
-import com.vt.shoppet.repo.AuthRepo
-import com.vt.shoppet.repo.FirestoreRepo
+import com.vt.shoppet.model.Chat
+import com.vt.shoppet.model.Filter
+import com.vt.shoppet.model.Pet
+import com.vt.shoppet.model.User
+import com.vt.shoppet.repo.DataRepo
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@ExperimentalCoroutinesApi
 class DataViewModel @ViewModelInject constructor(
-    private val auth: AuthRepo,
-    private val firestore: FirestoreRepo,
+    data: DataRepo,
     @Assisted private val handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -65,51 +67,26 @@ class DataViewModel @ViewModelInject constructor(
         _chat.value = chat
     }
 
-    private val userLiveData by lazy {
-        DocumentLiveData(firestore.getUserReference(auth.uid()))
-    }
-    private val petsLiveData by lazy {
-        QueryLiveData(firestore.getPets())
-    }
-    private val starredPetsLiveData by lazy {
-        QueryLiveData(firestore.getStarredPets())
-    }
-    private val ownPetsLiveData by lazy {
-        QueryLiveData(firestore.getOwnPets())
-    }
-    private val chatsLiveData by lazy {
-        QueryLiveData(firestore.getChats())
-    }
+    private val userLiveData = data.currentUserFlow.asLiveData(Dispatchers.IO)
+    private val petsLiveData = data.petsFlow.asLiveData(Dispatchers.IO)
+    private val starredPetsLiveData = data.starredPetsFlow.asLiveData(Dispatchers.IO)
+    private val ownPetsLiveData = data.ownPetsFlow.asLiveData(Dispatchers.IO)
+    private val chatsLiveData = data.chatsFlow.asLiveData(Dispatchers.IO)
 
-    private val userObserver = Observer<Result<DocumentSnapshot>> { result ->
-        when (result) {
-            is Result.Success -> _currentUser.value = result.data.toObject()
-            is Result.Failure -> _currentUser.value = User()
-        }
+    private val userObserver = Observer<DocumentSnapshot> { document ->
+        _currentUser.value = document.toObject()
     }
-    private val petsObserver = Observer<Result<QuerySnapshot>> { result ->
-        when (result) {
-            is Result.Success -> _pets.value = result.data.toObjects()
-            is Result.Failure -> _pets.value = listOf()
-        }
+    private val petsObserver = Observer<QuerySnapshot> { snapshots ->
+        _pets.value = snapshots.toObjects()
     }
-    private val starredPetsObserver = Observer<Result<QuerySnapshot>> { result ->
-        when (result) {
-            is Result.Success -> _starredPets.value = result.data.toObjects()
-            is Result.Failure -> _starredPets.value = listOf()
-        }
+    private val starredPetsObserver = Observer<QuerySnapshot> { snapshots ->
+        _starredPets.value = snapshots.toObjects()
     }
-    private val ownPetsObserver = Observer<Result<QuerySnapshot>> { result ->
-        when (result) {
-            is Result.Success -> _ownPets.value = result.data.toObjects()
-            is Result.Failure -> _ownPets.value = listOf()
-        }
+    private val ownPetsObserver = Observer<QuerySnapshot> { snapshots ->
+        _ownPets.value = snapshots.toObjects()
     }
-    private val chatsObserver = Observer<Result<QuerySnapshot>> { result ->
-        when (result) {
-            is Result.Success -> _chats.value = result.data.toObjects()
-            is Result.Failure -> _chats.value = listOf()
-        }
+    private val chatsObserver = Observer<QuerySnapshot> { snapshots ->
+        _chats.value = snapshots.toObjects()
     }
 
     fun initFirebaseData() {

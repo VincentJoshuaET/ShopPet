@@ -24,15 +24,16 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSelectedBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Pet
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.model.User
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
     private val binding by viewBinding(FragmentSelectedBinding::bind)
@@ -67,12 +68,12 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
     private fun removePetPhoto(id: String) {
         storage.removePetPhoto(id).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Success -> findNavController().run {
-                    previousBackStackEntry?.savedStateHandle?.set("removed", true)
-                    popBackStack()
-                }
-                is Result.Failure -> showActionSnackbar(result.exception) {
+            result.onSuccess {
+                findNavController().previousBackStackEntry?.savedStateHandle?.set("removed", true)
+                findNavController().popBackStack()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
                     removePetPhoto(id)
                 }
             }
@@ -87,25 +88,23 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 dialog.dismiss()
             }
             .setNegativeButton(R.string.btn_yes) { _, _ ->
+                progress.start()
+                fabChatSold.setImageDrawable(progress as Drawable)
+                fabChatSold.isClickable = false
                 firestore.markSoldPet(id).observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Loading -> {
-                            progress.start()
-                            fabChatSold.setImageDrawable(progress as Drawable)
-                            fabChatSold.isClickable = false
-                        }
-                        is Result.Success -> findNavController().run {
+                    result.onSuccess {
+                        findNavController().run {
                             previousBackStackEntry?.savedStateHandle?.set("sold", true)
                             popBackStack()
                         }
-                        is Result.Failure -> {
-                            showActionSnackbar(result.exception) {
-                                soldDialog(id).show()
-                            }
-                            fabChatSold.setImageDrawable(chat)
-                            fabChatSold.isClickable = true
-                            progress.stop()
+                    }
+                    result.onFailure { exception ->
+                        showActionSnackbar(exception) {
+                            soldDialog(id).show()
                         }
+                        fabChatSold.setImageDrawable(chat)
+                        fabChatSold.isClickable = true
+                        progress.stop()
                     }
                 }
             }
@@ -121,9 +120,11 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             }
             .setNegativeButton(R.string.btn_yes) { _, _ ->
                 firestore.removePet(id).observe(viewLifecycleOwner) { result ->
-                    when (result) {
-                        is Result.Success -> removePetPhoto(image)
-                        is Result.Failure -> showActionSnackbar(result.exception) {
+                    result.onSuccess {
+                        removePetPhoto(image)
+                    }
+                    result.onFailure { exception ->
+                        showActionSnackbar(exception) {
                             removeDialog(id, image).show()
                         }
                     }
@@ -133,44 +134,40 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun checkStarredPet(id: String) {
+        progress.start()
+        btnStar.isClickable = false
+        btnStar.icon = progress as Drawable
+        btnStar.text = getString(R.string.lbl_loading)
         firestore.checkStarredPet(id).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnStar.isClickable = false
-                    btnStar.icon = progress as Drawable
-                    btnStar.text = getString(R.string.lbl_loading)
-                }
-                is Result.Success -> {
-                    starred = result.data.exists()
-                    if (starred) {
-                        starPetButton()
-                        progress.stop()
-                    } else {
-                        unstarPetButton()
-                        progress.stop()
-                    }
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        checkStarredPet(id)
-                    }
-                    btnStar.isClickable = false
+            result.onSuccess { document ->
+                starred = document.exists()
+                if (starred) {
+                    starPetButton()
                     progress.stop()
+                } else {
                     unstarPetButton()
+                    progress.stop()
                 }
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    checkStarredPet(id)
+                }
+                btnStar.isClickable = false
+                progress.stop()
+                unstarPetButton()
             }
         }
     }
 
     private fun createChat(chat: Chat) {
         firestore.createChat(chat).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Success -> {
-                    dataViewModel.setChat(chat)
-                    findNavController().navigate(R.id.action_selected_to_conversation)
-                }
-                is Result.Failure -> showActionSnackbar(result.exception) {
+            result.onSuccess {
+                dataViewModel.setChat(chat)
+                findNavController().navigate(R.id.action_selected_to_conversation)
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
                     createChat(chat)
                 }
             }
@@ -178,131 +175,104 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun checkChat(pet: Pet, user: User) {
+        progress.start()
+        fabChatSold.setImageDrawable(progress as Drawable)
+        fabChatSold.isClickable = false
         firestore.checkChat(user.uid, pet.uid).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    fabChatSold.setImageDrawable(progress as Drawable)
-                    fabChatSold.isClickable = false
+            result.onSuccess { snapshots ->
+                if (snapshots.isEmpty) {
+                    val chat = Chat(
+                        id = "${user.uid}${pet.uid}",
+                        uid = listOf(user.uid, pet.uid),
+                        username = listOf(user.username, pet.username),
+                        read = mutableListOf(true, true),
+                        empty = true
+                    )
+                    createChat(chat)
+                } else {
+                    val chats: List<Chat> = snapshots.toObjects()
+                    dataViewModel.setChat(chats.first())
+                    val senderIndex = chats.first().uid.indexOf(pet.uid)
+                    val receiverIndex = chats.first().uid.indexOf(user.uid)
+                    val username = chats.first().username[senderIndex]
+                    val action =
+                        SelectedFragmentDirections
+                            .actionSelectedToConversation(senderIndex, receiverIndex, username)
+                    findNavController().navigate(action)
                 }
-                is Result.Success -> {
-                    if (result.data.isEmpty) {
-                        val chat = Chat(
-                            id = "${user.uid}${pet.uid}",
-                            uid = listOf(user.uid, pet.uid),
-                            username = listOf(user.username, pet.username),
-                            read = mutableListOf(true, true),
-                            empty = true
-                        )
-                        createChat(chat)
-                    } else {
-                        val chats: List<Chat> = result.data.toObjects()
-                        dataViewModel.setChat(chats.first())
-                        val senderIndex = chats.first().uid.indexOf(pet.uid)
-                        val receiverIndex = chats.first().uid.indexOf(user.uid)
-                        val username = chats.first().username[senderIndex]
-                        val action =
-                            SelectedFragmentDirections
-                                .actionSelectedToConversation(senderIndex, receiverIndex, username)
-                        findNavController().navigate(action)
-                    }
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    checkChat(pet, user)
                 }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        checkChat(pet, user)
-                    }
-                    fabChatSold.setImageDrawable(chat)
-                    fabChatSold.isClickable = true
-                    progress.stop()
-                }
+                fabChatSold.setImageDrawable(chat)
+                fabChatSold.isClickable = true
+                progress.stop()
             }
         }
     }
 
     private fun getUser(pet: Pet, user: User) {
         firestore.getUserSnapshot(pet.uid).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Success -> {
-                    val data: User? = result.data.toObject()
-                    if (data != null) {
-                        dataViewModel.setUser(data)
-                        val image = data.image
-                        if (image != null) {
-                            loadProfileImage(imageSeller, storage.getUserPhoto(image))
-                        } else imageSeller.setImageResource(R.drawable.ic_person)
-                    } else imageSeller.setImageResource(R.drawable.ic_person)
-
-                    fabChatSold.setOnClickListener {
-                        if (pet.uid == user.uid) soldDialog(pet.id).show()
-                        else checkChat(pet, user)
-                    }
-
-                    cardSeller.setOnClickListener {
-                        val action =
-                            SelectedFragmentDirections.actionSelectedToProfile(pet.uid == user.uid)
-                        findNavController().navigate(action)
-                    }
+            result.onSuccess { document ->
+                val data: User = document.toObject()
+                    ?: return@observe imageSeller.setImageResource(R.drawable.ic_person)
+                dataViewModel.setUser(data)
+                val image =
+                    data.image ?: return@observe imageSeller.setImageResource(R.drawable.ic_person)
+                loadProfileImage(imageSeller, storage.getUserPhoto(image))
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    getUser(pet, user)
                 }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        getUser(pet, user)
-                    }
-                    imageSeller.setImageResource(R.drawable.ic_person)
-                }
+                imageSeller.setImageResource(R.drawable.ic_person)
             }
         }
     }
 
     private fun starPet(pet: Pet) {
+        progress.start()
+        btnStar.isClickable = false
+        btnStar.icon = progress as Drawable
+        btnStar.text = getString(R.string.lbl_loading)
         firestore.starPet(pet).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnStar.isClickable = false
-                    btnStar.icon = progress as Drawable
-                    btnStar.text = getString(R.string.lbl_loading)
+            result.onSuccess {
+                showSnackbar(getString(R.string.txt_starred))
+                starred = true
+                starPetButton()
+                progress.stop()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    starPet(pet)
                 }
-                is Result.Success -> {
-                    showSnackbar(getString(R.string.txt_starred))
-                    starred = true
-                    starPetButton()
-                    progress.stop()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        starPet(pet)
-                    }
-                    starred = false
-                    unstarPetButton()
-                    progress.stop()
-                }
+                starred = false
+                unstarPetButton()
+                progress.stop()
             }
         }
     }
 
     private fun unstarPet(id: String) {
+        progress.start()
+        btnStar.isClickable = false
+        btnStar.icon = progress as Drawable
+        btnStar.text = getString(R.string.lbl_loading)
         firestore.unstarPet(id).observe(viewLifecycleOwner) { result ->
-            when (result) {
-                is Result.Loading -> {
-                    progress.start()
-                    btnStar.isClickable = false
-                    btnStar.icon = progress as Drawable
-                    btnStar.text = getString(R.string.lbl_loading)
+            result.onSuccess {
+                showSnackbar(getString(R.string.txt_unstarred))
+                starred = false
+                unstarPetButton()
+                progress.stop()
+            }
+            result.onFailure { exception ->
+                showActionSnackbar(exception) {
+                    unstarPet(id)
                 }
-                is Result.Success -> {
-                    showSnackbar(getString(R.string.txt_unstarred))
-                    starred = false
-                    unstarPetButton()
-                    progress.stop()
-                }
-                is Result.Failure -> {
-                    showActionSnackbar(result.exception) {
-                        unstarPet(id)
-                    }
-                    starred = true
-                    starPetButton()
-                    progress.stop()
-                }
+                starred = true
+                starPetButton()
+                progress.stop()
             }
         }
     }
@@ -390,6 +360,18 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     fabChatSold.setImageResource(R.drawable.ic_chat)
                     checkStarredPet(pet.id)
                 }
+
+                fabChatSold.setOnClickListener {
+                    if (pet.uid == user.uid) soldDialog(pet.id).show()
+                    else checkChat(pet, user)
+                }
+
+                cardSeller.setOnClickListener {
+                    val action =
+                        SelectedFragmentDirections.actionSelectedToProfile(pet.uid == user.uid)
+                    findNavController().navigate(action)
+                }
+
                 getUser(pet, user)
             }
 

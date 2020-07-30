@@ -7,7 +7,10 @@ import androidx.lifecycle.liveData
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
-import com.vt.shoppet.model.*
+import com.vt.shoppet.model.Chat
+import com.vt.shoppet.model.Message
+import com.vt.shoppet.model.Pet
+import com.vt.shoppet.model.User
 import com.vt.shoppet.repo.FirestoreRepo
 import kotlinx.coroutines.Dispatchers
 
@@ -16,32 +19,26 @@ class FirestoreViewModel @ViewModelInject constructor(private val firestore: Fir
 
     fun checkUsername(username: String): LiveData<Result<QuerySnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.checkUsername(username)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.checkUsername(username)
             }
+            emit(result)
         }
 
     fun addUser(user: User): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.addUser(user)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.addUser(user)
             }
+            emit(result)
         }
 
     fun getUserSnapshot(uid: String): LiveData<Result<DocumentSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.getUserSnapshot(uid)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.getUserSnapshot(uid)
             }
+            emit(result)
         }
 
     fun addToken(token: String) = firestore.addToken(token)
@@ -50,163 +47,131 @@ class FirestoreViewModel @ViewModelInject constructor(private val firestore: Fir
 
     fun getReport(uid: String, currentUid: String): LiveData<Result<DocumentSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.getReport(uid, currentUid)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.getReport(uid, currentUid)
             }
+            emit(result)
         }
 
     fun addReport(uid: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.addReport(uid)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.addReport(uid)
             }
+            emit(result)
         }
 
     fun reportUser(uid: String, currentUid: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.reportUser(uid, currentUid)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.reportUser(uid, currentUid)
             }
+            emit(result)
         }
 
     fun updateUser(user: User): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.updateUser(user)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.updateUser(user)
             }
+            emit(result)
         }
 
     fun removeUserPhoto(): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.removeUserPhoto()))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.removeUserPhoto()
             }
+            emit(result)
         }
 
     fun addPet(pet: Pet): LiveData<Result<DocumentReference>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.addPet(pet)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.addPet(pet)
             }
+            emit(result)
         }
 
     fun updatePet(pet: Pet): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.updatePet(pet)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.updatePet(pet)
             }
+            emit(result)
         }
 
     fun checkStarredPet(id: String): LiveData<Result<DocumentSnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.checkStarredPet(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.checkStarredPet(id)
             }
+            emit(result)
         }
 
     fun starPet(pet: Pet): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.starPet(pet)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.starPet(pet)
             }
+            emit(result)
         }
 
     fun unstarPet(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.unstarPet(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.unstarPet(id)
             }
+            emit(result)
         }
 
     fun markSoldPet(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.markSoldPet(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.markSoldPet(id)
             }
+            emit(result)
         }
 
     fun removePet(id: String): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.removePet(id)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.removePet(id)
             }
+            emit(result)
         }
 
     fun checkChat(uid: String, currentUid: String): LiveData<Result<QuerySnapshot>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.checkChat(uid, currentUid)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.checkChat(uid, currentUid)
             }
+            emit(result)
         }
 
     fun createChat(chat: Chat): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.createChat(chat)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.createChat(chat)
             }
+            emit(result)
         }
 
     fun updateChat(chat: Chat): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.updateChat(chat)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.updateChat(chat)
             }
+            emit(result)
         }
 
     fun getMessages(id: String) = firestore.getMessages(id)
 
     fun sendMessage(chat: Chat, message: Message): LiveData<Result<Void?>> =
         liveData(Dispatchers.IO) {
-            emit(Result.Loading)
-            try {
-                emit(Result.Success(firestore.sendMessage(chat, message)))
-            } catch (e: Exception) {
-                emit(Result.Failure(e))
+            val result = runCatching {
+                firestore.sendMessage(chat, message)
             }
+            emit(result)
         }
 }

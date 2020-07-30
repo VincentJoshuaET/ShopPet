@@ -17,7 +17,6 @@ import com.google.android.material.transition.MaterialSharedAxis
 import com.google.mlkit.vision.common.InputImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
-import com.vt.shoppet.model.Result
 import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.LabelerViewModel
@@ -97,17 +96,15 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             val mediaImage = proxy.image ?: return@Analyzer
             val image = InputImage.fromMediaImage(mediaImage, proxy.imageInfo.rotationDegrees)
             labeler.process(image).observe(viewLifecycleOwner) { result ->
-                when (result) {
-                    is Result.Success -> {
-                        val label = result.data.firstOrNull()?.text
-                        txtLabel.text = label
-                        isAnimal = labels.contains(label)
-                        proxy.close()
-                    }
-                    is Result.Failure -> {
-                        txtLabel.text = null
-                        proxy.close()
-                    }
+                result.onSuccess { list ->
+                    val label = list.firstOrNull()?.text
+                    txtLabel.text = label
+                    isAnimal = labels.contains(label)
+                    proxy.close()
+                }
+                result.onFailure {
+                    txtLabel.text = null
+                    proxy.close()
                 }
             }
         }
