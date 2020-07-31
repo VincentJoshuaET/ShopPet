@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/navigation_splash"
+    app:startDestination="@id/fragment_splash">
+
+    <fragment
+        android:id="@+id/fragment_splash"
+        android:name="com.vt.shoppet.ui.SplashFragment"
+        android:label="ShopPet" />
+
+    <action
+        android:id="@+id/action_splash_to_auth"
+        app:destination="@id/navigation_auth"
+        app:popUpTo="@id/navigation_splash"
+        app:popUpToInclusive="true" />
+
+    <action
+        android:id="@+id/action_splash_to_home"
+        app:destination="@id/navigation_home"
+        app:popUpTo="@id/navigation_splash"
+        app:popUpToInclusive="true" />
+
+</navigation>

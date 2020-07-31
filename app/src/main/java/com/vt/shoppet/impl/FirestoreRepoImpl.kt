@@ -105,9 +105,14 @@ class FirestoreRepoImpl @Inject constructor(
             .whereEqualTo("empty", false)
             .orderBy("date", Query.Direction.DESCENDING)
 
+    override suspend fun getChat(id: String): DocumentSnapshot =
+        firestore.collection("chats").document(id).get().await()
+
     override suspend fun checkChat(uid: String, currentUid: String): QuerySnapshot =
-        firestore.collection("chats").whereIn("id", listOf("$currentUid$uid", "$uid$currentUid"))
-            .get().await()
+        firestore.collection("chats")
+            .whereIn("id", listOf("$currentUid$uid", "$uid$currentUid"))
+            .get()
+            .await()
 
     override suspend fun createChat(chat: Chat): Void? =
         firestore.collection("chats").document(chat.id).set(chat).await()

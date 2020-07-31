@@ -11,6 +11,7 @@ import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Filter
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
+import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.DataRepo
 import com.vt.shoppet.util.localZoneId
 import kotlinx.coroutines.Dispatchers
@@ -20,6 +21,7 @@ import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class DataViewModel @ViewModelInject constructor(
+    auth: AuthRepo,
     data: DataRepo,
     @Assisted private val handle: SavedStateHandle
 ) : ViewModel() {
@@ -33,6 +35,7 @@ class DataViewModel @ViewModelInject constructor(
     private val _starredPets = MutableLiveData<List<Pet>>()
     private val _ownPets = MutableLiveData<List<Pet>>()
     private val _chats = MutableLiveData<List<Chat>>()
+    private val _unread = MutableLiveData<Int>()
 
     private val _filter = MutableLiveData<Filter>()
 
@@ -45,6 +48,7 @@ class DataViewModel @ViewModelInject constructor(
     val starredPets: LiveData<List<Pet>> = _starredPets
     val ownPets: LiveData<List<Pet>> = _ownPets
     val chats: LiveData<List<Chat>> = _chats
+    val unread: LiveData<Int> = _unread
 
     var filteredPets: LiveData<List<Pet>> = MutableLiveData<List<Pet>>()
     val filter: LiveData<Filter> = _filter
@@ -150,7 +154,14 @@ class DataViewModel @ViewModelInject constructor(
         _ownPets.value = snapshots.toObjects()
     }
     private val chatsObserver = Observer<QuerySnapshot> { snapshots ->
-        _chats.value = snapshots.toObjects()
+        val chats: List<Chat> = snapshots.toObjects()
+        _chats.value = chats
+        var unread = 0
+        chats.forEach { chat ->
+            val index = chat.uid.indexOf(auth.uid())
+            if (!chat.read[index]) unread++
+        }
+        _unread.value = unread
     }
 
     fun initFirebaseData() {

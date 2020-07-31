@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/navigation_auth"
+    app:startDestination="@id/fragment_login">
+
+    <fragment
+        android:id="@+id/fragment_login"
+        android:name="com.vt.shoppet.ui.auth.LoginFragment"
+        android:label="Login"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_login_to_register"
+            app:destination="@id/fragment_register" />
+        <action
+            android:id="@+id/action_login_to_forgot_password"
+            app:destination="@id/fragment_forgot_password" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/fragment_register"
+        android:name="com.vt.shoppet.ui.auth.RegisterFragment"
+        android:label="Register"
+        tools:layout="@layout/fragment_register" />
+
+    <fragment
+        android:id="@+id/fragment_forgot_password"
+        android:name="com.vt.shoppet.ui.auth.ForgotPasswordFragment"
+        android:label="Forgot Password"
+        tools:layout="@layout/fragment_forgot_password" />
+
+    <action
+        android:id="@+id/action_auth_to_home"
+        app:destination="@id/navigation_home"
+        app:popUpTo="@id/navigation_auth"
+        app:popUpToInclusive="true" />
+
+</navigation>

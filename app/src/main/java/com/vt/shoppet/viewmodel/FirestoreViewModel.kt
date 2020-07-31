@@ -4,6 +4,7 @@ import androidx.hilt.lifecycle.ViewModelInject
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.liveData
+import androidx.lifecycle.viewModelScope
 import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
@@ -13,6 +14,7 @@ import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
 import com.vt.shoppet.repo.FirestoreRepo
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 class FirestoreViewModel @ViewModelInject constructor(private val firestore: FirestoreRepo) :
     ViewModel() {
@@ -141,6 +143,15 @@ class FirestoreViewModel @ViewModelInject constructor(private val firestore: Fir
             emit(result)
         }
 
+
+    fun getChat(id: String): LiveData<Result<DocumentSnapshot>> =
+        liveData(Dispatchers.IO) {
+            val result = runCatching {
+                firestore.getChat(id)
+            }
+            emit(result)
+        }
+
     fun checkChat(uid: String, currentUid: String): LiveData<Result<QuerySnapshot>> =
         liveData(Dispatchers.IO) {
             val result = runCatching {
@@ -163,6 +174,11 @@ class FirestoreViewModel @ViewModelInject constructor(private val firestore: Fir
                 firestore.updateChat(chat)
             }
             emit(result)
+        }
+
+    fun markChatAsRead(chat: Chat, senderIndex: Int) =
+        viewModelScope.launch(Dispatchers.IO) {
+            firestore.updateChat(chat.copy(read = chat.read.also { it[senderIndex] = true }))
         }
 
     fun getMessages(id: String) = firestore.getMessages(id)

@@ -197,7 +197,12 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                     val username = chats.first().username[senderIndex]
                     val action =
                         SelectedFragmentDirections
-                            .actionSelectedToConversation(senderIndex, receiverIndex, username)
+                            .actionSelectedToConversation(
+                                chats.first().id,
+                                senderIndex,
+                                receiverIndex,
+                                username
+                            )
                     findNavController().navigate(action)
                 }
             }

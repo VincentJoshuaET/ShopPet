@@ -55,6 +55,8 @@ interface FirestoreRepo {
 
     fun getChats(): Query
 
+    suspend fun getChat(id: String): DocumentSnapshot
+
     suspend fun checkChat(uid: String, currentUid: String): QuerySnapshot
 
     suspend fun createChat(chat: Chat): Void?

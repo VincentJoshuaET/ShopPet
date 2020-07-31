@@ -276,12 +276,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     txtEmpty.isVisible = itemCount == 0
                     if (itemCount != 0) {
                         recyclerMessages.layoutManager?.scrollToPosition(itemCount - 1)
-                        val data = chat.copy(
-                            read = chat.read.apply {
-                                this[args.senderIndex] = true
-                            }
-                        )
-                        firestore.updateChat(data)
+                        firestore.markChatAsRead(chat, args.senderIndex)
                     }
                 }
             }

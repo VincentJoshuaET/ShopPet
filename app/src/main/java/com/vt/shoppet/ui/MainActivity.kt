@@ -1,17 +1,24 @@
 package com.vt.shoppet.ui
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.firebase.firestore.ktx.toObject
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
 import com.vt.shoppet.databinding.HeaderMainBinding
+import com.vt.shoppet.model.Chat
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
@@ -21,6 +28,7 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
@@ -32,6 +40,11 @@ class MainActivity : AppCompatActivity() {
     private val firestore: FirestoreViewModel by viewModels()
     private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by viewModels()
+
+    @Inject
+    lateinit var notificationManager: NotificationManager
+
+    private lateinit var navController: NavController
 
     fun signOut(token: String) {
         firestore.removeToken(token)
@@ -48,6 +61,11 @@ class MainActivity : AppCompatActivity() {
             finish()
             startActivity(Intent(this, MainActivity::class.java))
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        notificationManager.cancelAll()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -70,13 +88,41 @@ class MainActivity : AppCompatActivity() {
 
         val navHostFragment =
             supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
-        val navController = navHostFragment.navController
+        navController = navHostFragment.navController
         val destinations = setOf(R.id.fragment_login, R.id.fragment_shop, R.id.fragment_chat)
 
         bottomNavigationView.setupWithNavController(navController)
         navigationViewMain.setupWithNavController(navController)
         navigationView.setupWithNavController(navController)
         toolbar.setupWithNavController(navController, AppBarConfiguration(destinations, drawer))
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val name = getString(R.string.menu_item_chat)
+            val channel = NotificationChannel(name, name, NotificationManager.IMPORTANCE_HIGH)
+            channel.description = name
+            notificationManager.createNotificationChannel(channel)
+        }
+
+        intent?.extras?.let { bundle ->
+            val id = bundle.getString("CHAT_ID") ?: return@let
+            val senderIndex = bundle.getString("SENDER_INDEX")?.toInt() ?: return@let
+            val receiverIndex = bundle.getString("RECIPIENT_INDEX")?.toInt() ?: return@let
+            val senderUsername = bundle.getString("SENDER_USERNAME") ?: return@let
+            firestore.getChat(id).observe(this) { result ->
+                result.onSuccess { document ->
+                    val chat: Chat = document.toObject() ?: return@observe
+                    dataViewModel.setChat(chat)
+                    val arguments = bundleOf(
+                        "id" to id,
+                        "senderIndex" to receiverIndex,
+                        "receiverIndex" to senderIndex,
+                        "username" to senderUsername
+                    )
+                    navController.navigate(R.id.fragment_conversation, arguments)
+                }
+            }
+        }
+        notificationManager.cancelAll()
 
         dataViewModel.currentUser.observe(this) { user ->
             txtName.text = user.name
@@ -85,6 +131,11 @@ class MainActivity : AppCompatActivity() {
             val image =
                 user.image ?: return@observe imageUser.setImageResource(R.drawable.ic_person)
             loadProfileImage(imageUser, storage.getUserPhoto(image))
+        }
+
+        dataViewModel.unread.observe(this) { unread ->
+            if (unread == 0) bottomNavigationView.removeBadge(R.id.fragment_chat)
+            else bottomNavigationView.getOrCreateBadge(R.id.fragment_chat).number = unread
         }
 
         navController.addOnDestinationChangedListener { _, destination, _ ->
