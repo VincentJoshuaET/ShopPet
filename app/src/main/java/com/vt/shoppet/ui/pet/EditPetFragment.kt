@@ -128,7 +128,8 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                         val price = txtPrice.text.toString().toIntOrNull() ?: 0
                         val vaccineStatus = txtVaccineStatus.text.toString()
                         val medicalRecords = txtMedicalRecords.text.toString()
-                        val description = txtDescription.text.toString().capitalize(Locale.ROOT)
+                        val description =
+                            txtDescription.text.toString().capitalize(Locale.getDefault())
                         var fail = false
 
                         if (name.isEmpty()) {

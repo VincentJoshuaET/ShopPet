@@ -206,7 +206,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             val username = txtUsername.text.toString()
             val password = txtPassword.text.toString()
             val confirmPassword = txtConfirmPassword.text.toString()
-            val mobile = txtMobile.text.toString().mobileFormat()
+            val mobile = "+63" + txtMobile.text.toString()
             val location = txtProvince.text.toString()
             val sex = txtSex.text.toString()
             val birth = txtDateOfBirth.text.toString()

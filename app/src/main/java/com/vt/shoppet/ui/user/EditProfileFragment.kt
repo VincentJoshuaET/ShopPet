@@ -289,7 +289,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             txtName.setText(user.name)
             txtEmail.text = auth.email()
             txtUsername.text = user.username
-            txtMobile.setText(user.mobile)
+            txtMobile.setText(user.mobile.replaceFirst("+63", ""))
             txtSex.setText(user.sex, false)
             txtProvince.setText(user.location, false)
             val instant = Instant.ofEpochSecond(user.dateOfBirth.seconds)
@@ -321,7 +321,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 when (item.itemId) {
                     R.id.item_save -> {
                         val name = txtName.text.toString()
-                        val mobile = txtMobile.text.toString().mobileFormat()
+                        val mobile = "+63" + txtMobile.text.toString()
                         val sex = txtSex.text.toString()
                         val location = txtProvince.text.toString()
                         var fail = false

@@ -10,14 +10,16 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.DialogFilterBinding
+import com.vt.shoppet.model.Filter
 import com.vt.shoppet.util.KeyboardUtils
-import com.vt.shoppet.util.filter
 import com.vt.shoppet.util.getArrayAdapter
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
+@ExperimentalCoroutinesApi
 class FilterDialog : DialogFragment() {
 
     private val dataViewModel: DataViewModel by activityViewModels()
@@ -72,7 +74,10 @@ class FilterDialog : DialogFragment() {
             }
         }
 
-        dataViewModel.filter.observe(this) { filter ->
+        lateinit var filter: Filter
+
+        dataViewModel.filter.observe(this) {
+            filter = it
             txtType.setText(filter.type, false)
             txtSex.setText(filter.sex, false)
             txtPrice.setText(filter.price, false)
@@ -87,34 +92,28 @@ class FilterDialog : DialogFragment() {
             .setTitle(R.string.menu_item_filter)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                dataViewModel.filter.observe(this) { filter ->
-                    dataViewModel.pets.observe(this) { pets ->
-                        filter.enabled = true
-                        filter.type = "All"
-                        filter.sex = "Both"
-                        filter.price = "No Filter"
-                        filter.amounts = listOf(0F, 10000F)
-                        filter.age = "No Filter"
-                        filter.ages = listOf(0F, 100F)
-                        dataViewModel.setFilteredPets(pets.filter(filter))
-                        savedStateHandle?.set("filter", true)
-                    }
-                }
+                dataViewModel.filterPets(
+                    Filter(
+                        enabled = filter.enabled,
+                        field = filter.field,
+                        order = filter.order
+                    )
+                )
+                savedStateHandle?.set("filter", filter.enabled)
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                dataViewModel.filter.observe(this) { filter ->
-                    dataViewModel.pets.observe(this) { pets ->
-                        filter.enabled = true
-                        filter.type = txtType.text.toString()
-                        filter.sex = txtSex.text.toString()
-                        filter.price = txtPrice.text.toString()
-                        filter.amounts = sliderPrice.values
-                        filter.age = txtAge.text.toString()
-                        filter.ages = sliderAge.values
-                        dataViewModel.setFilteredPets(pets.filter(filter))
-                        savedStateHandle?.set("filter", true)
-                    }
-                }
+                dataViewModel.filterPets(
+                    filter.copy(
+                        enabled = true,
+                        type = txtType.text.toString(),
+                        sex = txtSex.text.toString(),
+                        price = txtPrice.text.toString(),
+                        amounts = sliderPrice.values,
+                        age = txtAge.text.toString(),
+                        ages = sliderAge.values
+                    )
+                )
+                savedStateHandle?.set("filter", true)
             }
             .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
                 dialog.dismiss()

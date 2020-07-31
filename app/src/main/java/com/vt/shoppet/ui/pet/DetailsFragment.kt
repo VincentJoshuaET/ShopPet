@@ -215,7 +215,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                     val sex = txtSex.text.toString()
                     val age = txtAge.text.toString().toIntOrNull() ?: 0
                     val unit = txtUnit.text.toString()
-                    val description = txtDescription.text.toString().capitalize(Locale.ROOT)
+                    val description = txtDescription.text.toString().capitalize(Locale.getDefault())
                     val breed =
                         if (custom) txtCustomBreed.text.toString().capitalizeWords()
                         else txtBreed.text.toString()

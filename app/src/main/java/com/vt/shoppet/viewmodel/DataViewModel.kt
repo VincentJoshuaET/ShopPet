@@ -12,8 +12,11 @@ import com.vt.shoppet.model.Filter
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
 import com.vt.shoppet.repo.DataRepo
+import com.vt.shoppet.util.localZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import java.time.Instant
+import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class DataViewModel @ViewModelInject constructor(
@@ -31,7 +34,6 @@ class DataViewModel @ViewModelInject constructor(
     private val _ownPets = MutableLiveData<List<Pet>>()
     private val _chats = MutableLiveData<List<Chat>>()
 
-    private val _filteredPets = MutableLiveData<List<Pet>>()
     private val _filter = MutableLiveData<Filter>()
 
     val currentPet: LiveData<Pet> = _currentPet
@@ -44,15 +46,77 @@ class DataViewModel @ViewModelInject constructor(
     val ownPets: LiveData<List<Pet>> = _ownPets
     val chats: LiveData<List<Chat>> = _chats
 
-    val filteredPets: LiveData<List<Pet>> = _filteredPets
+    var filteredPets: LiveData<List<Pet>> = MutableLiveData<List<Pet>>()
     val filter: LiveData<Filter> = _filter
+
+    fun filterPets(filter: Filter) {
+        _filter.value = filter
+        filteredPets = petsLiveData.map { snapshots ->
+            val pets: List<Pet> = snapshots.toObjects()
+            if (!filter.enabled) return@map pets
+            val typeList =
+                if (filter.type == "All") pets
+                else pets.filter { it.type == filter.type }
+
+            val sexList =
+                if (filter.sex == "Both") typeList
+                else typeList.filter { it.sex == filter.sex }
+
+            val priceList =
+                if (filter.price == "No Filter") sexList
+                else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
+
+            val now = LocalDateTime.now()
+
+            val fromInstant = when (filter.age) {
+                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                else -> now.atZone(localZoneId).toInstant()
+            }
+
+            val toInstant = when (filter.age) {
+                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                else -> now.atZone(localZoneId).toInstant()
+            }
+
+            val ageList =
+                if (filter.age == "No Filter") priceList
+                else priceList.filter { Instant.ofEpochSecond(it.dateOfBirth.seconds) in toInstant..fromInstant }
+
+            return@map when (filter.order) {
+                "Ascending" -> when (filter.field) {
+                    "Age" -> ageList.sortedByDescending { it.dateOfBirth }
+                    "Breed" -> ageList.sortedBy { it.breed }
+                    "Price" -> ageList.sortedBy { it.price }
+                    "Type" -> ageList.sortedBy { it.type }
+                    else -> ageList.sortedBy { it.date }
+                }
+                else -> when (filter.field) {
+                    "Age" -> ageList.sortedBy { it.dateOfBirth }
+                    "Breed" -> ageList.sortedByDescending { it.breed }
+                    "Price" -> ageList.sortedByDescending { it.price }
+                    "Type" -> ageList.sortedByDescending { it.type }
+                    else -> ageList.sortedByDescending { it.date }
+                }
+            }
+        }
+    }
 
     fun resetFilter() {
         _filter.value = Filter()
-    }
-
-    fun setFilteredPets(pets: List<Pet>) {
-        _filteredPets.value = pets
     }
 
     fun setUser(user: User) {

@@ -29,39 +29,25 @@
 
         </com.google.android.material.textfield.TextInputLayout>
 
-        <androidx.appcompat.widget.LinearLayoutCompat
-            android:id="@+id/layoutPrice"
-            android:layout_width="wrap_content"
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/inputPrice"
+            android:layout_width="144dp"
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
+            android:hint="@string/hint_price"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputName">
+            app:layout_constraintTop_toBottomOf="@+id/inputName"
+            app:prefixText="@string/sym_currency">
 
-            <TextView
-                android:id="@+id/textCurrency"
-                style="?attr/textAppearanceHeadline6"
-                android:layout_width="wrap_content"
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/txtPrice"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/sym_currency" />
+                android:inputType="number"
+                android:maxLines="1" />
 
-            <com.google.android.material.textfield.TextInputLayout
-                android:id="@+id/inputPrice"
-                android:layout_width="144dp"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="8dp"
-                android:hint="@string/hint_price">
-
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/txtPrice"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="number"
-                    android:maxLines="1" />
-
-            </com.google.android.material.textfield.TextInputLayout>
-
-        </androidx.appcompat.widget.LinearLayoutCompat>
+        </com.google.android.material.textfield.TextInputLayout>
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputType"
@@ -74,7 +60,7 @@
             app:endIconMode="none"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutPrice">
+            app:layout_constraintTop_toBottomOf="@+id/inputPrice">
 
             <AutoCompleteTextView
                 android:id="@+id/txtType"

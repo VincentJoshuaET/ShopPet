@@ -3,13 +3,13 @@
     <item
         android:id="@+id/fragment_profile"
         android:icon="@drawable/ic_person"
-        android:title="Profile" />
+        android:title="@string/title_profile" />
     <item
         android:id="@+id/fragment_starred"
         android:icon="@drawable/ic_unstarred"
-        android:title="Starred Pets" />
+        android:title="@string/title_starred_pets" />
     <item
         android:id="@+id/fragment_own"
         android:icon="@drawable/ic_home"
-        android:title="My Pets" />
+        android:title="@string/title_my_pets" />
 </menu>
