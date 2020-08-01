@@ -63,9 +63,31 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        notificationManager.cancelAll()
+    private fun readChatIntent(intent: Intent?) {
+        intent?.let {
+            val id = intent.getStringExtra("CHAT_ID") ?: return@let
+            val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toInt() ?: return@let
+            val receiverIndex = intent.getStringExtra("RECIPIENT_INDEX")?.toInt() ?: return@let
+            val senderUsername = intent.getStringExtra("SENDER_USERNAME") ?: return@let
+            firestore.getChat(id).observe(this) { result ->
+                result.onSuccess { document ->
+                    val chat: Chat = document.toObject() ?: return@observe
+                    dataViewModel.setChat(chat)
+                    val arguments = bundleOf(
+                        "id" to id,
+                        "senderIndex" to receiverIndex,
+                        "receiverIndex" to senderIndex,
+                        "username" to senderUsername
+                    )
+                    navController.navigate(R.id.fragment_conversation, arguments)
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        readChatIntent(intent)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -103,25 +125,7 @@ class MainActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        intent?.extras?.let { bundle ->
-            val id = bundle.getString("CHAT_ID") ?: return@let
-            val senderIndex = bundle.getString("SENDER_INDEX")?.toInt() ?: return@let
-            val receiverIndex = bundle.getString("RECIPIENT_INDEX")?.toInt() ?: return@let
-            val senderUsername = bundle.getString("SENDER_USERNAME") ?: return@let
-            firestore.getChat(id).observe(this) { result ->
-                result.onSuccess { document ->
-                    val chat: Chat = document.toObject() ?: return@observe
-                    dataViewModel.setChat(chat)
-                    val arguments = bundleOf(
-                        "id" to id,
-                        "senderIndex" to receiverIndex,
-                        "receiverIndex" to senderIndex,
-                        "username" to senderUsername
-                    )
-                    navController.navigate(R.id.fragment_conversation, arguments)
-                }
-            }
-        }
+        readChatIntent(intent)
         notificationManager.cancelAll()
 
         dataViewModel.currentUser.observe(this) { user ->

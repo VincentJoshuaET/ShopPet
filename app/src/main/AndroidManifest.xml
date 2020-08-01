@@ -47,7 +47,7 @@
             android:value="@string/menu_item_chat" />
 
         <service
-            android:name=".service.MessagingService"
+            android:name=".MessagingService"
             android:permission="android.permission.INTERNET">
             <intent-filter>
                 <action android:name="com.google.firebase.MESSAGING_EVENT" />
