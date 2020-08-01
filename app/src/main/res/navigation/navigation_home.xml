@@ -162,9 +162,6 @@
         android:label="{username}"
         tools:layout="@layout/fragment_conversation">
         <argument
-            android:name="id"
-            app:argType="string" />
-        <argument
             android:name="senderIndex"
             android:defaultValue="0"
             app:argType="integer" />

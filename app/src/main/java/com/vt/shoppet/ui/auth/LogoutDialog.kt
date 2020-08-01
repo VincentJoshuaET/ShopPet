@@ -25,7 +25,7 @@ class LogoutDialog : DialogFragment() {
                 signOut(instanceIdResult.token)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                binding.showActionSnackbar(exception) {
                     instanceId()
                 }
             }

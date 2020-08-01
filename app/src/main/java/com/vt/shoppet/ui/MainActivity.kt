@@ -2,14 +2,19 @@ package com.vt.shoppet.ui
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.BroadcastReceiver
+import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
+import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -51,7 +56,7 @@ class MainActivity : AppCompatActivity() {
         dataViewModel.removeFirebaseData()
         auth.signOut()
         if (auth.isLoggedIn()) {
-            showSnackbar(getString(R.string.txt_cannot_log_out))
+            binding.showSnackbar(getString(R.string.txt_cannot_log_out))
             dataViewModel.initFirebaseData()
             firestore.addToken(token)
         } else {
@@ -63,31 +68,68 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getChat(
+        id: String,
+        senderIndex: Int,
+        receiverIndex: Int,
+        senderUsername: String,
+        onError: (View) -> Unit
+    ) {
+        firestore.getChat(id).observe(this@MainActivity) { result ->
+            result.onSuccess { document ->
+                val chat: Chat = document.toObject() ?: return@observe
+                dataViewModel.setChat(chat)
+                val arguments = bundleOf(
+                    "senderIndex" to receiverIndex,
+                    "receiverIndex" to senderIndex,
+                    "username" to senderUsername
+                )
+                navController.navigate(R.id.fragment_conversation, arguments)
+            }
+            result.onFailure { exception ->
+                binding.showActionSnackbar(exception, onError)
+            }
+        }
+    }
+
     private fun readChatIntent(intent: Intent?) {
         intent?.let {
             val id = intent.getStringExtra("CHAT_ID") ?: return@let
             val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toInt() ?: return@let
             val receiverIndex = intent.getStringExtra("RECIPIENT_INDEX")?.toInt() ?: return@let
             val senderUsername = intent.getStringExtra("SENDER_USERNAME") ?: return@let
-            firestore.getChat(id).observe(this) { result ->
-                result.onSuccess { document ->
-                    val chat: Chat = document.toObject() ?: return@observe
-                    dataViewModel.setChat(chat)
-                    val arguments = bundleOf(
-                        "id" to id,
-                        "senderIndex" to receiverIndex,
-                        "receiverIndex" to senderIndex,
-                        "username" to senderUsername
-                    )
-                    navController.navigate(R.id.fragment_conversation, arguments)
+            getChat(id, senderIndex, receiverIndex, senderUsername) {
+                readChatIntent(intent)
+            }
+        }
+    }
+
+    private fun showChatSnackbar(intent: Intent?) {
+        intent?.let {
+            val id = intent.getStringExtra("CHAT_ID") ?: return@let
+            val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toInt() ?: return@let
+            val receiverIndex = intent.getStringExtra("RECIPIENT_INDEX")?.toInt() ?: return@let
+            val senderUsername = intent.getStringExtra("SENDER_USERNAME") ?: return@let
+            if (dataViewModel.chat.value?.id == id && navController.currentDestination?.id == R.id.fragment_conversation) return@let
+            binding.showActionSnackbar("$senderUsername messaged you") {
+                getChat(id, senderIndex, receiverIndex, senderUsername) {
+                    showChatSnackbar(intent)
                 }
             }
         }
     }
 
-    override fun onNewIntent(intent: Intent?) {
-        super.onNewIntent(intent)
-        readChatIntent(intent)
+    private val receiver = object : BroadcastReceiver() {
+        override fun onReceive(context: Context?, intent: Intent?) {
+            showChatSnackbar(intent)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        LocalBroadcastManager
+            .getInstance(this)
+            .registerReceiver(receiver, IntentFilter("ACTION_CHAT"))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

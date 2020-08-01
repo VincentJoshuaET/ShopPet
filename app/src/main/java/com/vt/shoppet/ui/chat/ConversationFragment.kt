@@ -264,7 +264,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     .build()
 
             val actions = MessageActions { id, imageView ->
-                loadFirebaseImage(imageView, storage.getMessagePhoto(id))
+                loadMessageImage(imageView, storage.getMessagePhoto(id))
             }
 
             val adapter = object : MessageAdapter(options, actions) {

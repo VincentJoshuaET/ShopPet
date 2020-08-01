@@ -54,7 +54,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                     recyclerChats.removeItemDecorationAt(0)
                     val action =
                         ChatFragmentDirections
-                            .actionChatToConversation(chat.id, senderIndex, receiverIndex, username)
+                            .actionChatToConversation(senderIndex, receiverIndex, username)
                     findNavController().navigate(action)
                 }
 

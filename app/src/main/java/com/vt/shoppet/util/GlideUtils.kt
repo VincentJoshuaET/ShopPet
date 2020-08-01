@@ -28,6 +28,13 @@ fun Fragment.loadFirebaseImage(imageView: ImageView, reference: StorageReference
         .fitCenter()
         .into(imageView)
 
+fun Fragment.loadMessageImage(imageView: ImageView, reference: StorageReference) =
+    GlideApp.with(this)
+        .load(reference)
+        .fitCenter()
+        .placeholder(circularProgressLarge())
+        .into(imageView)
+
 fun Fragment.loadProfileImage(imageView: ImageView, reference: StorageReference) =
     GlideApp.with(this)
         .load(reference)

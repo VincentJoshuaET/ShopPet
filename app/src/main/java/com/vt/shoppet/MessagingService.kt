@@ -1,15 +1,13 @@
 package com.vt.shoppet
 
 import android.app.NotificationManager
-import android.app.PendingIntent
 import android.content.Intent
-import androidx.core.app.NotificationCompat
 import androidx.core.os.bundleOf
+import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.FirestoreRepo
-import com.vt.shoppet.ui.MainActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
@@ -46,32 +44,11 @@ class MessagingService : FirebaseMessagingService() {
             "SENDER_USERNAME" to senderUsername
         )
 
-        val intent = Intent(this, MainActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        val intent = Intent("ACTION_CHAT").apply {
             putExtras(bundle)
         }
 
-        val pendingIntent = PendingIntent.getActivity(
-            this,
-            0,
-            intent,
-            PendingIntent.FLAG_ONE_SHOT
-        )
-
-        message.notification?.let { notification ->
-            val builder =
-                NotificationCompat.Builder(this, getString(R.string.menu_item_chat))
-                    .setSmallIcon(R.drawable.ic_pet)
-                    .setColor(getColor(R.color.colorAccent))
-                    .setContentTitle(notification.title)
-                    .setContentText(notification.body)
-                    .setPriority(NotificationCompat.PRIORITY_HIGH)
-                    .setAutoCancel(true)
-                    .setContentIntent(pendingIntent)
-                    .setExtras(bundle)
-
-            notificationManager.notify(id, 1, builder.build())
-        }
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
     }
 
 }

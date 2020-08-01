@@ -1,7 +1,7 @@
 package com.vt.shoppet.util
 
-import android.app.Activity
 import android.content.res.Configuration
+import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
 import android.view.View
@@ -13,6 +13,7 @@ import androidx.fragment.app.Fragment
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -28,26 +29,30 @@ fun Fragment.circularProgress(): Animatable {
     return drawable as Animatable
 }
 
-fun Activity.showSnackbar(message: String) =
-    Snackbar.make(window.decorView.rootView, message, Snackbar.LENGTH_SHORT).show()
-
-fun Activity.showActionSnackbar(exception: Throwable, action: (View) -> Unit) =
-    Snackbar.make(window.decorView.rootView, exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).show()
+fun Fragment.circularProgressLarge() =
+    CircularProgressDrawable(requireContext()).apply {
+        setStyle(CircularProgressDrawable.LARGE)
+        setColorSchemeColors(Color.WHITE)
+        start()
+    }
 
 fun Fragment.showSnackbar(message: String) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
 
-fun Fragment.showSnackbar(exception: Throwable) =
-    Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT).show()
+fun Fragment.showSnackbar(exception: Throwable) {
+    val message = exception.localizedMessage ?: return
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+}
 
 fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
 
-fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) =
-    Snackbar.make(requireView(), exception.localizedMessage!!, Snackbar.LENGTH_SHORT)
+fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
+    val message = exception.localizedMessage ?: return
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).show()
+}
 
 fun Fragment.setLayout(orientation: Int) = when (orientation) {
     Configuration.ORIENTATION_LANDSCAPE -> GridLayoutManager(context, 3)
@@ -104,3 +109,18 @@ fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
         toolbar.menu.clear()
         toolbar.inflateMenu(menu)
     }
+
+fun ActivityMainBinding.showSnackbar(message: String) =
+    Snackbar.make(fragment, message, Snackbar.LENGTH_SHORT).show()
+
+fun ActivityMainBinding.showActionSnackbar(message: String, action: (View) -> Unit) =
+    Snackbar.make(fragment, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_view, action)
+        .show()
+
+fun ActivityMainBinding.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
+    val message = exception.localizedMessage ?: return
+    Snackbar.make(fragment, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action)
+        .show()
+}
