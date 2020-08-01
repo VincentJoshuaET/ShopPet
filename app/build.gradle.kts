@@ -66,7 +66,7 @@ dependencies {
     // Kotlin / Java
     implementation(kotlin("stdlib-jdk7", "1.3.72"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.7")
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.9")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.10")
 
     // Android Architecture Components
     implementation("androidx.activity:activity-ktx:1.2.0-alpha07")
@@ -88,7 +88,7 @@ dependencies {
     implementation("com.google.firebase:firebase-auth-ktx:19.3.2")
     implementation("com.google.firebase:firebase-core:17.4.4")
     implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
-    implementation("com.google.firebase:firebase-messaging:20.2.3")
+    implementation("com.google.firebase:firebase-messaging:20.2.4")
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
     // Firebase-UI
@@ -126,7 +126,7 @@ dependencies {
     implementation("com.google.android.material:material:$materialVersion")
 
     // ML Kit
-    implementation("com.google.mlkit:image-labeling:16.1.0")
+    implementation("com.google.mlkit:image-labeling:16.2.0")
 
     // Navigation Component
     val navigationVersion = "2.3.0"
