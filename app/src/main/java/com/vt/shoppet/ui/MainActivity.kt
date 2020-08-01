@@ -167,7 +167,7 @@ class MainActivity : AppCompatActivity() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        readChatIntent(intent)
+        if (savedInstanceState == null) readChatIntent(intent)
         notificationManager.cancelAll()
 
         dataViewModel.currentUser.observe(this) { user ->
