@@ -1,17 +1,18 @@
 package com.vt.shoppet.impl
 
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.label.ImageLabel
-import com.google.mlkit.vision.label.ImageLabeler
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel
+import com.google.firebase.ml.vision.label.FirebaseVisionImageLabeler
 import com.vt.shoppet.repo.LabelerRepo
 import kotlinx.coroutines.tasks.await
 import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class LabelerRepoImpl @Inject constructor(private val labeler: ImageLabeler) : LabelerRepo {
+class LabelerRepoImpl @Inject constructor(private val labeler: FirebaseVisionImageLabeler) :
+    LabelerRepo {
 
-    override suspend fun process(image: InputImage): List<ImageLabel> =
-        labeler.process(image).await()
+    override suspend fun process(image: FirebaseVisionImage): List<FirebaseVisionImageLabel> =
+        labeler.processImage(image).await()
 
 }

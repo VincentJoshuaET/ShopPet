@@ -14,7 +14,8 @@ import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
-import com.google.mlkit.vision.common.InputImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
 import com.vt.shoppet.util.showSnackbar
@@ -94,7 +95,14 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         val analyzer = ImageAnalysis.Analyzer { proxy ->
             val mediaImage = proxy.image ?: return@Analyzer
-            val image = InputImage.fromMediaImage(mediaImage, proxy.imageInfo.rotationDegrees)
+            val degrees = when (proxy.imageInfo.rotationDegrees) {
+                0 -> FirebaseVisionImageMetadata.ROTATION_0
+                90 -> FirebaseVisionImageMetadata.ROTATION_90
+                180 -> FirebaseVisionImageMetadata.ROTATION_180
+                270 -> FirebaseVisionImageMetadata.ROTATION_270
+                else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
+            }
+            val image = FirebaseVisionImage.fromMediaImage(mediaImage, degrees)
             labeler.process(image).observe(viewLifecycleOwner) { result ->
                 result.onSuccess { list ->
                     val label = list.firstOrNull()?.text

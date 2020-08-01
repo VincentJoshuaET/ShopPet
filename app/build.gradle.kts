@@ -89,6 +89,8 @@ dependencies {
     implementation("com.google.firebase:firebase-core:17.4.4")
     implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
     implementation("com.google.firebase:firebase-messaging:20.2.4")
+    implementation("com.google.firebase:firebase-ml-vision:24.0.3")
+    implementation("com.google.firebase:firebase-ml-vision-image-label-model:20.0.1")
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
     // Firebase-UI
@@ -124,9 +126,6 @@ dependencies {
     // Material Components
     val materialVersion = "1.2.0-rc01"
     implementation("com.google.android.material:material:$materialVersion")
-
-    // ML Kit
-    implementation("com.google.mlkit:image-labeling:16.2.0")
 
     // Navigation Component
     val navigationVersion = "2.3.0"

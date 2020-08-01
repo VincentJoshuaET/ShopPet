@@ -46,6 +46,10 @@
             android:name="com.google.firebase.messaging.default_notification_channel_id"
             android:value="@string/menu_item_chat" />
 
+        <meta-data
+            android:name="com.google.firebase.ml.vision.DEPENDENCIES"
+            android:value="label" />
+
         <service
             android:name=".MessagingService"
             android:permission="android.permission.INTERNET">

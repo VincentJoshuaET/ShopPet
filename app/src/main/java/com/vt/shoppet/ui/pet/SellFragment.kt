@@ -15,7 +15,7 @@ import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.transition.MaterialSharedAxis
-import com.google.mlkit.vision.common.InputImage
+import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSellBinding
 import com.vt.shoppet.util.*
@@ -97,7 +97,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
         btnUpload.setOnClickListener {
             var isAnimal = false
-            val image = InputImage.fromFilePath(context, uri)
+            val image = FirebaseVisionImage.fromFilePath(context, uri)
             circularProgress.start()
             btnUpload.isClickable = false
             btnUpload.icon = circularProgress as Drawable
