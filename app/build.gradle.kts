@@ -93,7 +93,7 @@ dependencies {
     implementation("com.google.firebase:firebase-ml-vision-image-label-model:20.0.1")
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
-    // Firebase-UI
+    // Firebase UI
     val firebaseUiVersion = "6.3.0"
     implementation("com.firebaseui:firebase-ui-firestore:$firebaseUiVersion")
     implementation("com.firebaseui:firebase-ui-storage:$firebaseUiVersion")
