@@ -160,7 +160,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         firestore.createChat(chat).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 dataViewModel.setChat(chat)
-                findNavController().navigate(R.id.action_selected_to_conversation)
+                val action =
+                    SelectedFragmentDirections.actionSelectedToConversation(0, 1, chat.username[0])
+                findNavController().navigate(action)
             }
             result.onFailure { exception ->
                 showActionSnackbar(exception) {
@@ -188,9 +190,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 } else {
                     val chats: List<Chat> = snapshots.toObjects()
                     dataViewModel.setChat(chats.first())
-                    val senderIndex = chats.first().uid.indexOf(pet.uid)
-                    val receiverIndex = chats.first().uid.indexOf(user.uid)
-                    val username = chats.first().username[senderIndex]
+                    val senderIndex = chats.first().uid.indexOf(user.uid)
+                    val receiverIndex = chats.first().uid.indexOf(pet.uid)
+                    val username = chats.first().username[receiverIndex]
                     val action =
                         SelectedFragmentDirections
                             .actionSelectedToConversation(senderIndex, receiverIndex, username)

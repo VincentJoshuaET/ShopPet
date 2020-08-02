@@ -74,6 +74,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="8dp"
             android:hint="@string/hint_username"
+            app:helperText="@string/lbl_username_password_field"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputEmail">
@@ -96,7 +97,7 @@
             android:hint="@string/hint_password"
             app:counterEnabled="true"
             app:endIconMode="password_toggle"
-            app:helperText="@string/lbl_password_field"
+            app:helperText="@string/lbl_username_password_field"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/inputUsername">
