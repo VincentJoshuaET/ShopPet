@@ -10,7 +10,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="end"
         android:layout_margin="8dp"
-        app:cardBackgroundColor="@color/colorPrimary">
+        app:cardBackgroundColor="?attr/colorPrimary">
 
         <androidx.appcompat.widget.LinearLayoutCompat
             android:layout_width="match_parent"
@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_margin="4dp"
-                app:cardBackgroundColor="@color/colorPrimary"
+                app:cardBackgroundColor="?attr/colorPrimary"
                 app:cardCornerRadius="4dp">
 
                 <com.google.android.material.imageview.ShapeableImageView

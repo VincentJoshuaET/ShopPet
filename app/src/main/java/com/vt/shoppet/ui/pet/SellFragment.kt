@@ -5,6 +5,7 @@ import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.core.widget.ContentLoadingProgressBar
@@ -42,6 +43,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
     private lateinit var upload: Drawable
     private lateinit var progress: ContentLoadingProgressBar
     private lateinit var btnUpload: MaterialButton
+    private lateinit var txtLabels: TextView
 
     private fun uploadImage(uri: Uri) {
         val image = UUID.randomUUID().toString()
@@ -72,6 +74,36 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         }
     }
 
+    private fun processImage(image: FirebaseVisionImage, uri: Uri) {
+        val labels = resources.getStringArray(R.array.labels)
+        var isAnimal = false
+        labeler.process(image).observe(viewLifecycleOwner) { result ->
+            result.onSuccess { list ->
+                txtLabels.text = null
+                for (label in list) {
+                    val text = label.text
+                    val confidence = label.confidence * 100
+                    txtLabels.append("$text | $confidence%\n")
+                    isAnimal = labels.contains(text)
+                    if (isAnimal) break
+                }
+                if (isAnimal) uploadImage(uri)
+                else {
+                    showSnackbar(getString(R.string.txt_animal_undetected))
+                    btnUpload.isClickable = true
+                    btnUpload.icon = upload
+                    circularProgress.stop()
+                }
+            }
+            result.onFailure { exception ->
+                showSnackbar(exception)
+                btnUpload.isClickable = true
+                btnUpload.icon = upload
+                circularProgress.stop()
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enterTransition = MaterialSharedAxis(MaterialSharedAxis.Z, true)
@@ -82,13 +114,12 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         super.onViewCreated(view, savedInstanceState)
 
         val context = requireContext()
-        val labels = resources.getStringArray(R.array.labels)
 
         circularProgress = circularProgress()
         upload = getDrawable(R.drawable.ic_upload)
         progress = binding.progress
         btnUpload = binding.btnUpload
-        val txtLabels = binding.txtLabels
+        txtLabels = binding.txtLabels
         val imagePet = binding.imagePet
 
         val uri = args.uri.toUri()
@@ -96,28 +127,12 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         loadImage(imagePet, uri)
 
         btnUpload.setOnClickListener {
-            var isAnimal = false
-            val image = FirebaseVisionImage.fromFilePath(context, uri)
             circularProgress.start()
             btnUpload.isClickable = false
             btnUpload.icon = circularProgress as Drawable
-            labeler.process(image).observe(viewLifecycleOwner) { result ->
-                result.onSuccess { list ->
-                    txtLabels.text = null
-                    for (label in list) {
-                        val text = label.text
-                        val confidence = label.confidence * 100
-                        txtLabels.append("$text | $confidence%\n")
-                        isAnimal = labels.contains(text)
-                        if (isAnimal) break
-                    }
-                    if (isAnimal) uploadImage(uri)
-                    else {
-                        showSnackbar(getString(R.string.txt_animal_undetected))
-                        btnUpload.isClickable = true
-                        btnUpload.icon = upload
-                        circularProgress.stop()
-                    }
+            labeler.convertImage(context, uri).observe(viewLifecycleOwner) { result ->
+                result.onSuccess { image ->
+                    processImage(image, uri)
                 }
                 result.onFailure { exception ->
                     showSnackbar(exception)

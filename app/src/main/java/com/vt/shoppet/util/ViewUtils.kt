@@ -4,9 +4,11 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
+import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.annotation.MenuRes
+import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
@@ -38,6 +40,13 @@ fun Fragment.circularProgressLarge() =
 
 fun Fragment.showSnackbar(message: String) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+
+fun Fragment.topSnackbar(message: String) =
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        params.gravity = Gravity.TOP
+        view.layoutParams = params
+    }
 
 fun Fragment.showSnackbar(exception: Throwable) {
     val message = exception.localizedMessage ?: return

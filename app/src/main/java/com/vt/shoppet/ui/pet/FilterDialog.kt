@@ -92,32 +92,26 @@ class FilterDialog : DialogFragment() {
             .setTitle(R.string.menu_item_filter)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                dataViewModel.filterPets(
-                    Filter(
-                        enabled = filter.enabled,
-                        field = filter.field,
-                        order = filter.order
-                    )
-                )
-                savedStateHandle?.set("filter", filter.enabled)
+                if (filter.enabled) {
+                    val update = Filter(enabled = true, field = filter.field, order = filter.order)
+                    dataViewModel.filterPets(update)
+                    savedStateHandle?.set("filter", true)
+                }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                dataViewModel.filterPets(
-                    filter.copy(
-                        enabled = true,
-                        type = txtType.text.toString(),
-                        sex = txtSex.text.toString(),
-                        price = txtPrice.text.toString(),
-                        amounts = sliderPrice.values,
-                        age = txtAge.text.toString(),
-                        ages = sliderAge.values
-                    )
+                val new = filter.copy(
+                    enabled = true,
+                    type = txtType.text.toString(),
+                    sex = txtSex.text.toString(),
+                    price = txtPrice.text.toString(),
+                    amounts = sliderPrice.values,
+                    age = txtAge.text.toString(),
+                    ages = sliderAge.values
                 )
+                dataViewModel.filterPets(new)
                 savedStateHandle?.set("filter", true)
             }
-            .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
             .create()
     }
 }

@@ -40,8 +40,6 @@ class LogoutDialog : DialogFragment() {
                 val activity = requireActivity() as MainActivity
                 activity.instanceId()
             }
-            .setNegativeButton(R.string.btn_no) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton(R.string.btn_no, null)
             .create()
 }

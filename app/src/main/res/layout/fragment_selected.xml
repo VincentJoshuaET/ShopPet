@@ -56,7 +56,7 @@
                 android:layout_gravity="center"
                 android:text="@string/lbl_loading"
                 android:visibility="gone"
-                app:strokeColor="@color/colorPrimary"
+                app:strokeColor="?attr/colorPrimary"
                 tools:visibility="visible" />
 
             <com.google.android.material.button.MaterialButtonToggleGroup
@@ -75,7 +75,7 @@
                     android:layout_gravity="center"
                     android:text="@string/btn_edit"
                     app:icon="@drawable/ic_edit"
-                    app:strokeColor="@color/colorPrimary" />
+                    app:strokeColor="?attr/colorPrimary" />
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnRemove"
@@ -85,7 +85,7 @@
                     android:layout_gravity="center"
                     android:text="@string/btn_remove"
                     app:icon="@drawable/ic_cross"
-                    app:strokeColor="@color/colorPrimary" />
+                    app:strokeColor="?attr/colorPrimary" />
             </com.google.android.material.button.MaterialButtonToggleGroup>
 
 

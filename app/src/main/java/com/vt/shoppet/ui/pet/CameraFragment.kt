@@ -12,13 +12,11 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.transition.MaterialSharedAxis
-import com.google.firebase.ml.vision.common.FirebaseVisionImage
-import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
 import com.vt.shoppet.util.showSnackbar
+import com.vt.shoppet.util.topSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.LabelerViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -52,7 +50,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        showSnackbar(getString(R.string.txt_camera))
+        topSnackbar(getString(R.string.txt_camera)).show()
 
         val context = requireContext()
 
@@ -89,30 +87,24 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 .build()
         val callback = ImageSavedCallback(cameraProviderFuture.get())
 
-        val snackbar =
-            Snackbar.make(view, R.string.txt_animal_undetected, Snackbar.LENGTH_SHORT)
+        val snackbar = topSnackbar(getString(R.string.txt_animal_undetected))
         var isAnimal = false
 
         val analyzer = ImageAnalysis.Analyzer { proxy ->
-            val mediaImage = proxy.image ?: return@Analyzer
-            val degrees = when (proxy.imageInfo.rotationDegrees) {
-                0 -> FirebaseVisionImageMetadata.ROTATION_0
-                90 -> FirebaseVisionImageMetadata.ROTATION_90
-                180 -> FirebaseVisionImageMetadata.ROTATION_180
-                270 -> FirebaseVisionImageMetadata.ROTATION_270
-                else -> throw Exception("Rotation must be 0, 90, 180, or 270.")
-            }
-            val image = FirebaseVisionImage.fromMediaImage(mediaImage, degrees)
-            labeler.process(image).observe(viewLifecycleOwner) { result ->
-                result.onSuccess { list ->
-                    val label = list.firstOrNull()?.text
-                    txtLabel.text = label
-                    isAnimal = labels.contains(label)
-                    proxy.close()
-                }
-                result.onFailure {
-                    txtLabel.text = null
-                    proxy.close()
+            labeler.convertImage(proxy).observe(viewLifecycleOwner) { result ->
+                result.onSuccess { image ->
+                    labeler.process(image).observe(viewLifecycleOwner) { result ->
+                        result.onSuccess { list ->
+                            val label = list.firstOrNull()?.text
+                            txtLabel.text = label
+                            isAnimal = labels.contains(label)
+                            proxy.close()
+                        }
+                        result.onFailure {
+                            txtLabel.text = null
+                            proxy.close()
+                        }
+                    }
                 }
             }
         }

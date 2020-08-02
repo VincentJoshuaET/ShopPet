@@ -46,28 +46,22 @@ class SortDialog : DialogFragment() {
             .setTitle(R.string.menu_item_sort)
             .setView(binding.root)
             .setNeutralButton(R.string.btn_remove_filters) { _, _ ->
-                viewModel.filterPets(
-                    filter.copy(
-                        enabled = filter.enabled,
-                        field = "Upload Date",
-                        order = "Descending"
-                    )
-                )
-                savedStateHandle?.set("filter", filter.enabled)
+                if (filter.enabled) {
+                    val update = filter.copy(field = "Upload Date", order = "Descending")
+                    viewModel.filterPets(update)
+                    savedStateHandle?.set("filter", true)
+                }
             }
             .setPositiveButton(R.string.btn_ok) { _, _ ->
-                viewModel.filterPets(
-                    filter.copy(
-                        enabled = true,
-                        field = txtField.text.toString(),
-                        order = txtOrder.text.toString()
-                    )
+                val new = filter.copy(
+                    enabled = true,
+                    field = txtField.text.toString(),
+                    order = txtOrder.text.toString()
                 )
+                viewModel.filterPets(new)
                 savedStateHandle?.set("filter", true)
             }
-            .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
             .create()
     }
 

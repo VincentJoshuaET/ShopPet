@@ -155,9 +155,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     }
                 }
             }
-            .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
             .create()
     }
 

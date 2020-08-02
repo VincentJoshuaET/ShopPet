@@ -87,9 +87,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             .setPositiveButton(R.string.btn_confirm) { _, _ ->
                 addReport(uid, currentUid)
             }
-            .setNegativeButton(R.string.btn_cancel) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setNegativeButton(R.string.btn_cancel, null)
             .create()
 
     private fun getReport(uid: String, currentUid: String) {

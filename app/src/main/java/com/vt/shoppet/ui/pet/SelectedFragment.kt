@@ -84,9 +84,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_mark_as_sold)
             .setMessage(R.string.txt_mark_pet_sold)
-            .setPositiveButton(R.string.btn_no) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton(R.string.btn_no, null)
             .setNegativeButton(R.string.btn_yes) { _, _ ->
                 progress.start()
                 fabChatSold.setImageDrawable(progress as Drawable)
@@ -115,9 +113,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_remove)
             .setMessage(R.string.txt_remove_pet)
-            .setPositiveButton(R.string.btn_no) { dialog, _ ->
-                dialog.dismiss()
-            }
+            .setPositiveButton(R.string.btn_no, null)
             .setNegativeButton(R.string.btn_yes) { _, _ ->
                 firestore.removePet(id).observe(viewLifecycleOwner) { result ->
                     result.onSuccess {
