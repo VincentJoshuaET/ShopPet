@@ -11,12 +11,11 @@
         android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.core.widget.ContentLoadingProgressBar
+        <com.google.android.material.progressindicator.ProgressIndicator
             android:id="@+id/progress"
-            style="@style/Widget.AppCompat.ProgressBar.Horizontal"
+            style="@style/Widget.MaterialComponents.ProgressIndicator.Linear.Indeterminate"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:indeterminate="true"
             android:visibility="invisible"
             tools:visibility="visible" />
 

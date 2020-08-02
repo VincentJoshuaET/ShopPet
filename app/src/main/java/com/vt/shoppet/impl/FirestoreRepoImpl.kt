@@ -35,9 +35,9 @@ class FirestoreRepoImpl @Inject constructor(
         firestore.collection("users").document(auth.uid())
             .update("tokens", FieldValue.arrayUnion(token))
 
-    override fun removeToken(token: String): Task<Void> =
+    override suspend fun removeToken(token: String): Void? =
         firestore.collection("users").document(auth.uid())
-            .update("tokens", FieldValue.arrayRemove(token))
+            .update("tokens", FieldValue.arrayRemove(token)).await()
 
     override suspend fun getReport(uid: String, currentUid: String): DocumentSnapshot =
         firestore.collection("users/$uid/reports").document(currentUid).get().await()

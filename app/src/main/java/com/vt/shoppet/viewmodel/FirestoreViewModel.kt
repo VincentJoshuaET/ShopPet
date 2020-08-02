@@ -45,7 +45,13 @@ class FirestoreViewModel @ViewModelInject constructor(private val firestore: Fir
 
     fun addToken(token: String) = firestore.addToken(token)
 
-    fun removeToken(token: String) = firestore.removeToken(token)
+    fun removeToken(token: String): LiveData<Result<Void?>> =
+        liveData(Dispatchers.IO) {
+            val result = runCatching {
+                firestore.removeToken(token)
+            }
+            emit(result)
+        }
 
     fun getReport(uid: String, currentUid: String): LiveData<Result<DocumentSnapshot>> =
         liveData(Dispatchers.IO) {

@@ -11,6 +11,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.Observer
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -91,7 +92,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
 
-        val toolbar = activity.binding.toolbar
+        val toolbar = activity.toolbar
 
         val navBackStackEntry = findNavController().currentBackStackEntry
         val savedStateHandle = navBackStackEntry?.savedStateHandle
@@ -157,15 +158,18 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                 }
                 .create()
 
+
+        val filteredPetsObserver = Observer<List<Pet>> { filteredPets ->
+            adapter.submitList(filteredPets)
+            txtEmpty.isVisible = filteredPets.isEmpty()
+        }
+
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
                 val filter =
                     savedStateHandle?.get<Boolean>("filter") ?: return@LifecycleEventObserver
                 if (filter) {
-                    dataViewModel.filteredPets.observe(viewLifecycleOwner) { filteredPets ->
-                        adapter.submitList(filteredPets)
-                        txtEmpty.isVisible = filteredPets.isEmpty()
-                    }
+                    dataViewModel.filteredPets.observe(viewLifecycleOwner, filteredPetsObserver)
                 }
                 savedStateHandle.remove<Boolean>("filter")
             }
@@ -181,10 +185,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         dataViewModel.filter.observe(viewLifecycleOwner) { filter ->
             if (filter.enabled) {
-                dataViewModel.filteredPets.observe(viewLifecycleOwner) { filteredPets ->
-                    adapter.submitList(filteredPets)
-                    txtEmpty.isVisible = filteredPets.isEmpty()
-                }
+                dataViewModel.filteredPets.observe(viewLifecycleOwner, filteredPetsObserver)
             } else {
                 dataViewModel.pets.observe(viewLifecycleOwner) { pets ->
                     adapter.submitList(pets)
@@ -206,6 +207,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
             when (item.itemId) {
                 R.id.item_refresh -> {
                     dataViewModel.resetFilter()
+                    dataViewModel.filteredPets.removeObserver(filteredPetsObserver)
                     recyclerPets.smoothScrollToPosition(0)
                     return@setOnMenuItemClickListener true
                 }

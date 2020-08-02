@@ -55,68 +55,65 @@ class DataViewModel @ViewModelInject constructor(
 
     fun filterPets(filter: Filter) {
         _filter.value = filter
-        filteredPets = petsLiveData.switchMap { snapshots ->
+        filteredPets = petsLiveData.map { snapshots ->
             val pets: List<Pet> = snapshots.toObjects()
-            liveData(viewModelScope.coroutineContext + Dispatchers.IO) {
-                val typeList =
-                    if (filter.type == "All") pets
-                    else pets.filter { it.type == filter.type }
+            val typeList =
+                if (filter.type == "All") pets
+                else pets.filter { it.type == filter.type }
 
-                val sexList =
-                    if (filter.sex == "Both") typeList
-                    else typeList.filter { it.sex == filter.sex }
+            val sexList =
+                if (filter.sex == "Both") typeList
+                else typeList.filter { it.sex == filter.sex }
 
-                val priceList =
-                    if (filter.price == "No Filter") sexList
-                    else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
+            val priceList =
+                if (filter.price == "No Filter") sexList
+                else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
 
-                val now = LocalDateTime.now()
+            val now = LocalDateTime.now()
 
-                val fromInstant = when (filter.age) {
-                    "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    else -> now.atZone(localZoneId).toInstant()
+            val fromInstant = when (filter.age) {
+                "Days" -> now.minusDays(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Weeks" -> now.minusWeeks(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Months" -> now.minusMonths(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Years" -> now.minusYears(filter.ages[0].toLong()).atZone(localZoneId)
+                    .toInstant()
+                else -> now.atZone(localZoneId).toInstant()
+            }
+
+            val toInstant = when (filter.age) {
+                "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(localZoneId)
+                    .toInstant()
+                else -> now.atZone(localZoneId).toInstant()
+            }
+
+            val ageList =
+                if (filter.age == "No Filter") priceList
+                else priceList.filter { Instant.ofEpochSecond(it.dateOfBirth.seconds) in toInstant..fromInstant }
+
+            return@map when (filter.order) {
+                "Ascending" -> when (filter.field) {
+                    "Age" -> ageList.sortedByDescending { it.dateOfBirth }
+                    "Breed" -> ageList.sortedBy { it.breed }
+                    "Price" -> ageList.sortedBy { it.price }
+                    "Type" -> ageList.sortedBy { it.type }
+                    else -> ageList.sortedBy { it.date }
                 }
-
-                val toInstant = when (filter.age) {
-                    "Days" -> now.minusDays(filter.ages[1].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Weeks" -> now.minusWeeks(filter.ages[1].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Months" -> now.minusMonths(filter.ages[1].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    "Years" -> now.minusYears(filter.ages[1].toLong()).atZone(localZoneId)
-                        .toInstant()
-                    else -> now.atZone(localZoneId).toInstant()
+                else -> when (filter.field) {
+                    "Age" -> ageList.sortedBy { it.dateOfBirth }
+                    "Breed" -> ageList.sortedByDescending { it.breed }
+                    "Price" -> ageList.sortedByDescending { it.price }
+                    "Type" -> ageList.sortedByDescending { it.type }
+                    else -> ageList.sortedByDescending { it.date }
                 }
-
-                val ageList =
-                    if (filter.age == "No Filter") priceList
-                    else priceList.filter { Instant.ofEpochSecond(it.dateOfBirth.seconds) in toInstant..fromInstant }
-
-                val result = when (filter.order) {
-                    "Ascending" -> when (filter.field) {
-                        "Age" -> ageList.sortedByDescending { it.dateOfBirth }
-                        "Breed" -> ageList.sortedBy { it.breed }
-                        "Price" -> ageList.sortedBy { it.price }
-                        "Type" -> ageList.sortedBy { it.type }
-                        else -> ageList.sortedBy { it.date }
-                    }
-                    else -> when (filter.field) {
-                        "Age" -> ageList.sortedBy { it.dateOfBirth }
-                        "Breed" -> ageList.sortedByDescending { it.breed }
-                        "Price" -> ageList.sortedByDescending { it.price }
-                        "Type" -> ageList.sortedByDescending { it.type }
-                        else -> ageList.sortedByDescending { it.date }
-                    }
-                }
-                emit(result)
             }
         }
     }

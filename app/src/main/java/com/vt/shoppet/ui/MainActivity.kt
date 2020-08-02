@@ -19,6 +19,7 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.MaterialToolbar
 import com.google.firebase.firestore.ktx.toObject
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -39,7 +40,7 @@ import javax.inject.Inject
 @ExperimentalCoroutinesApi
 class MainActivity : AppCompatActivity() {
 
-    val binding by viewBinding(ActivityMainBinding::inflate)
+    private val binding by viewBinding(ActivityMainBinding::inflate)
 
     private val auth: AuthViewModel by viewModels()
     private val firestore: FirestoreViewModel by viewModels()
@@ -50,21 +51,43 @@ class MainActivity : AppCompatActivity() {
     lateinit var notificationManager: NotificationManager
 
     private lateinit var navController: NavController
+    lateinit var toolbar: MaterialToolbar
 
-    fun signOut(token: String) {
-        firestore.removeToken(token)
-        dataViewModel.removeFirebaseData()
-        auth.signOut()
-        if (auth.isLoggedIn()) {
-            binding.showSnackbar(getString(R.string.txt_cannot_log_out))
-            dataViewModel.initFirebaseData()
-            firestore.addToken(token)
-        } else {
-            lifecycleScope.launch(Dispatchers.IO) {
-                auth.deleteInstanceId()
+    fun instanceId() {
+        auth.instanceId().observe(this) { result ->
+            result.onSuccess { instanceIdResult ->
+                signOut(instanceIdResult.token)
             }
-            finish()
-            startActivity(Intent(this, MainActivity::class.java))
+            result.onFailure { exception ->
+                binding.showActionSnackbar(exception) {
+                    instanceId()
+                }
+            }
+        }
+    }
+
+    private fun signOut(token: String) {
+        firestore.removeToken(token).observe(this) { result ->
+            result.onSuccess {
+                dataViewModel.removeFirebaseData()
+                auth.signOut()
+                if (auth.isLoggedIn()) {
+                    binding.showSnackbar(getString(R.string.txt_cannot_log_out))
+                    dataViewModel.initFirebaseData()
+                    firestore.addToken(token)
+                } else {
+                    lifecycleScope.launch(Dispatchers.IO) {
+                        auth.deleteInstanceId()
+                    }
+                    finish()
+                    startActivity(Intent(this, MainActivity::class.java))
+                }
+            }
+            result.onFailure { exception ->
+                binding.showActionSnackbar(exception) {
+                    signOut(token)
+                }
+            }
         }
     }
 
@@ -137,11 +160,11 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(binding.root)
 
+        toolbar = binding.toolbar
         val bottomNavigationView = binding.bottomNavigationView
         val drawer = binding.drawer
         val navigationViewMain = binding.navigationViewMain
         val navigationView = binding.navigationView
-        val toolbar = binding.toolbar
 
         val header = navigationViewMain.getHeaderView(0)
         val headerBinding = HeaderMainBinding.bind(header)

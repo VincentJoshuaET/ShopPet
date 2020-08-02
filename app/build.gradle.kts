@@ -124,8 +124,7 @@ dependencies {
     implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:$lifecycleVersion")
 
     // Material Components
-    val materialVersion = "1.2.0-rc01"
-    implementation("com.google.android.material:material:$materialVersion")
+    implementation("com.google.android.material:material:1.3.0-alpha02")
 
     // Navigation Component
     val navigationVersion = "2.3.0"

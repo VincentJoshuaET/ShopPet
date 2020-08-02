@@ -68,7 +68,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
         val activity = requireActivity() as MainActivity
 
         progress = circularProgress()
-        toolbar = activity.binding.toolbar
+        toolbar = activity.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName

@@ -113,7 +113,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
         val activity = requireActivity() as MainActivity
 
-        toolbar = activity.binding.toolbar
+        toolbar = activity.toolbar
         progress = circularProgress()
         report = getDrawable(R.drawable.ic_report)
 

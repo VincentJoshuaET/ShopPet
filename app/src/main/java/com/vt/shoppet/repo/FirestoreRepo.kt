@@ -21,7 +21,7 @@ interface FirestoreRepo {
 
     fun addToken(token: String): Task<Void>
 
-    fun removeToken(token: String): Task<Void>
+    suspend fun removeToken(token: String): Void?
 
     suspend fun getReport(uid: String, currentUid: String): DocumentSnapshot
 

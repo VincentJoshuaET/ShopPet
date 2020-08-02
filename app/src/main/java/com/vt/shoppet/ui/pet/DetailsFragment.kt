@@ -95,7 +95,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         val activity = requireActivity() as MainActivity
 
         progress = circularProgress()
-        toolbar = activity.binding.toolbar
+        toolbar = activity.toolbar
         save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
