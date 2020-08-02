@@ -94,7 +94,7 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
     // Firebase-UI
-    val firebaseUiVersion = "6.2.1"
+    val firebaseUiVersion = "6.3.0"
     implementation("com.firebaseui:firebase-ui-firestore:$firebaseUiVersion")
     implementation("com.firebaseui:firebase-ui-storage:$firebaseUiVersion")
 
