@@ -1,10 +1,10 @@
 # ShopPetVT
-Android pet marketplace application that uses
+Android pet marketplace application with MVVM architecture implementing:
 * Kotlin Coroutines
 * LiveData, ViewModel
-* Firebase Services
+* Firebase Services (Auth, Cloud Firestore, Storage, Cloud Functions, Messaging)
 * Glide
 * Dagger Hilt
 * Material Components
-* ML Kit for Image Labeling
-* Navigation Components with Safe Args
+* Firebase ML Kit for Image Labeling
+* Navigation Component with Safe Args
