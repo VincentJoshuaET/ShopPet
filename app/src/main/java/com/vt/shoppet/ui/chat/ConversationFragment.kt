@@ -32,7 +32,6 @@ import com.vt.shoppet.ui.adapter.MessageAdapter
 import com.vt.shoppet.util.*
 import com.vt.shoppet.util.PermissionUtils.SELECT_PHOTO
 import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
-import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
@@ -48,7 +47,6 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     private val binding by viewBinding(FragmentConversationBinding::bind)
     private val args: ConversationFragmentArgs by navArgs()
 
-    private val auth: AuthViewModel by activityViewModels()
     private val storage: StorageViewModel by activityViewModels()
     private val firestore: FirestoreViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
@@ -211,7 +209,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uid = auth.uid() as String
+        val uid = firestore.uid
         val context = requireContext()
 
         recyclerMessages = binding.recyclerMessages

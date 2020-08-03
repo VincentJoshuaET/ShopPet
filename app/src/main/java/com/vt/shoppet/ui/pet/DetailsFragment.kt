@@ -18,7 +18,6 @@ import com.vt.shoppet.databinding.FragmentDetailsBinding
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
-import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -36,7 +35,6 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val auth: AuthViewModel by activityViewModels()
     private val firestore: FirestoreViewModel by activityViewModels()
 
     private lateinit var progress: Animatable
@@ -121,7 +119,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         val units = resources.getStringArray(R.array.age_unit)
         val ageAdapter = getArrayAdapter(units)
 
-        val uid = auth.uid() as String
+        val uid = firestore.uid
         val username = args.username
         val image = args.image
 

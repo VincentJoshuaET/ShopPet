@@ -2,7 +2,6 @@ package com.vt.shoppet.impl
 
 import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
-import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.DataRepo
 import com.vt.shoppet.repo.FirestoreRepo
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -15,21 +14,18 @@ import javax.inject.Singleton
 
 @ExperimentalCoroutinesApi
 @Singleton
-class DataRepoImpl @Inject constructor(
-    private val auth: AuthRepo,
-    private val firestore: FirestoreRepo
-) : DataRepo {
+class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : DataRepo {
     override val currentUserFlow: Flow<DocumentSnapshot> =
         callbackFlow<DocumentSnapshot> {
-            val uid = auth.uid() ?: return@callbackFlow
             val registration =
-                firestore.getUserReference(uid).addSnapshotListener { document, exception ->
-                    if (exception != null) {
-                        val message = exception.localizedMessage ?: "Error"
-                        cancel(message, exception)
+                firestore.getUserReference(firestore.uid)
+                    .addSnapshotListener { document, exception ->
+                        if (exception != null) {
+                            val message = exception.localizedMessage ?: "Error"
+                            cancel(message, exception)
+                        }
+                        if (document != null) offer(document)
                     }
-                    if (document != null) offer(document)
-                }
             awaitClose {
                 registration.remove()
             }

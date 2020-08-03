@@ -11,8 +11,8 @@ import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.Filter
 import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
-import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.DataRepo
+import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.util.localZoneId
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -21,8 +21,8 @@ import java.time.LocalDateTime
 
 @ExperimentalCoroutinesApi
 class DataViewModel @ViewModelInject constructor(
-    auth: AuthRepo,
     data: DataRepo,
+    firestore: FirestoreRepo,
     @Assisted private val handle: SavedStateHandle
 ) : ViewModel() {
 
@@ -156,12 +156,10 @@ class DataViewModel @ViewModelInject constructor(
         val chats: List<Chat> = snapshots.toObjects()
         _chats.value = chats
         var unread = 0
-        val uid = auth.uid()
-        if (uid != null && chats.isNotEmpty()) {
-            chats.forEach { chat ->
-                val index = chat.uid.indexOf(uid)
-                if (!chat.read[index]) unread++
-            }
+        val uid = firestore.uid
+        chats.forEach { chat ->
+            val index = chat.uid.indexOf(uid)
+            if (!chat.read[index]) unread++
         }
         _unread.value = unread
     }

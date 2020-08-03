@@ -19,6 +19,9 @@ import kotlinx.coroutines.launch
 class FirestoreViewModel @ViewModelInject constructor(private val firestore: FirestoreRepo) :
     ViewModel() {
 
+    val uid: String
+        get() = firestore.uid
+
     fun checkUsername(username: String): LiveData<Result<QuerySnapshot>> =
         liveData(Dispatchers.IO) {
             val result = runCatching {

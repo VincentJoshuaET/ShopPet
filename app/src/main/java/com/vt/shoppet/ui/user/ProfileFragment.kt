@@ -153,7 +153,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         progress = circularProgress()
         report = getDrawable(R.drawable.ic_report)
 
-        val currentUid = auth.uid() as String
+        val currentUid = firestore.uid
 
         if (args.current) {
             toolbar.inflateMenu(R.menu.menu_current_profile)
