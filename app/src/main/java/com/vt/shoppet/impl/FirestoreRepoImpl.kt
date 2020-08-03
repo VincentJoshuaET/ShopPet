@@ -68,20 +68,17 @@ class FirestoreRepoImpl @Inject constructor(
     override fun getPets() =
         firestore.collection("pets")
             .whereEqualTo("sold", false)
-            .whereEqualTo("visible", true)
             .orderBy("date", Query.Direction.DESCENDING)
 
     override fun getOwnPets() =
         firestore.collection("pets")
             .whereEqualTo("uid", uid)
-            .whereEqualTo("visible", true)
             .orderBy("date", Query.Direction.DESCENDING)
 
     override fun getStarredPets() =
         firestore.collection("starred")
             .document(uid)
             .collection("pets")
-            .whereEqualTo("visible", true)
 
     override suspend fun checkStarredPet(id: String): DocumentSnapshot =
         firestore.collection("starred").document(uid).collection("pets").document(id).get()
@@ -100,7 +97,7 @@ class FirestoreRepoImpl @Inject constructor(
             .update(mapOf("sold" to true, "date" to Timestamp.now())).await()
 
     override suspend fun removePet(id: String): Void? =
-        firestore.collection("pets").document(id).update("visible", false).await()
+        firestore.collection("pets").document(id).delete().await()
 
     override fun getChats() =
         firestore.collection("chats")

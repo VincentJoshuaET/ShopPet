@@ -288,7 +288,6 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                         vaccineStatus = vaccineStatus,
                         medicalRecords = medicalRecords,
                         description = description,
-                        visible = true,
                         sold = false
                     )
 
