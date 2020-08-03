@@ -19,6 +19,9 @@ class FirestoreRepoImpl @Inject constructor(
     private val firestore: FirebaseFirestore
 ) : FirestoreRepo {
 
+    override val uid: String
+        get() = auth.uid() as String
+
     override suspend fun checkUsername(username: String): QuerySnapshot =
         firestore.collection("users").whereEqualTo("username", username).get().await()
 
@@ -32,11 +35,11 @@ class FirestoreRepoImpl @Inject constructor(
         firestore.collection("users").document(uid).get().await()
 
     override fun addToken(token: String): Task<Void> =
-        firestore.collection("users").document(auth.uid())
+        firestore.collection("users").document(uid)
             .update("tokens", FieldValue.arrayUnion(token))
 
     override suspend fun removeToken(token: String): Void? =
-        firestore.collection("users").document(auth.uid())
+        firestore.collection("users").document(uid)
             .update("tokens", FieldValue.arrayRemove(token)).await()
 
     override suspend fun getReport(uid: String, currentUid: String): DocumentSnapshot =
@@ -51,10 +54,10 @@ class FirestoreRepoImpl @Inject constructor(
             .set(mapOf("uid" to currentUid)).await()
 
     override suspend fun updateUser(user: User): Void? =
-        firestore.collection("users").document(auth.uid()).set(user).await()
+        firestore.collection("users").document(uid).set(user).await()
 
     override suspend fun removeUserPhoto(): Void? =
-        firestore.collection("users").document(auth.uid()).update("image", null).await()
+        firestore.collection("users").document(uid).update("image", null).await()
 
     override suspend fun addPet(pet: Pet): DocumentReference =
         firestore.collection("pets").add(pet).await()
@@ -70,26 +73,26 @@ class FirestoreRepoImpl @Inject constructor(
 
     override fun getOwnPets() =
         firestore.collection("pets")
-            .whereEqualTo("uid", auth.uid())
+            .whereEqualTo("uid", uid)
             .whereEqualTo("visible", true)
             .orderBy("date", Query.Direction.DESCENDING)
 
     override fun getStarredPets() =
         firestore.collection("starred")
-            .document(auth.uid())
+            .document(uid)
             .collection("pets")
             .whereEqualTo("visible", true)
 
     override suspend fun checkStarredPet(id: String): DocumentSnapshot =
-        firestore.collection("starred").document(auth.uid()).collection("pets").document(id).get()
+        firestore.collection("starred").document(uid).collection("pets").document(id).get()
             .await()
 
     override suspend fun starPet(pet: Pet): Void? =
-        firestore.collection("starred").document(auth.uid()).collection("pets").document(pet.id)
+        firestore.collection("starred").document(uid).collection("pets").document(pet.id)
             .set(pet).await()
 
     override suspend fun unstarPet(id: String): Void? =
-        firestore.collection("starred").document(auth.uid()).collection("pets").document(id)
+        firestore.collection("starred").document(uid).collection("pets").document(id)
             .delete().await()
 
     override suspend fun markSoldPet(id: String): Void? =
@@ -101,7 +104,7 @@ class FirestoreRepoImpl @Inject constructor(
 
     override fun getChats() =
         firestore.collection("chats")
-            .whereArrayContains("uid", auth.uid())
+            .whereArrayContains("uid", uid)
             .whereEqualTo("empty", false)
             .orderBy("date", Query.Direction.DESCENDING)
 

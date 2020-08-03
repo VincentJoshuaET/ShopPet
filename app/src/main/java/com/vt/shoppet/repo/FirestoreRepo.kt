@@ -11,6 +11,8 @@ import com.vt.shoppet.model.Pet
 import com.vt.shoppet.model.User
 
 interface FirestoreRepo {
+    val uid: String
+
     suspend fun checkUsername(username: String): QuerySnapshot
 
     suspend fun addUser(user: User): Void?

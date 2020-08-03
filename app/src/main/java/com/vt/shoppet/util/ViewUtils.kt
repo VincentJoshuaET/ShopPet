@@ -16,7 +16,6 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.google.android.material.appbar.AppBarLayout
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -45,9 +44,14 @@ fun Fragment.showSnackbar(message: String) =
 fun Fragment.topSnackbar(message: String) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
         val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        params.gravity = Gravity.TOP
-        view.layoutParams = params
+        view.layoutParams = params.apply { gravity = Gravity.TOP }
     }
+
+fun Fragment.showTopSnackbar(message: String) =
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        view.layoutParams = params.apply { gravity = Gravity.TOP }
+    }.show()
 
 fun Fragment.showSnackbar(exception: Throwable) {
     val message = exception.localizedMessage ?: return
@@ -82,66 +86,48 @@ fun ActivityMainBinding.setupAuthView() =
     apply {
         appbar.isVisible = false
         bottomNavigationView.isVisible = false
-        fabSell.hide()
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        toolbar.menu.clear()
-        (toolbar.layoutParams as AppBarLayout.LayoutParams).scrollFlags = 0
     }
 
 fun ActivityMainBinding.setupHomeNavigationView() =
     apply {
         appbar.isVisible = true
         bottomNavigationView.isVisible = true
-        fabSell.hide()
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-        toolbar.menu.clear()
-        (toolbar.layoutParams as AppBarLayout.LayoutParams).scrollFlags = 0
-    }
-
-fun ActivityMainBinding.setupHomeNavigationView(@MenuRes menu: Int) =
-    apply {
-        appbar.isVisible = true
-        bottomNavigationView.isVisible = true
-        fabSell.hide()
-        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
-        toolbar.menu.clear()
-        toolbar.inflateMenu(menu)
-        (toolbar.layoutParams as AppBarLayout.LayoutParams).scrollFlags =
-            AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL or AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
     }
 
 fun ActivityMainBinding.setupToolbar() =
     apply {
         appbar.isVisible = true
         bottomNavigationView.isVisible = false
-        fabSell.hide()
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        toolbar.menu.clear()
-        (toolbar.layoutParams as AppBarLayout.LayoutParams).scrollFlags = 0
     }
 
 fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
     apply {
         appbar.isVisible = true
         bottomNavigationView.isVisible = false
-        fabSell.isVisible = false
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         toolbar.menu.clear()
         toolbar.inflateMenu(menu)
-        (toolbar.layoutParams as AppBarLayout.LayoutParams).scrollFlags = 0
     }
 
 fun ActivityMainBinding.showSnackbar(message: String) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        view.layoutParams = params.apply { gravity = Gravity.TOP }
+    }.show()
 
 fun ActivityMainBinding.showActionSnackbar(message: String, action: (View) -> Unit) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_view, action)
-        .show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        view.layoutParams = params.apply { gravity = Gravity.TOP }
+    }.setAction(R.string.btn_view, action).show()
 
 fun ActivityMainBinding.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action)
-        .show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        view.layoutParams = params.apply { gravity = Gravity.TOP }
+    }.setAction(R.string.btn_retry, action).show()
 }

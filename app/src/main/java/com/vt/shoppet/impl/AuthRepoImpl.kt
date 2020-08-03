@@ -34,11 +34,11 @@ class AuthRepoImpl @Inject constructor(
 
     override fun isUserVerified() = auth.currentUser?.isEmailVerified != null
 
-    override fun email() = auth.currentUser?.email as String
+    override fun email() = auth.currentUser?.email
 
     override fun signOut() = auth.signOut()
 
-    override fun uid() = auth.uid as String
+    override fun uid() = auth.uid
 
     override fun deleteInstanceId() = instanceId.deleteInstanceId()
 

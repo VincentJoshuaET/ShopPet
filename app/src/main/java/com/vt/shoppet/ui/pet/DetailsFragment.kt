@@ -121,7 +121,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         val units = resources.getStringArray(R.array.age_unit)
         val ageAdapter = getArrayAdapter(units)
 
-        val uid = auth.uid()
+        val uid = auth.uid() as String
         val username = args.username
         val image = args.image
 

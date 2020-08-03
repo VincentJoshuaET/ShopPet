@@ -86,8 +86,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         btnRegister.isClickable = false
         btnRegister.icon = progress as Drawable
         auth.createUser(email, password).observe(viewLifecycleOwner) { result ->
-            result.onSuccess {
-                addUser(user.copy(uid = auth.uid()))
+            result.onSuccess { authResult ->
+                val uid = authResult.user?.uid ?: return@observe
+                addUser(user.copy(uid = uid))
             }
             result.onFailure { exception ->
                 showActionSnackbar(exception) {

@@ -16,6 +16,7 @@ import com.google.android.material.transition.MaterialSharedAxis
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
 import com.vt.shoppet.util.showSnackbar
+import com.vt.shoppet.util.showTopSnackbar
 import com.vt.shoppet.util.topSnackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.LabelerViewModel
@@ -50,7 +51,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        topSnackbar(getString(R.string.txt_camera)).show()
+        showTopSnackbar(getString(R.string.txt_camera))
 
         val context = requireContext()
 

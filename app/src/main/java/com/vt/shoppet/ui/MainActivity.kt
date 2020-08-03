@@ -19,6 +19,9 @@ import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
+import com.google.android.material.appbar.AppBarLayout
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_ENTER_ALWAYS
+import com.google.android.material.appbar.AppBarLayout.LayoutParams.SCROLL_FLAG_SCROLL
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.ktx.toObject
@@ -164,6 +167,7 @@ class MainActivity : AppCompatActivity() {
 
         toolbar = binding.toolbar
         fabSell = binding.fabSell
+        val params = toolbar.layoutParams as AppBarLayout.LayoutParams
         val bottomNavigationView = binding.bottomNavigationView
         val drawer = binding.drawer
         val navigationViewMain = binding.navigationViewMain
@@ -216,7 +220,7 @@ class MainActivity : AppCompatActivity() {
                 R.id.fragment_login -> binding.setupAuthView()
                 R.id.fragment_register -> binding.setupAuthView()
                 R.id.fragment_forgot_password -> binding.setupAuthView()
-                R.id.fragment_shop -> binding.setupHomeNavigationView(R.menu.menu_shop)
+                R.id.fragment_shop -> binding.setupHomeNavigationView()
                 R.id.fragment_chat -> binding.setupHomeNavigationView()
                 R.id.fragment_profile -> binding.setupToolbar()
                 R.id.fragment_starred -> binding.setupToolbar()
@@ -228,6 +232,18 @@ class MainActivity : AppCompatActivity() {
                 R.id.fragment_edit_pet -> binding.setupToolbar(R.menu.menu_edit)
                 R.id.fragment_edit_profile -> binding.setupToolbar(R.menu.menu_edit)
                 R.id.fragment_conversation -> binding.setupToolbar()
+            }
+            params.scrollFlags = when (destination.id) {
+                R.id.fragment_shop -> {
+                    toolbar.menu.clear()
+                    toolbar.inflateMenu(R.menu.menu_shop)
+                    SCROLL_FLAG_SCROLL or SCROLL_FLAG_ENTER_ALWAYS
+                }
+                else -> {
+                    toolbar.menu.clear()
+                    fabSell.hide()
+                    0
+                }
             }
         }
     }

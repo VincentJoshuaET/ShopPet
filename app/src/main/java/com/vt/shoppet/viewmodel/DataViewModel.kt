@@ -156,9 +156,12 @@ class DataViewModel @ViewModelInject constructor(
         val chats: List<Chat> = snapshots.toObjects()
         _chats.value = chats
         var unread = 0
-        chats.forEach { chat ->
-            val index = chat.uid.indexOf(auth.uid())
-            if (!chat.read[index]) unread++
+        val uid = auth.uid()
+        if (uid != null && chats.isNotEmpty()) {
+            chats.forEach { chat ->
+                val index = chat.uid.indexOf(uid)
+                if (!chat.read[index]) unread++
+            }
         }
         _unread.value = unread
     }

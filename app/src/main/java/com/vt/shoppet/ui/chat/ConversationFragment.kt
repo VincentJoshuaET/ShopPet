@@ -211,7 +211,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val uid = auth.uid()
+        val uid = auth.uid() as String
         val context = requireContext()
 
         recyclerMessages = binding.recyclerMessages

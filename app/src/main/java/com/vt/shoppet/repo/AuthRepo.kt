@@ -18,11 +18,11 @@ interface AuthRepo {
 
     fun isUserVerified(): Boolean
 
-    fun email(): String
+    fun email(): String?
 
     fun signOut()
 
-    fun uid(): String
+    fun uid(): String?
 
     fun deleteInstanceId()
 }

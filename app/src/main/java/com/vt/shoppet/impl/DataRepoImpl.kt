@@ -21,8 +21,9 @@ class DataRepoImpl @Inject constructor(
 ) : DataRepo {
     override val currentUserFlow: Flow<DocumentSnapshot> =
         callbackFlow<DocumentSnapshot> {
+            val uid = auth.uid() ?: return@callbackFlow
             val registration =
-                firestore.getUserReference(auth.uid()).addSnapshotListener { document, exception ->
+                firestore.getUserReference(uid).addSnapshotListener { document, exception ->
                     if (exception != null) {
                         val message = exception.localizedMessage ?: "Error"
                         cancel(message, exception)
