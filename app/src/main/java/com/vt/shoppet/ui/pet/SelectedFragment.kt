@@ -278,14 +278,14 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.fragment
+            drawingViewId = R.id.fragmentContainerView
             fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
             interpolator = FastOutSlowInInterpolator()
             duration = 500
             isElevationShadowEnabled = false
         }
         sharedElementReturnTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.fragment
+            drawingViewId = R.id.fragmentContainerView
             fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
             interpolator = FastOutSlowInInterpolator()
             duration = 500

@@ -87,7 +87,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val context = requireContext()
         val activity = requireActivity() as MainActivity
 
-        val fabSell = binding.fabSell
+        val fabSell = activity.fabSell
 
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
@@ -201,6 +201,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
+            else showSnackbar(getString(R.string.txt_reported))
         }
 
         toolbar.setOnMenuItemClickListener { item ->

@@ -39,7 +39,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 import java.util.*
 import javax.inject.Inject
 
@@ -257,8 +256,6 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
         val provinceAdapter = getArrayAdapter(provinces)
         val sexAdapter = getArrayAdapter(resources.getStringArray(R.array.sex))
 
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(localZoneId)
-
         txtName.setErrorListener()
         txtMobile.setErrorListener()
         txtProvince.setErrorListener()
@@ -293,7 +290,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             val instant = Instant.ofEpochSecond(user.dateOfBirth.seconds)
             val dateTime = LocalDateTime.ofInstant(instant, localZoneId)
             dateOfBirth = instant.toEpochMilli()
-            txtDateOfBirth.setText(dateTimeFormatter.format(dateTime))
+            txtDateOfBirth.setText(dateOfBirthFormatter.format(dateTime))
 
             txtDateOfBirth.setOnClickListener {
                 keyboard.hide(this)
@@ -306,7 +303,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 val picker = builder.build().apply {
                     addOnPositiveButtonClickListener { long ->
                         dateOfBirth = long
-                        val date = dateTimeFormatter.format(Instant.ofEpochMilli(dateOfBirth))
+                        val date = dateOfBirthFormatter.format(Instant.ofEpochMilli(dateOfBirth))
                         txtDateOfBirth.setText(date)
                     }
                 }

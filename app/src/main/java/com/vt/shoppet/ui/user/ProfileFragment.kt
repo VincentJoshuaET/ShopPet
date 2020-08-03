@@ -25,7 +25,6 @@ import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.Instant
 import java.time.LocalDateTime
-import java.time.format.DateTimeFormatter
 
 @AndroidEntryPoint
 @ExperimentalCoroutinesApi
@@ -49,7 +48,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.reportUser(uid, currentUid).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                toolbar.menu.getItem(0).icon = report
+                toolbar.menu.clear()
                 progress.stop()
                 showSnackbar(getString(R.string.txt_reported_user))
             }
@@ -91,19 +90,56 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             .create()
 
     private fun getReport(uid: String, currentUid: String) {
-        toolbar.menu.getItem(0).icon = progress as Drawable
         firestore.getReport(uid, currentUid).observe(viewLifecycleOwner) { result ->
             result.onSuccess { document ->
-                if (document.exists()) {
-                    showSnackbar(getString(R.string.txt_user_already_reported))
-                    toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
-                } else dialog(uid, currentUid).show()
+                if (!document.exists()) toolbar.inflateMenu(R.menu.menu_profile)
             }
             result.onFailure { exception ->
                 showActionSnackbar(exception) {
                     getReport(uid, currentUid)
                 }
                 toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
+            }
+        }
+    }
+
+    private fun setProfile(user: User, currentUid: String) = binding.apply {
+        val uid = user.uid
+        txtName.text = user.name
+        if (args.current) {
+            txtEmailTitle.isVisible = true
+            txtEmail.isVisible = true
+            txtEmail.text = auth.email()
+            txtDateOfBirthTitle.isVisible = true
+            txtDateOfBirth.isVisible = true
+        }
+        txtUsername.text = user.username
+        txtMobile.text = user.mobile
+        txtLocation.text = user.location
+        txtSex.text = user.sex
+        val dateOfBirth =
+            LocalDateTime.ofInstant(
+                Instant.ofEpochSecond(user.dateOfBirth.seconds),
+                localZoneId
+            )
+        txtDateOfBirth.text = dateOfBirthFormatter.format(dateOfBirth)
+
+        val image = user.image
+        if (image != null) {
+            loadProfileImage(imageUser, storage.getUserPhoto(image))
+        } else imageUser.setImageResource(R.drawable.ic_person)
+
+        toolbar.setOnMenuItemClickListener { item ->
+            when (item.itemId) {
+                R.id.item_edit -> {
+                    findNavController().navigate(R.id.action_profile_to_edit_profile)
+                    return@setOnMenuItemClickListener true
+                }
+                R.id.item_report -> {
+                    dialog(uid, currentUid).show()
+                    return@setOnMenuItemClickListener true
+                }
+                else -> return@setOnMenuItemClickListener false
             }
         }
     }
@@ -118,71 +154,16 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         report = getDrawable(R.drawable.ic_report)
 
         val currentUid = auth.uid()
-        val email = auth.email()
-
-        val imageUser = binding.imageUser
-        val txtName = binding.txtName
-        val txtEmailTitle = binding.txtEmailTitle
-        val txtEmail = binding.txtEmail
-        val txtUsername = binding.txtUsername
-        val txtMobile = binding.txtMobile
-        val txtLocation = binding.txtLocation
-        val txtSex = binding.txtSex
-        val txtDateOfBirthTitle = binding.txtDateOfBirthTitle
-        val txtDateOfBirth = binding.txtDateOfBirth
-
-        val dateTimeFormatter = DateTimeFormatter.ofPattern("MMMM d, yyyy")
-
-        fun setProfile(user: User) {
-            val uid = user.uid
-            txtName.text = user.name
-            if (args.current) {
-                txtEmailTitle.isVisible = true
-                txtEmail.isVisible = true
-                txtEmail.text = email
-                txtDateOfBirthTitle.isVisible = true
-                txtDateOfBirth.isVisible = true
-            }
-            txtUsername.text = user.username
-            txtMobile.text = user.mobile.replaceFirst("0", "+63")
-            txtLocation.text = user.location
-            txtSex.text = user.sex
-            val dateOfBirth =
-                LocalDateTime.ofInstant(
-                    Instant.ofEpochSecond(user.dateOfBirth.seconds),
-                    localZoneId
-                )
-            txtDateOfBirth.text = dateTimeFormatter.format(dateOfBirth)
-
-            val image = user.image
-            if (image != null) {
-                loadProfileImage(imageUser, storage.getUserPhoto(image))
-            } else imageUser.setImageResource(R.drawable.ic_person)
-
-            toolbar.setOnMenuItemClickListener { item ->
-                when (item.itemId) {
-                    R.id.item_edit -> {
-                        findNavController().navigate(R.id.action_profile_to_edit_profile)
-                        return@setOnMenuItemClickListener true
-                    }
-                    R.id.item_report -> {
-                        getReport(uid, currentUid)
-                        return@setOnMenuItemClickListener true
-                    }
-                    else -> return@setOnMenuItemClickListener false
-                }
-            }
-        }
 
         if (args.current) {
             toolbar.inflateMenu(R.menu.menu_current_profile)
             dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
-                setProfile(user)
+                setProfile(user, currentUid)
             }
         } else {
-            toolbar.inflateMenu(R.menu.menu_profile)
             dataViewModel.user.observe(viewLifecycleOwner) { user ->
-                setProfile(user)
+                setProfile(user, currentUid)
+                getReport(user.uid, currentUid)
             }
         }
     }

@@ -20,6 +20,7 @@ import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.setupWithNavController
 import com.google.android.material.appbar.MaterialToolbar
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.firebase.firestore.ktx.toObject
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -52,6 +53,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var navController: NavController
     lateinit var toolbar: MaterialToolbar
+    lateinit var fabSell: FloatingActionButton
 
     fun instanceId() {
         auth.instanceId().observe(this) { result ->
@@ -161,6 +163,7 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         toolbar = binding.toolbar
+        fabSell = binding.fabSell
         val bottomNavigationView = binding.bottomNavigationView
         val drawer = binding.drawer
         val navigationViewMain = binding.navigationViewMain
@@ -174,7 +177,7 @@ class MainActivity : AppCompatActivity() {
         val txtEmail = headerBinding.txtEmail
 
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
         navController = navHostFragment.navController
         val destinations = setOf(R.id.fragment_login, R.id.fragment_shop, R.id.fragment_chat)
 
