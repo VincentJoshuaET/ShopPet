@@ -3,6 +3,8 @@ plugins {
     kotlin("android")
     kotlin("kapt")
     id("com.google.gms.google-services")
+    id("com.google.firebase.crashlytics")
+    id("com.google.firebase.firebase-perf")
     id("dagger.hilt.android.plugin")
     id("androidx.navigation.safeargs.kotlin")
 }
@@ -85,12 +87,15 @@ dependencies {
     implementation("androidx.camera:camera-view:1.0.0-alpha14")
 
     // Firebase
+    implementation("com.google.firebase:firebase-analytics-ktx:17.4.4")
     implementation("com.google.firebase:firebase-auth-ktx:19.3.2")
     implementation("com.google.firebase:firebase-core:17.4.4")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:17.1.1")
     implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
     implementation("com.google.firebase:firebase-messaging:20.2.4")
     implementation("com.google.firebase:firebase-ml-vision:24.0.3")
     implementation("com.google.firebase:firebase-ml-vision-image-label-model:20.0.1")
+    implementation("com.google.firebase:firebase-perf:19.0.8")
     implementation("com.google.firebase:firebase-storage-ktx:19.1.1")
 
     // Firebase UI

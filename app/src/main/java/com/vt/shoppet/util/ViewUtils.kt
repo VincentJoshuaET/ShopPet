@@ -12,6 +12,8 @@ import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
@@ -19,6 +21,13 @@ import androidx.swiperefreshlayout.widget.CircularProgressDrawable
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
+
+private fun Lifecycle.observeSnackbar(snackbar: Snackbar) =
+    addObserver(LifecycleEventObserver { _, event ->
+        if (event == Lifecycle.Event.ON_DESTROY) {
+            snackbar.dismiss()
+        }
+    })
 
 fun Fragment.circularProgress(): Animatable {
     val value = TypedValue()
@@ -60,12 +69,16 @@ fun Fragment.showSnackbar(exception: Throwable) {
 
 fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).show()
+        .setAction(R.string.btn_retry, action).apply {
+            viewLifecycleOwner.lifecycle.observeSnackbar(this)
+        }.show()
 
 fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).show()
+        .setAction(R.string.btn_retry, action).apply {
+            viewLifecycleOwner.lifecycle.observeSnackbar(this)
+        }.show()
 }
 
 fun Fragment.setLayout(orientation: Int) = when (orientation) {

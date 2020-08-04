@@ -38,7 +38,7 @@
             android:layout_marginTop="16dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/progress"
+            app:layout_constraintTop_toBottomOf="@id/progress"
             tools:src="@tools:sample/avatars" />
 
         <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -48,8 +48,8 @@
             android:layout_marginTop="4dp"
             android:src="@drawable/ic_edit"
             app:fabSize="mini"
-            app:layout_constraintEnd_toEndOf="@+id/imageUserUpload"
-            app:layout_constraintTop_toTopOf="@+id/imageUserUpload" />
+            app:layout_constraintEnd_toEndOf="@id/imageUserUpload"
+            app:layout_constraintTop_toTopOf="@id/imageUserUpload" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputName"
@@ -59,7 +59,7 @@
             android:hint="@string/hint_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageUserUpload">
+            app:layout_constraintTop_toBottomOf="@id/imageUserUpload">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtName"
@@ -80,7 +80,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputName" />
+            app:layout_constraintTop_toBottomOf="@id/inputName" />
 
         <TextView
             android:id="@+id/txtEmail"
@@ -90,7 +90,7 @@
             android:layout_marginTop="12dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtEmailTitle"
+            app:layout_constraintTop_toBottomOf="@id/txtEmailTitle"
             tools:text="@tools:sample/full_names" />
 
         <TextView
@@ -103,7 +103,7 @@
             android:textStyle="bold"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/txtEmail" />
+            app:layout_constraintTop_toBottomOf="@id/txtEmail" />
 
         <TextView
             android:id="@+id/txtUsername"

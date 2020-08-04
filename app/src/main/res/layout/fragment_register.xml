@@ -29,7 +29,7 @@
             android:transitionName="logo"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/txtSignUp" />
+            app:layout_constraintTop_toTopOf="@id/txtSignUp" />
 
         <com.google.android.material.textfield.TextInputLayout
             android:id="@+id/inputName"
@@ -39,7 +39,7 @@
             android:hint="@string/hint_name"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageLogo">
+            app:layout_constraintTop_toBottomOf="@id/imageLogo">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtName"
@@ -58,7 +58,7 @@
             android:hint="@string/hint_email_address"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputName">
+            app:layout_constraintTop_toBottomOf="@id/inputName">
 
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/txtEmail"

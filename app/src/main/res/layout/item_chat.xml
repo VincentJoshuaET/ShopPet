@@ -27,7 +27,7 @@
             android:layout_height="wrap_content"
             android:layout_marginStart="12dp"
             android:layout_marginTop="12dp"
-            app:layout_constraintStart_toEndOf="@+id/imageUser"
+            app:layout_constraintStart_toEndOf="@id/imageUser"
             app:layout_constraintTop_toTopOf="parent"
             tools:text="@tools:sample/first_names" />
 
@@ -40,8 +40,8 @@
             android:ellipsize="end"
             android:gravity="center_vertical"
             android:lines="2"
-            app:layout_constraintStart_toEndOf="@+id/imageUser"
-            app:layout_constraintTop_toBottomOf="@+id/txtUsername"
+            app:layout_constraintStart_toEndOf="@id/imageUser"
+            app:layout_constraintTop_toBottomOf="@id/txtUsername"
             tools:text="@tools:sample/lorem/random" />
 
         <TextView
