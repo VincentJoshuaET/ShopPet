@@ -3,6 +3,7 @@ package com.vt.shoppet.ui
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.vt.shoppet.R
 import com.vt.shoppet.viewmodel.AuthViewModel
@@ -14,8 +15,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
 @ExperimentalCoroutinesApi
 class SplashFragment : Fragment() {
 
-    private val auth: AuthViewModel by activityViewModels()
-
+    private val auth: AuthViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {

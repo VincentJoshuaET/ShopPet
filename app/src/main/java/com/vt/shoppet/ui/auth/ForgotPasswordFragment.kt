@@ -5,7 +5,7 @@ import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
@@ -21,7 +21,7 @@ import javax.inject.Inject
 class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
 
     private val binding by viewBinding(FragmentForgotPasswordBinding::bind)
-    private val auth: AuthViewModel by activityViewModels()
+    private val auth: AuthViewModel by viewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils

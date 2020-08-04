@@ -9,7 +9,7 @@ import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.transition.MaterialSharedAxis
@@ -19,14 +19,14 @@ import com.vt.shoppet.util.showSnackbar
 import com.vt.shoppet.util.showTopSnackbar
 import com.vt.shoppet.util.topSnackbar
 import com.vt.shoppet.util.viewBinding
-import com.vt.shoppet.viewmodel.LabelerViewModel
+import com.vt.shoppet.viewmodel.VisionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
 class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private val binding by viewBinding(FragmentCameraBinding::bind)
-    private val labeler: LabelerViewModel by activityViewModels()
+    private val vision: VisionViewModel by viewModels()
 
     inner class ImageSavedCallback(private val cameraProvider: ProcessCameraProvider) :
         ImageCapture.OnImageSavedCallback {
@@ -92,9 +92,9 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         var isAnimal = false
 
         val analyzer = ImageAnalysis.Analyzer { proxy ->
-            labeler.convertImage(proxy).observe(viewLifecycleOwner) { result ->
+            vision.convertImage(proxy).observe(viewLifecycleOwner) { result ->
                 result.onSuccess { image ->
-                    labeler.process(image).observe(viewLifecycleOwner) { result ->
+                    vision.process(image).observe(viewLifecycleOwner) { result ->
                         result.onSuccess { list ->
                             val label = list.firstOrNull()?.text
                             txtLabel.text = label

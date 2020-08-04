@@ -35,8 +35,11 @@ object FirebaseModule {
 
     @Provides
     @Singleton
-    fun provideFirebaseVision() = FirebaseVision.getInstance().getOnDeviceImageLabeler(
+    fun provideFirebaseVision() = FirebaseVision.getInstance()
+
+    @Provides
+    @Singleton
+    fun provideOnDeviceImageLabelerOptions() =
         FirebaseVisionOnDeviceImageLabelerOptions.Builder().setConfidenceThreshold(0.75f).build()
-    )
 
 }

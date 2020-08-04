@@ -15,6 +15,7 @@ import androidx.core.view.isInvisible
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
@@ -48,9 +49,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private val binding by viewBinding(FragmentEditProfileBinding::bind)
 
-    private val auth: AuthViewModel by activityViewModels()
-    private val storage: StorageViewModel by activityViewModels()
-    private val firestore: FirestoreViewModel by activityViewModels()
+    private val auth: AuthViewModel by viewModels()
+    private val storage: StorageViewModel by viewModels()
+    private val firestore: FirestoreViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     @Inject

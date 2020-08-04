@@ -6,7 +6,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.core.text.trimmedLength
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.button.MaterialButton
@@ -29,8 +29,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
     private val binding by viewBinding(FragmentRegisterBinding::bind)
 
-    private val auth: AuthViewModel by activityViewModels()
-    private val firestore: FirestoreViewModel by activityViewModels()
+    private val auth: AuthViewModel by viewModels()
+    private val firestore: FirestoreViewModel by viewModels()
 
     @Inject
     lateinit var keyboard: KeyboardUtils

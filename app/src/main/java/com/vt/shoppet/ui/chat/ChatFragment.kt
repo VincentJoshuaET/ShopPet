@@ -6,6 +6,7 @@ import android.widget.ImageView
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -33,8 +34,8 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private val binding by viewBinding(FragmentChatBinding::bind)
 
-    private val firestore: FirestoreViewModel by activityViewModels()
-    private val storage: StorageViewModel by activityViewModels()
+    private val firestore: FirestoreViewModel by viewModels()
+    private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {

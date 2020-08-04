@@ -9,6 +9,7 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.Observer
@@ -38,7 +39,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val binding by viewBinding(FragmentShopBinding::bind)
 
-    private val storage: StorageViewModel by activityViewModels()
+    private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     private var action = 0

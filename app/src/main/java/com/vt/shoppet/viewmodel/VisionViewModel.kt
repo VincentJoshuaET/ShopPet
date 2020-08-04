@@ -11,17 +11,15 @@ import androidx.lifecycle.liveData
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.google.firebase.ml.vision.common.FirebaseVisionImageMetadata
 import com.google.firebase.ml.vision.label.FirebaseVisionImageLabel
-import com.vt.shoppet.repo.LabelerRepo
+import com.vt.shoppet.repo.VisionRepo
 import kotlinx.coroutines.Dispatchers
 
-class LabelerViewModel @ViewModelInject constructor(
-    private val labeler: LabelerRepo
-) : ViewModel() {
+class VisionViewModel @ViewModelInject constructor(private val vision: VisionRepo) : ViewModel() {
 
     fun process(image: FirebaseVisionImage): LiveData<Result<List<FirebaseVisionImageLabel>>> =
         liveData {
             val result = runCatching {
-                labeler.process(image)
+                vision.process(image)
             }
             emit(result)
         }

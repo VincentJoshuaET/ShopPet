@@ -10,6 +10,7 @@ import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -21,8 +22,8 @@ import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentSellBinding
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
-import com.vt.shoppet.viewmodel.LabelerViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
+import com.vt.shoppet.viewmodel.VisionViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
@@ -33,9 +34,9 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private val binding by viewBinding(FragmentSellBinding::bind)
 
-    private val labeler: LabelerViewModel by activityViewModels()
-    private val storage: StorageViewModel by activityViewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
+    private val storage: StorageViewModel by viewModels()
+    private val vision: VisionViewModel by viewModels()
 
     private val args: SellFragmentArgs by navArgs()
 
@@ -77,7 +78,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
     private fun processImage(image: FirebaseVisionImage, uri: Uri) {
         val labels = resources.getStringArray(R.array.labels)
         var isAnimal = false
-        labeler.process(image).observe(viewLifecycleOwner) { result ->
+        vision.process(image).observe(viewLifecycleOwner) { result ->
             result.onSuccess { list ->
                 txtLabels.text = null
                 for (label in list) {
@@ -115,6 +116,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
         val context = requireContext()
 
+
         circularProgress = circularProgress()
         upload = getDrawable(R.drawable.ic_upload)
         progress = binding.progress
@@ -130,7 +132,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
             circularProgress.start()
             btnUpload.isClickable = false
             btnUpload.icon = circularProgress as Drawable
-            labeler.convertImage(context, uri).observe(viewLifecycleOwner) { result ->
+            vision.convertImage(context, uri).observe(viewLifecycleOwner) { result ->
                 result.onSuccess { image ->
                     processImage(image, uri)
                 }

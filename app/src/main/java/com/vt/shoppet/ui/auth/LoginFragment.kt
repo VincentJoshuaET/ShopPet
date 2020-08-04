@@ -7,6 +7,7 @@ import android.view.View
 import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
@@ -28,8 +29,8 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
 
     private val binding by viewBinding(FragmentLoginBinding::bind)
 
-    private val auth: AuthViewModel by activityViewModels()
-    private val firestore: FirestoreViewModel by activityViewModels()
+    private val auth: AuthViewModel by viewModels()
+    private val firestore: FirestoreViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     @Inject

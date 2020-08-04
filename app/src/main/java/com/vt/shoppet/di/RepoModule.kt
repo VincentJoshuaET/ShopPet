@@ -28,7 +28,7 @@ abstract class RepoModule {
 
     @Binds
     @Singleton
-    abstract fun bindLabelerRepo(labelerRepoImpl: LabelerRepoImpl): LabelerRepo
+    abstract fun bindVisionRepo(visionRepoImpl: VisionRepoImpl): VisionRepo
 
     @Binds
     @Singleton

@@ -7,6 +7,7 @@ import android.view.View
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
@@ -34,9 +35,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
 
     private val args: ProfileFragmentArgs by navArgs()
 
-    private val auth: AuthViewModel by activityViewModels()
-    private val firestore: FirestoreViewModel by activityViewModels()
-    private val storage: StorageViewModel by activityViewModels()
+    private val auth: AuthViewModel by viewModels()
+    private val firestore: FirestoreViewModel by viewModels()
+    private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
     private lateinit var toolbar: MaterialToolbar
