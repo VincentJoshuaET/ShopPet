@@ -19,7 +19,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:src="@drawable/ic_camera"
-        android:visibility="visible"
+        android:visibility="invisible"
         app:elevation="8dp"
         app:layout_anchor="@id/recyclerPets"
         app:layout_anchorGravity="bottom|end"
