@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:textColor="@android:color/white"
-        app:layout_anchor="@+id/cameraView"
+        app:layout_anchor="@id/cameraView"
         app:layout_anchorGravity="top|center" />
 
     <com.google.android.material.imageview.ShapeableImageView
@@ -27,7 +27,7 @@
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
         android:src="@drawable/sl_capture"
-        app:layout_anchor="@+id/cameraView"
+        app:layout_anchor="@id/cameraView"
         app:layout_anchorGravity="bottom|center" />
 
 </androidx.coordinatorlayout.widget.CoordinatorLayout>
