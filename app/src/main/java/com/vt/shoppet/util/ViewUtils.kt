@@ -107,6 +107,7 @@ fun ActivityMainBinding.setupHomeNavigationView() =
         appbar.isVisible = true
         bottomNavigationView.isVisible = true
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+        toolbar.menu.clear()
     }
 
 fun ActivityMainBinding.setupToolbar() =
@@ -114,6 +115,7 @@ fun ActivityMainBinding.setupToolbar() =
         appbar.isVisible = true
         bottomNavigationView.isVisible = false
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+        toolbar.menu.clear()
     }
 
 fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =

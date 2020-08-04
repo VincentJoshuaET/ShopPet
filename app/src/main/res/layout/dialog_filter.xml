@@ -74,10 +74,10 @@
             android:padding="4dp"
             android:text="@string/sym_currency"
             android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@+id/sliderPrice"
+            app:layout_constraintBottom_toBottomOf="@id/sliderPrice"
             app:layout_constraintEnd_toStartOf="@id/sliderPrice"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/sliderPrice" />
+            app:layout_constraintTop_toTopOf="@id/sliderPrice" />
 
         <com.google.android.material.slider.RangeSlider
             android:id="@+id/sliderPrice"
@@ -101,7 +101,7 @@
             android:hint="@string/hint_age_unit"
             android:labelFor="@id/txtAge"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/sliderPrice">
+            app:layout_constraintTop_toBottomOf="@id/sliderPrice">
 
             <AutoCompleteTextView
                 android:id="@+id/txtAge"
@@ -121,7 +121,7 @@
             android:visibility="gone"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/inputAge"
+            app:layout_constraintTop_toBottomOf="@id/inputAge"
             app:values="@array/age" />
 
     </androidx.appcompat.widget.LinearLayoutCompat>

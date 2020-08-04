@@ -15,7 +15,7 @@
         android:layout_height="96dp"
         android:layout_marginTop="8dp"
         android:src="@drawable/ic_person"
-        app:layout_constraintStart_toStartOf="@+id/linearLayoutCompat"
+        app:layout_constraintStart_toStartOf="@id/linearLayoutCompat"
         app:layout_constraintTop_toTopOf="parent" />
 
     <androidx.appcompat.widget.LinearLayoutCompat
@@ -26,7 +26,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toStartOf="@id/linearLayoutCompat2"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageUser">
+        app:layout_constraintTop_toBottomOf="@id/imageUser">
 
         <TextView
             style="?attr/textAppearanceHeadline5"
@@ -90,7 +90,7 @@
         android:orientation="vertical"
         app:layout_constraintEnd_toStartOf="@id/linearLayoutCompat3"
         app:layout_constraintStart_toEndOf="@id/linearLayoutCompat"
-        app:layout_constraintTop_toBottomOf="@+id/imageUser">
+        app:layout_constraintTop_toBottomOf="@id/imageUser">
 
         <TextView
             style="?attr/textAppearanceHeadline5"
@@ -148,8 +148,8 @@
         android:layout_marginTop="8dp"
         android:orientation="vertical"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/linearLayoutCompat2"
-        app:layout_constraintTop_toBottomOf="@+id/imageUser">
+        app:layout_constraintStart_toEndOf="@id/linearLayoutCompat2"
+        app:layout_constraintTop_toBottomOf="@id/imageUser">
 
         <TextView
             android:id="@+id/txtDateOfBirthTitle"

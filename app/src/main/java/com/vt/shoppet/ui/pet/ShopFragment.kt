@@ -87,7 +87,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val context = requireContext()
         val activity = requireActivity() as MainActivity
 
-        val fabSell = activity.fabSell
+        val fabSell = binding.fabSell
 
         val recyclerPets = binding.recyclerPets
         val txtEmpty = binding.txtEmpty
