@@ -16,6 +16,7 @@ data class Pet(
     var medicalRecords: String = "",
     var description: String = "",
     var sold: Boolean = false,
+    var starred: Boolean = false,
     var id: String = "",
     val date: Timestamp = Timestamp.now()
 )
