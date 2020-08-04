@@ -201,7 +201,10 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
-            else showTopSnackbar(getString(R.string.txt_reported))
+            else {
+                showTopSnackbar(getString(R.string.txt_reported))
+                fabSell.hide()
+            }
         }
 
         toolbar.setOnMenuItemClickListener { item ->
