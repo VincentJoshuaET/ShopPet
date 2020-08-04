@@ -128,21 +128,14 @@ fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
     }
 
 fun ActivityMainBinding.showSnackbar(message: String) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        view.layoutParams = params.apply { gravity = Gravity.TOP }
-    }.show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).show()
 
 fun ActivityMainBinding.showActionSnackbar(message: String, action: (View) -> Unit) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        view.layoutParams = params.apply { gravity = Gravity.TOP }
-    }.setAction(R.string.btn_view, action).show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_view, action).show()
 
 fun ActivityMainBinding.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).apply {
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        view.layoutParams = params.apply { gravity = Gravity.TOP }
-    }.setAction(R.string.btn_retry, action).show()
+    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).show()
 }

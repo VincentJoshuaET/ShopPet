@@ -98,15 +98,15 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val savedStateHandle = navBackStackEntry?.savedStateHandle
         savedStateHandle?.run {
             getLiveData<Boolean>("posted").observe(viewLifecycleOwner) { posted ->
-                if (posted) showTopSnackbar(getString(R.string.txt_upload_success))
+                if (posted) showSnackbar(getString(R.string.txt_upload_success))
                 remove<Boolean>("posted")
             }
             getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
-                if (removed) showTopSnackbar(getString(R.string.txt_removed_pet))
+                if (removed) showSnackbar(getString(R.string.txt_removed_pet))
                 remove<Boolean>("removed")
             }
             getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
-                if (sold) showTopSnackbar(getString(R.string.txt_marked_pet_sold))
+                if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
                 remove<Boolean>("sold")
             }
         }
@@ -201,7 +201,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
         dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
-            else showTopSnackbar(getString(R.string.txt_reported))
+            else showSnackbar(getString(R.string.txt_reported))
         }
 
         toolbar.setOnMenuItemClickListener { item ->
