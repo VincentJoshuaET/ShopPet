@@ -1,4 +1,4 @@
-# ShopPetVT
+# ShopPet
 Android pet marketplace application with MVVM architecture implementing:
 * Kotlin Coroutines
 * LiveData, ViewModel
