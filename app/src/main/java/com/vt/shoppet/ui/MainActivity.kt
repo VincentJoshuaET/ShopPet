@@ -130,8 +130,9 @@ class MainActivity : AppCompatActivity() {
     private fun showChatSnackbar(intent: Intent?) {
         intent?.let {
             val id = intent.getStringExtra("CHAT_ID") ?: return@let
-            val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toInt() ?: return@let
-            val receiverIndex = intent.getStringExtra("RECIPIENT_INDEX")?.toInt() ?: return@let
+            val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toIntOrNull() ?: return@let
+            val receiverIndex =
+                intent.getStringExtra("RECIPIENT_INDEX")?.toIntOrNull() ?: return@let
             val senderUsername = intent.getStringExtra("SENDER_USERNAME") ?: return@let
             if (dataViewModel.chat.value?.id == id && navController.currentDestination?.id == R.id.fragment_conversation) return@let
             binding.showActionSnackbar("$senderUsername messaged you") {
