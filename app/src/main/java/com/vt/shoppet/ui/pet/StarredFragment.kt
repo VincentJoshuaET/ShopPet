@@ -22,10 +22,8 @@ import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class StarredFragment : Fragment(R.layout.fragment_starred) {
 
     private val binding by viewBinding(FragmentStarredBinding::bind)

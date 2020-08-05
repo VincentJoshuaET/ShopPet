@@ -9,11 +9,9 @@ import com.google.firebase.messaging.RemoteMessage
 import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.FirestoreRepo
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class MessagingService : FirebaseMessagingService() {
 
     @Inject

@@ -20,13 +20,11 @@ import com.vt.shoppet.ui.MainActivity
 import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.LocalDateTime
 import java.util.*
 import javax.inject.Inject
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class DetailsFragment : Fragment(R.layout.fragment_details) {
 
     private val binding by viewBinding(FragmentDetailsBinding::bind)

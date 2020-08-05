@@ -25,11 +25,9 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import com.vt.shoppet.viewmodel.VisionViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.util.*
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private val binding by viewBinding(FragmentSellBinding::bind)

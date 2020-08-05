@@ -31,10 +31,8 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
     private val binding by viewBinding(FragmentSelectedBinding::bind)

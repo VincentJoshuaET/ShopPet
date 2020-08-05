@@ -15,11 +15,9 @@ import com.vt.shoppet.repo.DataRepo
 import com.vt.shoppet.repo.FirestoreRepo
 import com.vt.shoppet.util.localZoneId
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import java.time.Instant
 import java.time.LocalDateTime
 
-@ExperimentalCoroutinesApi
 class DataViewModel @ViewModelInject constructor(
     data: DataRepo,
     firestore: FirestoreRepo,

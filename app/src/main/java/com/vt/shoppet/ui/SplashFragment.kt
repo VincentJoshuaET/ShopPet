@@ -9,10 +9,8 @@ import com.vt.shoppet.R
 import com.vt.shoppet.viewmodel.AuthViewModel
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class SplashFragment : Fragment() {
 
     private val auth: AuthViewModel by viewModels()

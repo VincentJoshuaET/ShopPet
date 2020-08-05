@@ -67,7 +67,8 @@ dependencies {
 
     // Kotlin / Java
     implementation(kotlin("stdlib-jdk7", "1.3.72"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.7")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.8")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.10")
 
     // Android Architecture Components

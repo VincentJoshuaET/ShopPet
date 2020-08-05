@@ -13,10 +13,8 @@ import com.vt.shoppet.model.Filter
 import com.vt.shoppet.util.getArrayAdapter
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class SortDialog : DialogFragment() {
 
     private val viewModel: DataViewModel by activityViewModels()

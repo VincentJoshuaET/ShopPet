@@ -31,10 +31,8 @@ import com.vt.shoppet.util.PermissionUtils.TAKE_PHOTO
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val binding by viewBinding(FragmentShopBinding::bind)

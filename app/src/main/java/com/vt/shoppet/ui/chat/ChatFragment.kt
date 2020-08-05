@@ -26,10 +26,8 @@ import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class ChatFragment : Fragment(R.layout.fragment_chat) {
 
     private val binding by viewBinding(FragmentChatBinding::bind)

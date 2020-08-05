@@ -23,10 +23,8 @@ import com.vt.shoppet.util.*
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class OwnFragment : Fragment(R.layout.fragment_own) {
 
     private val binding by viewBinding(FragmentOwnBinding::bind)

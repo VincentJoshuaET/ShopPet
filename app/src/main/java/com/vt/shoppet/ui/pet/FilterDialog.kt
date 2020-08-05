@@ -15,11 +15,9 @@ import com.vt.shoppet.util.KeyboardUtils
 import com.vt.shoppet.util.getArrayAdapter
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Inject
 
 @AndroidEntryPoint
-@ExperimentalCoroutinesApi
 class FilterDialog : DialogFragment() {
 
     private val dataViewModel: DataViewModel by activityViewModels()
