@@ -1,6 +1,5 @@
 package com.vt.shoppet
 
-import android.app.NotificationManager
 import android.content.Intent
 import androidx.core.os.bundleOf
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
@@ -19,9 +18,6 @@ class MessagingService : FirebaseMessagingService() {
 
     @Inject
     lateinit var firestore: FirestoreRepo
-
-    @Inject
-    lateinit var notificationManager: NotificationManager
 
     override fun onNewToken(token: String) {
         if (auth.isLoggedIn()) firestore.addToken(token)

@@ -73,10 +73,11 @@ dependencies {
 
     // Android Architecture Components
     implementation("androidx.activity:activity-ktx:1.2.0-alpha07")
-    implementation("androidx.appcompat:appcompat:1.1.0")
+    implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
     implementation("androidx.core:core-ktx:1.3.1")
     implementation("androidx.fragment:fragment-ktx:1.3.0-alpha07")
+    implementation("androidx.localbroadcastmanager:localbroadcastmanager:1.0.0")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha05")
 
@@ -93,6 +94,7 @@ dependencies {
     implementation("com.google.firebase:firebase-core:17.4.4")
     implementation("com.google.firebase:firebase-crashlytics-ktx:17.1.1")
     implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
+    implementation("com.google.firebase:firebase-iid:20.2.4")
     implementation("com.google.firebase:firebase-messaging:20.2.4")
     implementation("com.google.firebase:firebase-ml-vision:24.0.3")
     implementation("com.google.firebase:firebase-ml-vision-image-label-model:20.0.1")
