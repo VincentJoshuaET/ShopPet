@@ -144,6 +144,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val txtEmail = binding.txtEmail
         val txtUsername = binding.txtUsername
         val txtPassword = binding.txtPassword
+        val inputConfirmPassword = binding.inputConfirmPassword
         val txtConfirmPassword = binding.txtConfirmPassword
         val txtMobile = binding.txtMobile
         val txtDateOfBirth = binding.txtDateOfBirth
@@ -244,6 +245,8 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             if (password.trim() != confirmPassword.trim()) {
                 txtConfirmPassword.showError(getString(R.string.txt_passwords_not_match))
                 fail = true
+            } else {
+                inputConfirmPassword.error = null
             }
             if (password.length < 8) {
                 txtPassword.showError(getString(R.string.txt_password_short))
