@@ -1,129 +1,229 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_width="wrap_content"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:padding="12dp">
 
-    <androidx.appcompat.widget.LinearLayoutCompat
+    <TextView
+        android:id="@+id/txtTitle"
+        style="?attr/textAppearanceHeadline6"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:text="@string/menu_item_filter"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputType"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:hint="@string/hint_type"
-            android:labelFor="@id/txtType"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+    <TextView
+        android:id="@+id/txtType"
+        style="?attr/textAppearanceSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_type"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtTitle" />
 
-            <AutoCompleteTextView
-                android:id="@+id/txtType"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkBird"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_bird"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtType" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkCat"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_cat"
+        app:layout_constraintStart_toEndOf="@id/chkBird"
+        app:layout_constraintTop_toBottomOf="@id/txtType" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputSex"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="120dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:hint="@string/hint_sex"
-            android:labelFor="@id/txtSex"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inputType">
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkDog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_dog"
+        app:layout_constraintStart_toEndOf="@id/chkCat"
+        app:layout_constraintTop_toBottomOf="@id/txtType" />
 
-            <AutoCompleteTextView
-                android:id="@+id/txtSex"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkFish"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_fish"
+        app:layout_constraintStart_toEndOf="@id/chkDog"
+        app:layout_constraintTop_toBottomOf="@id/txtType" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkLizard"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/type_lizard"
+        app:layout_constraintStart_toEndOf="@id/chkFish"
+        app:layout_constraintTop_toBottomOf="@id/txtType" />
 
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputPrice"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:hint="@string/hint_price"
-            android:labelFor="@id/txtPrice"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inputSex">
+    <TextView
+        android:id="@+id/txtSex"
+        style="?attr/textAppearanceSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_sex"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chkBird" />
 
-            <AutoCompleteTextView
-                android:id="@+id/txtPrice"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkMale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sex_male"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtSex" />
 
-        </com.google.android.material.textfield.TextInputLayout>
+    <com.google.android.material.checkbox.MaterialCheckBox
+        android:id="@+id/chkFemale"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/sex_female"
+        app:layout_constraintStart_toEndOf="@id/chkMale"
+        app:layout_constraintTop_toBottomOf="@id/txtSex" />
 
-        <TextView
-            android:id="@+id/txtCurrency"
-            style="?attr/textAppearanceHeadline6"
+    <TextView
+        android:id="@+id/txtPrice"
+        style="?attr/textAppearanceSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_price"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/chkFemale" />
+
+
+    <RadioGroup
+        android:id="@+id/rdPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtPrice">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdPriceNoFilter"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:padding="4dp"
-            android:text="@string/sym_currency"
-            android:visibility="gone"
-            app:layout_constraintBottom_toBottomOf="@id/sliderPrice"
-            app:layout_constraintEnd_toStartOf="@id/sliderPrice"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="@id/sliderPrice" />
+            android:text="@string/lbl_no_filter" />
 
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/sliderPrice"
-            android:layout_width="300dp"
-            android:layout_height="wrap_content"
-            android:stepSize="500"
-            android:valueFrom="0"
-            android:valueTo="10000"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/txtCurrency"
-            app:layout_constraintTop_toBottomOf="@id/inputPrice"
-            app:values="@array/price" />
-
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/inputAge"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
-            android:layout_width="160dp"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            android:hint="@string/hint_age_unit"
-            android:labelFor="@id/txtAge"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/sliderPrice">
-
-            <AutoCompleteTextView
-                android:id="@+id/txtAge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:inputType="none" />
-
-        </com.google.android.material.textfield.TextInputLayout>
-
-        <com.google.android.material.slider.RangeSlider
-            android:id="@+id/sliderAge"
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdPriceRange"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:stepSize="1"
-            android:valueFrom="0"
-            android:valueTo="100"
-            android:visibility="gone"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/inputAge"
-            app:values="@array/age" />
+            android:text="@string/lbl_range" />
+    </RadioGroup>
 
-    </androidx.appcompat.widget.LinearLayoutCompat>
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/sliderPrice"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:stepSize="500"
+        android:valueFrom="0"
+        android:valueTo="10000"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rdPrice"
+        app:values="@array/price"
+        tools:visibility="visible" />
 
-</androidx.core.widget.NestedScrollView>
+    <TextView
+        android:id="@+id/txtAgeUnit"
+        style="?attr/textAppearanceSubtitle1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/hint_age_unit"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sliderPrice" />
+
+    <RadioGroup
+        android:id="@+id/rdAge"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/txtAgeUnit">
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdAgeNoFilter"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/lbl_no_filter" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdAgeDay"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age_unit_days" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdAgeWeek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age_unit_weeks" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdAgeMonth"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age_unit_months" />
+
+        <com.google.android.material.radiobutton.MaterialRadioButton
+            android:id="@+id/rdAgeYear"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/age_unit_years" />
+    </RadioGroup>
+
+    <com.google.android.material.slider.RangeSlider
+        android:id="@+id/sliderAge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:stepSize="1"
+        android:valueFrom="0"
+        android:valueTo="100"
+        android:visibility="gone"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/rdAge"
+        app:values="@array/age"
+        tools:visibility="visible" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnClear"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_remove_filters"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sliderAge" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnCancel"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_cancel"
+        app:layout_constraintEnd_toStartOf="@id/btnOk"
+        app:layout_constraintTop_toBottomOf="@id/sliderAge" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnOk"
+        style="?attr/borderlessButtonStyle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/btn_ok"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/sliderAge" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

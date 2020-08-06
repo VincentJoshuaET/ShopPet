@@ -157,11 +157,6 @@ class MainActivity : AppCompatActivity() {
         )
     }
 
-    override fun onPause() {
-        super.onPause()
-        if (auth.isLoggedIn()) unregisterReceiver(receiver)
-    }
-
     override fun onCreate(savedInstanceState: Bundle?) {
         setTheme(R.style.AppTheme)
         super.onCreate(savedInstanceState)

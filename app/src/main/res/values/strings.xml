@@ -34,6 +34,7 @@
     <string name="hint_from">From</string>
     <string name="hint_to">To</string>
     <string name="hint_age_unit">Age Unit</string>
+    <string name="hint_upload_date">Upload Date</string>
     <string name="sym_currency">₱</string>
     <string name="sym_range">-</string>
 
@@ -116,6 +117,22 @@
     <string name="lbl_unstarred">Unstarred</string>
     <string name="lbl_no_messages">No messages!</string>
     <string name="lbl_no_pets">No pets available!</string>
+    <string name="lbl_no_filter">No Filter</string>
+    <string name="lbl_range">Range</string>
+
+    <string name="type_bird">Bird</string>
+    <string name="type_cat">Cat</string>
+    <string name="type_dog">Dog</string>
+    <string name="type_fish">Fish</string>
+    <string name="type_lizard">Lizard</string>
+    <string name="sex_male">Male</string>
+    <string name="sex_female">Female</string>
+    <string name="age_unit_days">Days</string>
+    <string name="age_unit_weeks">Weeks</string>
+    <string name="age_unit_months">Months</string>
+    <string name="age_unit_years">Years</string>
+    <string name="order_ascending">Ascending</string>
+    <string name="order_descending">Descending</string>
 
     <string name="title_cannot_log_in">Cannot Log In</string>
     <string name="title_profile_image">Profile Image</string>

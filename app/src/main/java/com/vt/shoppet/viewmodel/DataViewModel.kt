@@ -55,17 +55,13 @@ class DataViewModel @ViewModelInject constructor(
         _filter.value = filter
         filteredPets = petsLiveData.map { snapshots ->
             val pets: List<Pet> = snapshots.toObjects()
-            val typeList =
-                if (filter.type == "All") pets
-                else pets.filter { it.type == filter.type }
+            val typeList = pets.filter { filter.type.contains(it.type) }
 
-            val sexList =
-                if (filter.sex == "Both") typeList
-                else typeList.filter { it.sex == filter.sex }
+            val sexList = typeList.filter { filter.sex.contains(it.sex) }
 
             val priceList =
-                if (filter.price == "No Filter") sexList
-                else sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
+                if (filter.price) sexList.filter { it.price in filter.amounts[0].toInt()..filter.amounts[1].toInt() }
+                else sexList
 
             val now = LocalDateTime.now()
 
@@ -97,15 +93,16 @@ class DataViewModel @ViewModelInject constructor(
                 if (filter.age == "No Filter") priceList
                 else priceList.filter { Instant.ofEpochSecond(it.dateOfBirth.seconds) in toInstant..fromInstant }
 
-            return@map when (filter.order) {
-                "Ascending" -> when (filter.field) {
+            if (filter.order) {
+                return@map when (filter.field) {
                     "Age" -> ageList.sortedByDescending { it.dateOfBirth }
                     "Breed" -> ageList.sortedBy { it.breed }
                     "Price" -> ageList.sortedBy { it.price }
                     "Type" -> ageList.sortedBy { it.type }
                     else -> ageList.sortedBy { it.date }
                 }
-                else -> when (filter.field) {
+            } else {
+                return@map when (filter.field) {
                     "Age" -> ageList.sortedBy { it.dateOfBirth }
                     "Breed" -> ageList.sortedByDescending { it.breed }
                     "Price" -> ageList.sortedByDescending { it.price }
