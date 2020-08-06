@@ -2,7 +2,6 @@ package com.vt.shoppet
 
 import android.content.Intent
 import androidx.core.os.bundleOf
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
 import com.vt.shoppet.repo.AuthRepo
@@ -38,11 +37,11 @@ class MessagingService : FirebaseMessagingService() {
             "SENDER_USERNAME" to senderUsername
         )
 
-        val intent = Intent("ACTION_CHAT").apply {
+        val intent = Intent(Intent.CATEGORY_APP_MESSAGING).apply {
             putExtras(bundle)
         }
 
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent)
+        sendBroadcast(intent)
     }
 
 }

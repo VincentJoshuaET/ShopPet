@@ -14,7 +14,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.observe
-import androidx.localbroadcastmanager.content.LocalBroadcastManager
 import androidx.navigation.NavController
 import androidx.navigation.fragment.NavHostFragment
 import androidx.navigation.ui.AppBarConfiguration
@@ -127,31 +126,40 @@ class MainActivity : AppCompatActivity() {
 
     private fun showChatSnackbar(intent: Intent?) {
         intent?.let {
-            val id = intent.getStringExtra("CHAT_ID") ?: return@let
-            val senderIndex = intent.getStringExtra("SENDER_INDEX")?.toIntOrNull() ?: return@let
+            val id =
+                intent.getStringExtra("CHAT_ID") ?: return@let
+            val senderIndex =
+                intent.getStringExtra("SENDER_INDEX")?.toIntOrNull() ?: return@let
             val receiverIndex =
                 intent.getStringExtra("RECIPIENT_INDEX")?.toIntOrNull() ?: return@let
-            val senderUsername = intent.getStringExtra("SENDER_USERNAME") ?: return@let
-            if (dataViewModel.chat.value?.id == id && navController.currentDestination?.id == R.id.fragment_conversation) return@let
-            binding.showActionSnackbar("$senderUsername messaged you") {
-                getChat(id, senderIndex, receiverIndex, senderUsername) {
-                    showChatSnackbar(intent)
+            val senderUsername =
+                intent.getStringExtra("SENDER_USERNAME") ?: return@let
+            if (dataViewModel.chat.value?.id != id && navController.currentDestination?.id != R.id.fragment_conversation) {
+                binding.showActionSnackbar("$senderUsername messaged you") {
+                    getChat(id, senderIndex, receiverIndex, senderUsername) {
+                        showChatSnackbar(intent)
+                    }
                 }
             }
         }
     }
 
     private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) {
+        override fun onReceive(context: Context?, intent: Intent?) =
             showChatSnackbar(intent)
-        }
     }
 
     override fun onResume() {
         super.onResume()
-        LocalBroadcastManager
-            .getInstance(this)
-            .registerReceiver(receiver, IntentFilter("ACTION_CHAT"))
+        if (auth.isLoggedIn()) registerReceiver(
+            receiver,
+            IntentFilter(Intent.CATEGORY_APP_MESSAGING)
+        )
+    }
+
+    override fun onPause() {
+        super.onPause()
+        if (auth.isLoggedIn()) unregisterReceiver(receiver)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
