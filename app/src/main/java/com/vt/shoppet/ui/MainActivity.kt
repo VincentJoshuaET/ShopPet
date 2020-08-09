@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 signOut(instanceIdResult.token)
             }
             result.onFailure { exception ->
-                binding.showActionSnackbar(exception) {
+                showActionSnackbar(binding.fragment, exception) {
                     instanceId()
                 }
             }
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 dataViewModel.removeFirebaseData()
                 auth.signOut()
                 if (auth.isLoggedIn()) {
-                    binding.showSnackbar(getString(R.string.txt_cannot_log_out))
+                    showSnackbar(binding.fragment, getString(R.string.txt_cannot_log_out))
                     dataViewModel.initFirebaseData()
                     firestore.addToken(token)
                 } else {
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             result.onFailure { exception ->
-                binding.showActionSnackbar(exception) {
+                showActionSnackbar(binding.fragment, exception) {
                     signOut(token)
                 }
             }
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(R.id.fragment_conversation, arguments)
             }
             result.onFailure { exception ->
-                binding.showActionSnackbar(exception, onError)
+                showActionSnackbar(binding.fragment, exception, onError)
             }
         }
     }
@@ -135,7 +135,7 @@ class MainActivity : AppCompatActivity() {
             val senderUsername =
                 intent.getStringExtra("SENDER_USERNAME") ?: return@let
             if (dataViewModel.chat.value?.id != id && navController.currentDestination?.id != R.id.fragment_conversation) {
-                binding.showActionSnackbar("$senderUsername messaged you") {
+                showActionSnackbar(binding.fragment, "$senderUsername messaged you") {
                     getChat(id, senderIndex, receiverIndex, senderUsername) {
                         showChatSnackbar(intent)
                     }
@@ -176,7 +176,7 @@ class MainActivity : AppCompatActivity() {
         val txtEmail = headerBinding.txtEmail
 
         val navHostFragment =
-            supportFragmentManager.findFragmentById(R.id.fragmentContainerView) as NavHostFragment
+            supportFragmentManager.findFragmentById(R.id.fragment) as NavHostFragment
         navController = navHostFragment.navController
         val destinations = setOf(R.id.fragment_login, R.id.fragment_shop, R.id.fragment_chat)
 

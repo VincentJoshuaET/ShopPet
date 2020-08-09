@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.pet
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -13,11 +12,7 @@ import androidx.fragment.app.viewModels
 import androidx.interpolator.view.animation.FastOutSlowInInterpolator
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.card.MaterialCardView
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.imageview.ShapeableImageView
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.firestore.ktx.toObject
 import com.google.firebase.firestore.ktx.toObjects
@@ -41,25 +36,20 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
-    private lateinit var imagePet: ShapeableImageView
-    private lateinit var fabChatSold: FloatingActionButton
-    private lateinit var btnStar: MaterialButton
-    private lateinit var cardSeller: MaterialCardView
-    private lateinit var imageSeller: ShapeableImageView
-    private lateinit var progress: Animatable
-    private lateinit var chat: Drawable
+    private val progress by lazy { circularProgress() }
+    private val chat by lazy { getDrawable(R.drawable.ic_chat) }
 
     private var starred = false
 
     private fun starPetButton() =
-        btnStar.apply {
+        binding.btnStar.apply {
             isClickable = true
             setIconResource(R.drawable.ic_starred)
             text = getString(R.string.lbl_starred)
         }
 
     private fun unstarPetButton() =
-        btnStar.apply {
+        binding.btnStar.apply {
             isClickable = true
             setIconResource(R.drawable.ic_unstarred)
             text = getString(R.string.lbl_unstarred)
@@ -72,7 +62,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     removePetPhoto(id)
                 }
             }
@@ -80,6 +70,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun soldDialog(id: String): AlertDialog {
+        val fabChatSold = binding.fabChatSold
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_mark_as_sold)
             .setMessage(R.string.txt_mark_pet_sold)
@@ -96,7 +87,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         }
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(exception) {
+                        showActionSnackbar(binding.root, exception) {
                             soldDialog(id).show()
                         }
                         fabChatSold.setImageDrawable(chat)
@@ -119,7 +110,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         removePetPhoto(image)
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(exception) {
+                        showActionSnackbar(binding.root, exception) {
                             removeDialog(id, image).show()
                         }
                     }
@@ -129,6 +120,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun checkStarredPet(id: String) {
+        val btnStar = binding.btnStar
         progress.start()
         btnStar.isClickable = false
         btnStar.icon = progress as Drawable
@@ -145,7 +137,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     checkStarredPet(id)
                 }
                 btnStar.isClickable = false
@@ -164,7 +156,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 findNavController().navigate(action)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     createChat(chat)
                 }
             }
@@ -172,6 +164,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun checkChat(pet: Pet, user: User) {
+        val fabChatSold = binding.fabChatSold
         progress.start()
         fabChatSold.setImageDrawable(progress as Drawable)
         fabChatSold.isClickable = false
@@ -199,7 +192,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     checkChat(pet, user)
                 }
                 fabChatSold.setImageDrawable(chat)
@@ -210,6 +203,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun getUser(pet: Pet, user: User) {
+        val imageSeller = binding.imageSeller
         firestore.getUserSnapshot(pet.uid).observe(viewLifecycleOwner) { result ->
             result.onSuccess { document ->
                 val data: User = document.toObject()
@@ -220,7 +214,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 loadProfileImage(imageSeller, storage.getUserPhoto(image))
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     getUser(pet, user)
                 }
                 imageSeller.setImageResource(R.drawable.ic_person)
@@ -229,6 +223,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun starPet(pet: Pet) {
+        val btnStar = binding.btnStar
         pet.starred = true
         progress.start()
         btnStar.isClickable = false
@@ -236,13 +231,13 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         btnStar.text = getString(R.string.lbl_loading)
         firestore.starPet(pet).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(getString(R.string.txt_starred))
+                showSnackbar(binding.root, getString(R.string.txt_starred))
                 starred = true
                 starPetButton()
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     starPet(pet)
                 }
                 starred = false
@@ -253,19 +248,20 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun unstarPet(id: String) {
+        val btnStar = binding.btnStar
         progress.start()
         btnStar.isClickable = false
         btnStar.icon = progress as Drawable
         btnStar.text = getString(R.string.lbl_loading)
         firestore.unstarPet(id).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(getString(R.string.txt_unstarred))
+                showSnackbar(binding.root, getString(R.string.txt_unstarred))
                 starred = false
                 unstarPetButton()
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     unstarPet(id)
                 }
                 starred = true
@@ -278,14 +274,14 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         sharedElementEnterTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.fragmentContainerView
+            drawingViewId = R.id.fragment
             fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
             interpolator = FastOutSlowInInterpolator()
             duration = 500
             isElevationShadowEnabled = false
         }
         sharedElementReturnTransition = MaterialContainerTransform().apply {
-            drawingViewId = R.id.fragmentContainerView
+            drawingViewId = R.id.fragment
             fadeMode = MaterialContainerTransform.FADE_MODE_THROUGH
             interpolator = FastOutSlowInInterpolator()
             duration = 500
@@ -296,14 +292,10 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progress = circularProgress()
-        btnStar = binding.btnStar
-        imagePet = binding.imagePet
-        fabChatSold = binding.fabChatSold
-        cardSeller = binding.cardSeller
-        imageSeller = binding.imageSeller
-
-        chat = getDrawable(R.drawable.ic_chat)
+        val btnStar = binding.btnStar
+        val imagePet = binding.imagePet
+        val fabChatSold = binding.fabChatSold
+        val cardSeller = binding.cardSeller
 
         val btnGroup = binding.btnGrp
         val btnEdit = binding.btnEdit
@@ -325,7 +317,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Boolean>("edited")?.observe(viewLifecycleOwner) { edited ->
-            if (edited) showSnackbar(getString(R.string.txt_pet_updated))
+            if (edited) showSnackbar(binding.root, getString(R.string.txt_pet_updated))
             savedStateHandle.remove<Boolean>("edited")
         }
 

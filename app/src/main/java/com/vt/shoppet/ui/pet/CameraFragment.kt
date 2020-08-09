@@ -38,7 +38,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         override fun onError(exception: ImageCaptureException) =
-            showSnackbar(exception)
+            showSnackbar(binding.root, exception)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +51,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        showTopSnackbar(getString(R.string.txt_camera))
+        showTopSnackbar(binding.root, getString(R.string.txt_camera))
 
         val context = requireContext()
 
@@ -88,7 +88,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 .build()
         val callback = ImageSavedCallback(cameraProviderFuture.get())
 
-        val snackbar = topSnackbar(getString(R.string.txt_animal_undetected))
+        val snackbar = topSnackbar(binding.root, getString(R.string.txt_animal_undetected))
         var isAnimal = false
 
         val analyzer = ImageAnalysis.Analyzer { proxy ->

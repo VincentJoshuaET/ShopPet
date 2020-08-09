@@ -1,7 +1,6 @@
 package com.vt.shoppet.ui.chat
 
 import android.content.ContentValues
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -9,7 +8,6 @@ import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.view.View
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -17,12 +15,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.navArgs
 import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.textfield.TextInputEditText
-import com.google.android.material.textfield.TextInputLayout
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.actions.MessageActions
@@ -53,14 +47,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var layoutImage: CoordinatorLayout
-    private lateinit var imageMessage: ShapeableImageView
-    private lateinit var inputMessage: TextInputLayout
-    private lateinit var txtMessage: TextInputEditText
-    private lateinit var recyclerMessages: RecyclerView
-
-    private lateinit var send: Drawable
-    private lateinit var progress: Animatable
+    private val send by lazy { getDrawable(R.drawable.ic_send) }
+    private val progress by lazy { circularProgress() }
 
     private var uri = Uri.EMPTY
     private var action = 0
@@ -90,7 +78,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     }
                 }
             } else {
-                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                showActionSnackbar(binding.root, getString(R.string.txt_permission_denied)) {
                     requestPermissions.launch(permissions)
                 }
             }
@@ -109,22 +97,24 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
             if (boolean) loadImage()
         }
 
-    private fun loadImage() {
+    private fun loadImage() = binding.apply {
         loadImage(imageMessage, uri)
         layoutImage.isVisible = true
-        val adapter = recyclerMessages.adapter ?: return
+        val adapter = recyclerMessages.adapter ?: return@apply
         recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
-    private fun clearImageView() {
+    private fun clearImageView() = binding.apply {
         imageMessage.setImageDrawable(null)
         layoutImage.isVisible = false
         uri = Uri.EMPTY
-        val adapter = recyclerMessages.adapter ?: return
+        val adapter = recyclerMessages.adapter ?: return@apply
         recyclerMessages.layoutManager?.scrollToPosition(adapter.itemCount - 1)
     }
 
     private fun sendChat(chat: Chat) {
+        val txtMessage = binding.txtMessage
+        val inputMessage = binding.inputMessage
         txtMessage.text = null
         txtMessage.isEnabled = false
         progress.start()
@@ -136,7 +126,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     sendChat(chat)
                 }
                 txtMessage.isEnabled = true
@@ -147,6 +137,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     }
 
     private fun sendTextMessage(chat: Chat, message: Message) {
+        val txtMessage = binding.txtMessage
+        val inputMessage = binding.inputMessage
         txtMessage.text = null
         txtMessage.isEnabled = false
         progress.start()
@@ -163,7 +155,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 sendChat(data)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     sendTextMessage(chat, message)
                 }
                 txtMessage.isEnabled = true
@@ -174,6 +166,8 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     }
 
     private fun uploadMessagePhoto(chat: Chat, text: String, image: String) {
+        val txtMessage = binding.txtMessage
+        val inputMessage = binding.inputMessage
         txtMessage.text = null
         txtMessage.isEnabled = false
         progress.start()
@@ -195,7 +189,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 sendTextMessage(chat, message)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     uploadMessagePhoto(chat, text, image)
                 }
                 txtMessage.isEnabled = true
@@ -211,13 +205,9 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
         val uid = firestore.uid
         val context = requireContext()
 
-        recyclerMessages = binding.recyclerMessages
-        layoutImage = binding.layoutImage
-        imageMessage = binding.imageMessage
-        inputMessage = binding.inputMessage
-        txtMessage = binding.txtMessage
-        progress = circularProgress()
-        send = getDrawable(R.drawable.ic_send)
+        val recyclerMessages = binding.recyclerMessages
+        val inputMessage = binding.inputMessage
+        val txtMessage = binding.txtMessage
 
         val txtEmpty = binding.txtEmpty
         val fabRemove = binding.fabRemove

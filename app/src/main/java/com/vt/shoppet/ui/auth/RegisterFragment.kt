@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.auth
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -9,7 +8,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.transition.MaterialContainerTransform
 import com.google.firebase.Timestamp
@@ -35,11 +33,11 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var progress: Animatable
-    private lateinit var check: Drawable
-    private lateinit var btnRegister: MaterialButton
+    private val progress by lazy { circularProgress() }
+    private val check by lazy { getDrawable(R.drawable.ic_check) }
 
     private fun verifyEmail() {
+        val btnRegister = binding.btnRegister
         progress.start()
         btnRegister.isClickable = false
         btnRegister.icon = progress as Drawable
@@ -47,12 +45,12 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             result.onSuccess {
                 btnRegister.icon = check
                 progress.stop()
-                showSnackbar(getString(R.string.txt_verification_sent))
+                showSnackbar(binding.root, getString(R.string.txt_verification_sent))
                 auth.signOut()
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     verifyEmail()
                 }
                 btnRegister.isClickable = true
@@ -63,6 +61,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     }
 
     private fun addUser(user: User) {
+        val btnRegister = binding.btnRegister
         progress.start()
         btnRegister.isClickable = false
         btnRegister.icon = progress as Drawable
@@ -71,7 +70,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 verifyEmail()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     addUser(user)
                 }
                 btnRegister.isClickable = true
@@ -82,6 +81,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     }
 
     private fun createUser(user: User, email: String, password: String) {
+        val btnRegister = binding.btnRegister
         progress.start()
         btnRegister.isClickable = false
         btnRegister.icon = progress as Drawable
@@ -91,7 +91,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 addUser(user.copy(uid = uid))
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     createUser(user, email, password)
                 }
                 btnRegister.isClickable = true
@@ -102,6 +102,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     }
 
     private fun checkUsername(user: User, email: String, password: String) {
+        val btnRegister = binding.btnRegister
         progress.start()
         btnRegister.isClickable = false
         btnRegister.icon = progress as Drawable
@@ -109,14 +110,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             result.onSuccess { snapshot ->
                 if (snapshot.isEmpty) createUser(user, email, password)
                 else {
-                    showSnackbar(getString(R.string.txt_username_exists))
+                    showSnackbar(binding.root, getString(R.string.txt_username_exists))
                     btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     checkUsername(user, email, password)
                 }
                 binding.btnRegister.isClickable = true
@@ -136,10 +137,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progress = circularProgress()
-        check = getDrawable(R.drawable.ic_check)
-        btnRegister = binding.btnRegister
-
         val txtName = binding.txtName
         val txtEmail = binding.txtEmail
         val txtUsername = binding.txtUsername
@@ -150,6 +147,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         val txtDateOfBirth = binding.txtDateOfBirth
         val txtProvince = binding.txtProvince
         val txtSex = binding.txtSex
+        val btnRegister = binding.btnRegister
         val btnLogin = binding.btnLogin
 
         val provinceAdapter = getArrayAdapter(resources.getStringArray(R.array.province))

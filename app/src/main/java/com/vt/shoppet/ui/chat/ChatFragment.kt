@@ -67,7 +67,7 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         }
                         result.onFailure { exception ->
                             imageView.setImageResource(R.drawable.ic_person)
-                            showActionSnackbar(exception) {
+                            showActionSnackbar(binding.root, exception) {
                                 setImage(uid, imageView)
                             }
                         }

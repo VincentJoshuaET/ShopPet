@@ -18,6 +18,7 @@ import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -47,44 +48,60 @@ fun Fragment.circularProgressLarge() =
         start()
     }
 
-fun Fragment.showSnackbar(message: String) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+fun showSnackbar(view: View, message: String) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
 
-fun Fragment.topSnackbar(message: String) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
+fun showSnackbar(view: View, fab: FloatingActionButton, message: String) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).setAnchorView(fab).show()
+
+fun showSnackbar(view: View, exception: Throwable) {
+    val message = exception.localizedMessage ?: return
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+}
+
+fun topSnackbar(view: View, message: String) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).apply {
         val params = view.layoutParams as CoordinatorLayout.LayoutParams
         view.layoutParams = params.apply { gravity = Gravity.TOP }
     }
 
-fun Fragment.showTopSnackbar(message: String) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).apply {
+fun showTopSnackbar(view: View, message: String) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).apply {
         val params = view.layoutParams as CoordinatorLayout.LayoutParams
         view.layoutParams = params.apply { gravity = Gravity.TOP }
     }.show()
 
-fun Fragment.showSnackbar(exception: Throwable) {
+fun showActionSnackbar(view: View, message: String, action: (View) -> Unit) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_view, action).show()
+
+fun showActionSnackbar(view: View, exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT).show()
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).show()
 }
 
-fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+fun Fragment.showActionSnackbar(view: View, message: String, action: (View) -> Unit) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).apply {
             viewLifecycleOwner.lifecycle.observeSnackbar(this)
         }.show()
 
-fun Fragment.showTopActionSnackbar(message: String, action: (View) -> Unit) =
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+fun Fragment.showActionSnackbar(
+    view: View,
+    fab: FloatingActionButton,
+    message: String,
+    action: (View) -> Unit
+) =
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
+        .setAnchorView(fab)
         .setAction(R.string.btn_retry, action).apply {
             viewLifecycleOwner.lifecycle.observeSnackbar(this)
-        }.apply {
-            val params = view.layoutParams as CoordinatorLayout.LayoutParams
-            view.layoutParams = params.apply { gravity = Gravity.TOP }
         }.show()
 
-fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
+fun Fragment.showActionSnackbar(view: View, exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
-    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
         .setAction(R.string.btn_retry, action).apply {
             viewLifecycleOwner.lifecycle.observeSnackbar(this)
         }.show()
@@ -135,16 +152,3 @@ fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
         toolbar.menu.clear()
         toolbar.inflateMenu(menu)
     }
-
-fun ActivityMainBinding.showSnackbar(message: String) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT).show()
-
-fun ActivityMainBinding.showActionSnackbar(message: String, action: (View) -> Unit) =
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_view, action).show()
-
-fun ActivityMainBinding.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
-    val message = exception.localizedMessage ?: return
-    Snackbar.make(fragmentContainerView, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).show()
-}

@@ -2,7 +2,6 @@ package com.vt.shoppet.ui.user
 
 import android.content.ContentValues
 import android.content.pm.PackageManager.FEATURE_CAMERA_ANY
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
@@ -21,9 +20,6 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
-import com.google.android.material.floatingactionbutton.FloatingActionButton
-import com.google.android.material.imageview.ShapeableImageView
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.firebase.Timestamp
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentEditProfileBinding
@@ -55,13 +51,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var circularProgress: Animatable
-    private lateinit var progress: ProgressIndicator
-    private lateinit var imageUser: ShapeableImageView
-    private lateinit var imageUserUpload: ShapeableImageView
+    private val progress by lazy { circularProgress() }
+    private val save by lazy { getDrawable(R.drawable.ic_save) }
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var fabEdit: FloatingActionButton
-    private lateinit var save: Drawable
 
     private var uri = Uri.EMPTY
     private var image: String? = null
@@ -94,7 +86,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     }
                 }
             } else {
-                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                showActionSnackbar(binding.root, getString(R.string.txt_permission_denied)) {
                     requestPermissions.launch(permissions)
                 }
             }
@@ -113,12 +105,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             if (boolean) loadImage()
         }
 
-    private fun loadImage() {
+    private fun loadImage() = binding.apply {
         setProfileImage(imageUserUpload, uri)
         imageUser.isInvisible = true
     }
 
-    private fun clearImageView() {
+    private fun clearImageView() = binding.apply {
         imageUser.setImageResource(R.drawable.ic_person)
         imageUserUpload.setImageResource(R.drawable.ic_person)
         imageUser.isVisible = true
@@ -127,28 +119,29 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun removeDialog(id: String): AlertDialog {
+        val fabEdit = binding.fabEdit
         return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_remove_image)
             .setMessage(R.string.txt_remove_image)
             .setPositiveButton(R.string.btn_confirm) { _, _ ->
-                circularProgress.start()
-                toolbar.menu.getItem(0).icon = circularProgress as Drawable
+                progress.start()
+                toolbar.menu.getItem(0).icon = progress as Drawable
                 fabEdit.isClickable = false
                 firestore.removeUserPhoto().observe(viewLifecycleOwner) { result ->
                     result.onSuccess {
                         storage.removeUserPhoto(id)
                         toolbar.menu.getItem(0).icon = save
-                        circularProgress.stop()
+                        progress.stop()
                         clearImageView()
-                        showSnackbar(getString(R.string.txt_profile_updated))
+                        showSnackbar(binding.root, getString(R.string.txt_profile_updated))
                         findNavController().popBackStack()
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(exception) {
+                        showActionSnackbar(binding.root, exception) {
                             removeDialog(id).show()
                         }
                         toolbar.menu.getItem(0).icon = save
-                        circularProgress.stop()
+                        progress.stop()
                         fabEdit.isClickable = true
                     }
                 }
@@ -187,45 +180,48 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     }
 
     private fun updateUser(user: User) {
-        circularProgress.start()
-        toolbar.menu.getItem(0).icon = circularProgress as Drawable
+        val fabEdit = binding.fabEdit
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         fabEdit.isClickable = false
         firestore.updateUser(user).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 toolbar.menu.getItem(0).icon = save
-                circularProgress.stop()
-                showSnackbar(getString(R.string.txt_profile_updated))
+                progress.stop()
+                showSnackbar(binding.root, getString(R.string.txt_profile_updated))
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     updateUser(user)
                 }
                 toolbar.menu.getItem(0).icon = save
                 fabEdit.isClickable = true
-                circularProgress.stop()
+                progress.stop()
             }
         }
     }
 
     private fun uploadUserPhoto(user: User, id: String) {
-        progress.isVisible = true
-        circularProgress.start()
-        toolbar.menu.getItem(0).icon = circularProgress as Drawable
+        val fabEdit = binding.fabEdit
+        val progressIndicator = binding.progress
+        progressIndicator.isVisible = true
+        progress.start()
+        toolbar.menu.getItem(0).icon = progress as Drawable
         fabEdit.isClickable = false
         storage.uploadUserPhoto(id, uri).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                progress.isInvisible = true
+                progressIndicator.isInvisible = true
                 updateUser(user.copy(image = id))
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     uploadUserPhoto(user, id)
                 }
                 toolbar.menu.getItem(0).icon = save
                 fabEdit.isClickable = true
-                progress.isInvisible = true
-                circularProgress.stop()
+                progressIndicator.isInvisible = true
+                progress.stop()
             }
         }
     }
@@ -235,13 +231,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
         val activity = requireActivity() as MainActivity
 
-        circularProgress = circularProgress()
         toolbar = activity.toolbar
-        imageUser = binding.imageUser
-        imageUserUpload = binding.imageUserUpload
-        fabEdit = binding.fabEdit
-        save = getDrawable(R.drawable.ic_save)
-        progress = binding.progress
+        val imageUser = binding.imageUser
+        val fabEdit = binding.fabEdit
 
         val txtName = binding.txtName
         val txtEmail = binding.txtEmail

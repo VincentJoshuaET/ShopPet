@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.pet
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -34,8 +33,8 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var progress: Animatable
-    private lateinit var save: Drawable
+    private val progress by lazy { circularProgress() }
+    private val save by lazy { getDrawable(R.drawable.ic_save) }
     private lateinit var toolbar: MaterialToolbar
 
     private fun updatePet(pet: Pet) {
@@ -51,7 +50,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     updatePet(pet)
                 }
                 toolbar.menu.getItem(0).icon = save
@@ -68,7 +67,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 updatePet(pet.copy(id = reference.id))
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     addPet(pet)
                 }
                 toolbar.menu.getItem(0).icon = save
@@ -88,10 +87,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
         super.onViewCreated(view, savedInstanceState)
 
         val activity = requireActivity() as MainActivity
-
-        progress = circularProgress()
         toolbar = activity.toolbar
-        save = getDrawable(R.drawable.ic_save)
 
         val txtName = binding.txtName
         val txtPrice = binding.txtPrice

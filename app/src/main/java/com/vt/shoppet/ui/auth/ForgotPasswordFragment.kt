@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.auth
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -8,7 +7,6 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.transition.MaterialContainerTransform
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentForgotPasswordBinding
@@ -26,23 +24,21 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var progress: Animatable
-    private lateinit var btnReset: MaterialButton
-    private lateinit var icon: Drawable
-
     private fun resetPassword(email: String) {
-        progress.start()
+        val progress = circularProgress().apply { start() }
+        val btnReset = binding.btnReset
+        val icon = getDrawable(R.drawable.ic_email)
         btnReset.isClickable = false
         btnReset.icon = progress as Drawable
         auth.resetPassword(email).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 btnReset.icon = icon
                 progress.stop()
-                showSnackbar(getString(R.string.txt_email_sent))
+                showSnackbar(binding.root, getString(R.string.txt_email_sent))
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     resetPassword(email)
                 }
                 btnReset.isClickable = true
@@ -62,12 +58,9 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progress = circularProgress()
-        btnReset = binding.btnReset
-        icon = getDrawable(R.drawable.ic_email)
-
         val txtEmail = binding.txtEmail
         val btnLogin = binding.btnLogin
+        val btnReset = binding.btnReset
 
         txtEmail.setErrorListener()
         btnLogin.popBackStackOnClick()

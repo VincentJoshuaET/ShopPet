@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.user
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -39,8 +38,8 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val dataViewModel: DataViewModel by activityViewModels()
 
     private lateinit var toolbar: MaterialToolbar
-    private lateinit var progress: Animatable
-    private lateinit var report: Drawable
+    private val progress by lazy { circularProgress() }
+    private val report by lazy { getDrawable(R.drawable.ic_report) }
 
     private fun reportUser(uid: String, currentUid: String) {
         progress.start()
@@ -49,10 +48,10 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             result.onSuccess {
                 toolbar.menu.clear()
                 progress.stop()
-                showSnackbar(getString(R.string.txt_reported_user))
+                showSnackbar(binding.root, getString(R.string.txt_reported_user))
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     reportUser(uid, currentUid)
                 }
                 toolbar.menu.getItem(0).icon = report
@@ -69,7 +68,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 reportUser(uid, currentUid)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     addReport(uid, currentUid)
                 }
                 toolbar.menu.getItem(0).icon = report
@@ -94,7 +93,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 if (!document.exists()) toolbar.inflateMenu(R.menu.menu_profile)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     getReport(uid, currentUid)
                 }
                 toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
@@ -149,8 +148,6 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
         val activity = requireActivity() as MainActivity
 
         toolbar = activity.toolbar
-        progress = circularProgress()
-        report = getDrawable(R.drawable.ic_report)
 
         val currentUid = firestore.uid
 

@@ -1,11 +1,9 @@
 package com.vt.shoppet.ui.pet
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
-import android.widget.TextView
 import androidx.core.net.toUri
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -14,8 +12,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
-import com.google.android.material.button.MaterialButton
-import com.google.android.material.progressindicator.ProgressIndicator
 import com.google.android.material.transition.MaterialSharedAxis
 import com.google.firebase.ml.vision.common.FirebaseVisionImage
 import com.vt.shoppet.R
@@ -38,23 +34,22 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private val args: SellFragmentArgs by navArgs()
 
-    private lateinit var circularProgress: Animatable
-    private lateinit var upload: Drawable
-    private lateinit var progress: ProgressIndicator
-    private lateinit var btnUpload: MaterialButton
-    private lateinit var txtLabels: TextView
+    private val progress by lazy { circularProgress() }
+    private val upload by lazy { getDrawable(R.drawable.ic_upload) }
 
     private fun uploadImage(uri: Uri) {
         val image = UUID.randomUUID().toString()
-        circularProgress.start()
+        val btnUpload = binding.btnUpload
+        val progressIndicator = binding.progress
+        progress.start()
         btnUpload.isClickable = false
-        btnUpload.icon = circularProgress as Drawable
-        progress.isVisible = true
+        btnUpload.icon = progress as Drawable
+        progressIndicator.isVisible = true
         storage.uploadPetPhoto(image, uri).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
                 btnUpload.icon = upload
-                circularProgress.stop()
-                progress.isVisible = false
+                progress.stop()
+                progressIndicator.isVisible = false
                 dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
                     val action =
                         SellFragmentDirections.actionSellToDetails(image, user.username)
@@ -62,19 +57,21 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     uploadImage(uri)
                 }
                 btnUpload.isClickable = true
                 btnUpload.icon = upload
-                circularProgress.stop()
-                progress.isVisible = false
+                progress.stop()
+                progressIndicator.isVisible = false
             }
         }
     }
 
     private fun processImage(image: FirebaseVisionImage, uri: Uri) {
         val labels = resources.getStringArray(R.array.labels)
+        val btnUpload = binding.btnUpload
+        val txtLabels = binding.txtLabels
         var isAnimal = false
         vision.process(image).observe(viewLifecycleOwner) { result ->
             result.onSuccess { list ->
@@ -88,17 +85,17 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                 }
                 if (isAnimal) uploadImage(uri)
                 else {
-                    showSnackbar(getString(R.string.txt_animal_undetected))
+                    showSnackbar(binding.root, getString(R.string.txt_animal_undetected))
                     btnUpload.isClickable = true
                     btnUpload.icon = upload
-                    circularProgress.stop()
+                    progress.stop()
                 }
             }
             result.onFailure { exception ->
-                showSnackbar(exception)
+                showSnackbar(binding.root, exception)
                 btnUpload.isClickable = true
                 btnUpload.icon = upload
-                circularProgress.stop()
+                progress.stop()
             }
         }
     }
@@ -114,12 +111,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
         val context = requireContext()
 
-
-        circularProgress = circularProgress()
-        upload = getDrawable(R.drawable.ic_upload)
-        progress = binding.progress
-        btnUpload = binding.btnUpload
-        txtLabels = binding.txtLabels
+        val btnUpload = binding.btnUpload
         val imagePet = binding.imagePet
 
         val uri = args.uri.toUri()
@@ -127,18 +119,18 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         loadImage(imagePet, uri)
 
         btnUpload.setOnClickListener {
-            circularProgress.start()
+            progress.start()
             btnUpload.isClickable = false
-            btnUpload.icon = circularProgress as Drawable
+            btnUpload.icon = progress as Drawable
             vision.convertImage(context, uri).observe(viewLifecycleOwner) { result ->
                 result.onSuccess { image ->
                     processImage(image, uri)
                 }
                 result.onFailure { exception ->
-                    showSnackbar(exception)
+                    showSnackbar(binding.root, exception)
                     btnUpload.isClickable = true
                     btnUpload.icon = upload
-                    circularProgress.stop()
+                    progress.stop()
                 }
             }
         }

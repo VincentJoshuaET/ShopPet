@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.auth
 
-import android.graphics.drawable.Animatable
 import android.graphics.drawable.Drawable
 import android.os.Bundle
 import android.view.View
@@ -11,7 +10,6 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.observe
 import androidx.navigation.fragment.FragmentNavigatorExtras
 import androidx.navigation.fragment.findNavController
-import com.google.android.material.button.MaterialButton
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentLoginBinding
@@ -34,10 +32,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private lateinit var progress: Animatable
-    private lateinit var btnLogin: MaterialButton
+    private val progress by lazy { circularProgress() }
 
     private fun instanceId() {
+        val btnLogin = binding.btnLogin
         progress.start()
         btnLogin.isClickable = false
         btnLogin.icon = progress as Drawable
@@ -50,7 +48,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 findNavController().navigate(R.id.action_auth_to_home)
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     instanceId()
                 }
                 auth.signOut()
@@ -70,6 +68,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 instanceId()
             }
             .setNegativeButton(R.string.btn_cancel) { _, _ ->
+                val btnLogin = binding.btnLogin
                 auth.signOut()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
@@ -78,19 +77,20 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             .create()
 
     private fun verifyEmail() {
+        val btnLogin = binding.btnLogin
         progress.start()
         btnLogin.isClickable = false
         btnLogin.icon = progress as Drawable
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(getString(R.string.txt_verification_sent))
+                showSnackbar(binding.root, getString(R.string.txt_verification_sent))
                 auth.signOut()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     verifyEmail()
                 }
                 auth.signOut()
@@ -101,8 +101,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         }
     }
 
-    private fun unverified(): AlertDialog =
-        MaterialAlertDialogBuilder(requireContext())
+    private fun unverified(): AlertDialog {
+        val btnLogin = binding.btnLogin
+        return MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.title_cannot_log_in)
             .setMessage(R.string.txt_account_unverified)
             .setCancelable(false)
@@ -116,8 +117,10 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 progress.stop()
             }
             .create()
+    }
 
     private fun signIn(email: String, password: String) {
+        val btnLogin = binding.btnLogin
         progress.start()
         btnLogin.isClickable = false
         btnLogin.icon = progress as Drawable
@@ -127,7 +130,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 else unverified().show()
             }
             result.onFailure { exception ->
-                showActionSnackbar(exception) {
+                showActionSnackbar(binding.root, exception) {
                     signIn(email, password)
                 }
                 btnLogin.isClickable = true
@@ -140,14 +143,12 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        progress = circularProgress()
-        btnLogin = binding.btnLogin
-
         val imageLogo = binding.imageLogo
         val txtEmail = binding.txtEmail
         val txtPassword = binding.txtPassword
         val btnForgot = binding.btnForgot
         val btnRegister = binding.btnRegister
+        val btnLogin = binding.btnLogin
 
         txtEmail.setErrorListener()
         txtPassword.setErrorListener()

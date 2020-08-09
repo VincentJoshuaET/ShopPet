@@ -45,11 +45,11 @@ class StarredFragment : Fragment(R.layout.fragment_starred) {
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Boolean>("removed")?.observe(viewLifecycleOwner) { removed ->
-            if (removed) showSnackbar(getString(R.string.txt_removed_pet))
+            if (removed) showSnackbar(binding.root, getString(R.string.txt_removed_pet))
             savedStateHandle.remove<Boolean>("removed")
         }
         savedStateHandle?.getLiveData<Boolean>("sold")?.observe(viewLifecycleOwner) { sold ->
-            if (sold) showSnackbar(getString(R.string.txt_marked_pet_sold))
+            if (sold) showSnackbar(binding.root, getString(R.string.txt_marked_pet_sold))
             savedStateHandle.remove<Boolean>("sold")
         }
 
