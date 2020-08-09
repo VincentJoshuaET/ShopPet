@@ -73,6 +73,15 @@ fun Fragment.showActionSnackbar(message: String, action: (View) -> Unit) =
             viewLifecycleOwner.lifecycle.observeSnackbar(this)
         }.show()
 
+fun Fragment.showTopActionSnackbar(message: String, action: (View) -> Unit) =
+    Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)
+        .setAction(R.string.btn_retry, action).apply {
+            viewLifecycleOwner.lifecycle.observeSnackbar(this)
+        }.apply {
+            val params = view.layoutParams as CoordinatorLayout.LayoutParams
+            view.layoutParams = params.apply { gravity = Gravity.TOP }
+        }.show()
+
 fun Fragment.showActionSnackbar(exception: Throwable, action: (View) -> Unit) {
     val message = exception.localizedMessage ?: return
     Snackbar.make(requireView(), message, Snackbar.LENGTH_SHORT)

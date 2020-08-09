@@ -59,7 +59,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                     TAKE_PHOTO -> findNavController().navigate(R.id.action_shop_to_camera)
                 }
             } else {
-                showActionSnackbar(getString(R.string.txt_permission_denied)) {
+                showTopActionSnackbar(getString(R.string.txt_permission_denied)) {
                     requestPermissions.launch(permissions)
                 }
             }
