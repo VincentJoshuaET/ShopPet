@@ -205,8 +205,10 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 R.id.item_save -> {
                     val name = txtName.text.toString().capitalizeWords()
                     val price = txtPrice.text.toString().toIntOrNull() ?: 0
-                    val vaccineStatus = txtVaccineStatus.text.toString()
-                    val medicalRecords = txtMedicalRecords.text.toString()
+                    val vaccineStatus =
+                        txtVaccineStatus.text.toString().run { if (isNotEmpty()) this else null }
+                    val medicalRecords =
+                        txtMedicalRecords.text.toString().run { if (isNotEmpty()) this else null }
                     val sex = txtSex.text.toString()
                     val age = txtAge.text.toString().toIntOrNull() ?: 0
                     val unit = txtUnit.text.toString()
@@ -234,11 +236,11 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                         fail = true
                     }
                     if (type == types[1] || type == types[2]) {
-                        if (vaccineStatus.isEmpty()) {
+                        if (vaccineStatus == null) {
                             txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
                             fail = true
                         }
-                        if (medicalRecords.isEmpty()) {
+                        if (medicalRecords == null) {
                             txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
                             fail = true
                         }

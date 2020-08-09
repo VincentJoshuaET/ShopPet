@@ -229,6 +229,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     }
 
     private fun starPet(pet: Pet) {
+        pet.starred = true
         progress.start()
         btnStar.isClickable = false
         btnStar.icon = progress as Drawable

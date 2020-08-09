@@ -126,7 +126,9 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                         val name = txtName.text.toString().capitalizeWords()
                         val price = txtPrice.text.toString().toIntOrNull() ?: 0
                         val vaccineStatus = txtVaccineStatus.text.toString()
+                            .run { if (isNotEmpty()) this else null }
                         val medicalRecords = txtMedicalRecords.text.toString()
+                            .run { if (isNotEmpty()) this else null }
                         val description =
                             txtDescription.text.toString().capitalize(Locale.getDefault())
                         var fail = false
@@ -140,11 +142,11 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                             fail = true
                         }
                         if (type == types[1] || type == types[2]) {
-                            if (vaccineStatus.isEmpty()) {
+                            if (vaccineStatus == null) {
                                 txtVaccineStatus.showError(getString(R.string.txt_enter_vaccine_status))
                                 fail = true
                             }
-                            if (medicalRecords.isEmpty()) {
+                            if (medicalRecords == null) {
                                 txtMedicalRecords.showError(getString(R.string.txt_enter_medical_records))
                                 fail = true
                             }

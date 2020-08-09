@@ -86,7 +86,7 @@ class FirestoreRepoImpl @Inject constructor(
 
     override suspend fun starPet(pet: Pet): Void? =
         firestore.collection("starred").document(uid).collection("pets").document(pet.id)
-            .set(pet.copy(starred = true)).await()
+            .set(pet).await()
 
     override suspend fun unstarPet(id: String): Void? =
         firestore.collection("starred").document(uid).collection("pets").document(id)
