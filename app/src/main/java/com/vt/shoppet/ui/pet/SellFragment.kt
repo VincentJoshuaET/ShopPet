@@ -57,9 +57,9 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     uploadImage(uri)
-                }
+                }.show()
                 btnUpload.isClickable = true
                 btnUpload.icon = upload
                 progress.stop()
@@ -85,14 +85,36 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
                 }
                 if (isAnimal) uploadImage(uri)
                 else {
-                    showSnackbar(binding.root, getString(R.string.txt_animal_undetected))
+                    binding.snackbar(getString(R.string.txt_animal_undetected)).show()
                     btnUpload.isClickable = true
                     btnUpload.icon = upload
                     progress.stop()
                 }
             }
             result.onFailure { exception ->
-                showSnackbar(binding.root, exception)
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
+                    processImage(image, uri)
+                }.show()
+                btnUpload.isClickable = true
+                btnUpload.icon = upload
+                progress.stop()
+            }
+        }
+    }
+
+    private fun convertImage(uri: Uri) {
+        val btnUpload = binding.btnUpload
+        progress.start()
+        btnUpload.isClickable = false
+        btnUpload.icon = progress as Drawable
+        vision.convertImage(requireContext(), uri).observe(viewLifecycleOwner) { result ->
+            result.onSuccess { image ->
+                processImage(image, uri)
+            }
+            result.onFailure { exception ->
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
+                    convertImage(uri)
+                }.show()
                 btnUpload.isClickable = true
                 btnUpload.icon = upload
                 progress.stop()
@@ -109,8 +131,6 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val context = requireContext()
-
         val btnUpload = binding.btnUpload
         val imagePet = binding.imagePet
 
@@ -119,20 +139,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
         loadImage(imagePet, uri)
 
         btnUpload.setOnClickListener {
-            progress.start()
-            btnUpload.isClickable = false
-            btnUpload.icon = progress as Drawable
-            vision.convertImage(context, uri).observe(viewLifecycleOwner) { result ->
-                result.onSuccess { image ->
-                    processImage(image, uri)
-                }
-                result.onFailure { exception ->
-                    showSnackbar(binding.root, exception)
-                    btnUpload.isClickable = true
-                    btnUpload.icon = upload
-                    progress.stop()
-                }
-            }
+            convertImage(uri)
         }
     }
 

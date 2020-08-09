@@ -78,9 +78,12 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                     }
                 }
             } else {
-                showActionSnackbar(binding.root, getString(R.string.txt_permission_denied)) {
+                binding.snackbar(
+                    message = getString(R.string.txt_permission_denied),
+                    owner = viewLifecycleOwner
+                ) {
                     requestPermissions.launch(permissions)
-                }
+                }.show()
             }
         }
 
@@ -126,9 +129,12 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(
+                    message = exception.localizedMessage,
+                    owner = viewLifecycleOwner
+                ) {
                     sendChat(chat)
-                }
+                }.show()
                 txtMessage.isEnabled = true
                 inputMessage.endIconDrawable = send
                 progress.stop()
@@ -155,9 +161,12 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 sendChat(data)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(
+                    message = exception.localizedMessage,
+                    owner = viewLifecycleOwner
+                ) {
                     sendTextMessage(chat, message)
-                }
+                }.show()
                 txtMessage.isEnabled = true
                 inputMessage.endIconDrawable = send
                 progress.stop()
@@ -189,9 +198,12 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
                 sendTextMessage(chat, message)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(
+                    message = exception.localizedMessage,
+                    owner = viewLifecycleOwner
+                ) {
                     uploadMessagePhoto(chat, text, image)
-                }
+                }.show()
                 txtMessage.isEnabled = true
                 inputMessage.endIconDrawable = send
                 progress.stop()

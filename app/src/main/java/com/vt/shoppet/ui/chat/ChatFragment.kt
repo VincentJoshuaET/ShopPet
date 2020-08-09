@@ -20,7 +20,7 @@ import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.User
 import com.vt.shoppet.ui.adapter.ChatAdapter
 import com.vt.shoppet.util.loadProfileImage
-import com.vt.shoppet.util.showActionSnackbar
+import com.vt.shoppet.util.snackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.DataViewModel
 import com.vt.shoppet.viewmodel.FirestoreViewModel
@@ -67,9 +67,12 @@ class ChatFragment : Fragment(R.layout.fragment_chat) {
                         }
                         result.onFailure { exception ->
                             imageView.setImageResource(R.drawable.ic_person)
-                            showActionSnackbar(binding.root, exception) {
+                            binding.snackbar(
+                                message = exception.localizedMessage,
+                                owner = viewLifecycleOwner
+                            ) {
                                 setImage(uid, imageView)
-                            }
+                            }.show()
                         }
                     }
                 }

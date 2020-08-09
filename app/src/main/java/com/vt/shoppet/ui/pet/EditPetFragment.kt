@@ -50,9 +50,9 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     updatePet(pet)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = save
                 progress.stop()
             }

@@ -56,7 +56,7 @@ class MainActivity : AppCompatActivity() {
                 signOut(instanceIdResult.token)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.fragment, exception) {
+                binding.showSnackbar(exception.localizedMessage) {
                     instanceId()
                 }
             }
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                 dataViewModel.removeFirebaseData()
                 auth.signOut()
                 if (auth.isLoggedIn()) {
-                    showSnackbar(binding.fragment, getString(R.string.txt_cannot_log_out))
+                    binding.showSnackbar(getString(R.string.txt_cannot_log_out))
                     dataViewModel.initFirebaseData()
                     firestore.addToken(token)
                 } else {
@@ -81,7 +81,7 @@ class MainActivity : AppCompatActivity() {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.fragment, exception) {
+                binding.showSnackbar(exception.localizedMessage) {
                     signOut(token)
                 }
             }
@@ -107,7 +107,7 @@ class MainActivity : AppCompatActivity() {
                 navController.navigate(R.id.fragment_conversation, arguments)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.fragment, exception, onError)
+                binding.showSnackbar(message = exception.localizedMessage, action = onError)
             }
         }
     }
@@ -135,7 +135,10 @@ class MainActivity : AppCompatActivity() {
             val senderUsername =
                 intent.getStringExtra("SENDER_USERNAME") ?: return@let
             if (dataViewModel.chat.value?.id != id && navController.currentDestination?.id != R.id.fragment_conversation) {
-                showActionSnackbar(binding.fragment, "$senderUsername messaged you") {
+                binding.showSnackbar(
+                    message = "$senderUsername messaged you",
+                    id = R.string.btn_view
+                ) {
                     getChat(id, senderIndex, receiverIndex, senderUsername) {
                         showChatSnackbar(intent)
                     }

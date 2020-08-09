@@ -86,9 +86,12 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                     }
                 }
             } else {
-                showActionSnackbar(binding.root, getString(R.string.txt_permission_denied)) {
+                binding.snackbar(
+                    message = getString(R.string.txt_permission_denied),
+                    owner = viewLifecycleOwner
+                ) {
                     requestPermissions.launch(permissions)
-                }
+                }.show()
             }
         }
 
@@ -133,13 +136,16 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                         toolbar.menu.getItem(0).icon = save
                         progress.stop()
                         clearImageView()
-                        showSnackbar(binding.root, getString(R.string.txt_profile_updated))
+                        binding.snackbar(getString(R.string.txt_profile_updated)).show()
                         findNavController().popBackStack()
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(binding.root, exception) {
+                        binding.snackbar(
+                            message = exception.localizedMessage,
+                            owner = viewLifecycleOwner
+                        ) {
                             removeDialog(id).show()
-                        }
+                        }.show()
                         toolbar.menu.getItem(0).icon = save
                         progress.stop()
                         fabEdit.isClickable = true
@@ -188,13 +194,13 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
             result.onSuccess {
                 toolbar.menu.getItem(0).icon = save
                 progress.stop()
-                showSnackbar(binding.root, getString(R.string.txt_profile_updated))
+                binding.snackbar(getString(R.string.txt_profile_updated)).show()
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     updateUser(user)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = save
                 fabEdit.isClickable = true
                 progress.stop()
@@ -215,9 +221,9 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
                 updateUser(user.copy(image = id))
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     uploadUserPhoto(user, id)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = save
                 fabEdit.isClickable = true
                 progressIndicator.isInvisible = true

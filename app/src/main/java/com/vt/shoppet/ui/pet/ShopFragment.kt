@@ -59,13 +59,13 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
                     TAKE_PHOTO -> findNavController().navigate(R.id.action_shop_to_camera)
                 }
             } else {
-                showActionSnackbar(
-                    binding.root,
-                    binding.fabSell,
-                    getString(R.string.txt_permission_denied)
+                binding.snackbar(
+                    message = getString(R.string.txt_permission_denied),
+                    anchor = binding.fabSell,
+                    owner = viewLifecycleOwner
                 ) {
                     requestPermissions.launch(permissions)
-                }
+                }.show()
             }
         }
 
@@ -101,27 +101,21 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         val savedStateHandle = navBackStackEntry?.savedStateHandle
         savedStateHandle?.run {
             getLiveData<Boolean>("posted").observe(viewLifecycleOwner) { posted ->
-                if (posted) showSnackbar(
-                    binding.root,
-                    fabSell,
-                    getString(R.string.txt_upload_success)
-                )
+                if (posted) {
+                    binding.snackbar(getString(R.string.txt_upload_success), fabSell).show()
+                }
                 remove<Boolean>("posted")
             }
             getLiveData<Boolean>("removed").observe(viewLifecycleOwner) { removed ->
-                if (removed) showSnackbar(
-                    binding.root,
-                    fabSell,
-                    getString(R.string.txt_removed_pet)
-                )
+                if (removed) {
+                    binding.snackbar(getString(R.string.txt_removed_pet), fabSell).show()
+                }
                 remove<Boolean>("removed")
             }
             getLiveData<Boolean>("sold").observe(viewLifecycleOwner) { sold ->
-                if (sold) showSnackbar(
-                    binding.root,
-                    fabSell,
-                    getString(R.string.txt_marked_pet_sold)
-                )
+                if (sold) {
+                    binding.snackbar(getString(R.string.txt_marked_pet_sold), fabSell).show()
+                }
                 remove<Boolean>("sold")
             }
         }
@@ -217,7 +211,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
         dataViewModel.currentUser.observe(viewLifecycleOwner) { user ->
             if (user.reports < resources.getInteger(R.integer.reports)) fabSell.show()
             else {
-                showSnackbar(binding.root, fabSell, getString(R.string.txt_reported))
+                binding.snackbar(getString(R.string.txt_reported), fabSell).show()
                 fabSell.hide()
             }
         }

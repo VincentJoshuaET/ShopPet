@@ -49,11 +49,11 @@ class OwnFragment : Fragment(R.layout.fragment_own) {
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
 
         savedStateHandle?.getLiveData<Boolean>("removed")?.observe(viewLifecycleOwner) { removed ->
-            if (removed) showSnackbar(binding.root, getString(R.string.txt_removed_pet))
+            if (removed) binding.snackbar(getString(R.string.txt_removed_pet)).show()
             savedStateHandle.remove<Boolean>("removed")
         }
         savedStateHandle?.getLiveData<Boolean>("sold")?.observe(viewLifecycleOwner) { sold ->
-            if (sold) showSnackbar(binding.root, getString(R.string.txt_marked_pet_sold))
+            if (sold) binding.snackbar(getString(R.string.txt_marked_pet_sold)).show()
             savedStateHandle.remove<Boolean>("sold")
         }
 

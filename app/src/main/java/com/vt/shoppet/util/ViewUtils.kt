@@ -4,21 +4,22 @@ import android.content.res.Configuration
 import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
-import android.view.Gravity
 import android.view.View
 import android.widget.Button
 import androidx.annotation.MenuRes
+import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
 import androidx.core.view.isVisible
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
-import com.google.android.material.floatingactionbutton.FloatingActionButton
+import androidx.viewbinding.ViewBinding
 import com.google.android.material.snackbar.Snackbar
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.ActivityMainBinding
@@ -48,63 +49,32 @@ fun Fragment.circularProgressLarge() =
         start()
     }
 
-fun showSnackbar(view: View, message: String) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
-
-fun showSnackbar(view: View, fab: FloatingActionButton, message: String) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).setAnchorView(fab).show()
-
-fun showSnackbar(view: View, exception: Throwable) {
-    val message = exception.localizedMessage ?: return
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).show()
+fun ActivityMainBinding.showSnackbar(
+    message: String?,
+    @StringRes id: Int = R.string.btn_retry,
+    action: ((View) -> Unit)? = null
+) {
+    val snackbar = Snackbar.make(fragment, message ?: "Empty Message", Snackbar.LENGTH_SHORT)
+    if (action != null) snackbar.setAction(id, action)
+    snackbar.show()
 }
 
-fun topSnackbar(view: View, message: String) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).apply {
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        view.layoutParams = params.apply { gravity = Gravity.TOP }
+fun <T : ViewBinding> T.snackbar(
+    message: String?,
+    anchor: View? = null,
+    gravity: Int? = null,
+    owner: LifecycleOwner? = null,
+    action: ((View) -> Unit)? = null
+): Snackbar {
+    val snackbar = Snackbar.make(root, message ?: "Empty Message", Snackbar.LENGTH_SHORT)
+    if (anchor != null) snackbar.anchorView = anchor
+    if (gravity != null) {
+        val params = snackbar.view.layoutParams as CoordinatorLayout.LayoutParams
+        snackbar.view.layoutParams = params.apply { this.gravity = gravity }
     }
-
-fun showTopSnackbar(view: View, message: String) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT).apply {
-        val params = view.layoutParams as CoordinatorLayout.LayoutParams
-        view.layoutParams = params.apply { gravity = Gravity.TOP }
-    }.show()
-
-fun showActionSnackbar(view: View, message: String, action: (View) -> Unit) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_view, action).show()
-
-fun showActionSnackbar(view: View, exception: Throwable, action: (View) -> Unit) {
-    val message = exception.localizedMessage ?: return
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).show()
-}
-
-fun Fragment.showActionSnackbar(view: View, message: String, action: (View) -> Unit) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).apply {
-            viewLifecycleOwner.lifecycle.observeSnackbar(this)
-        }.show()
-
-fun Fragment.showActionSnackbar(
-    view: View,
-    fab: FloatingActionButton,
-    message: String,
-    action: (View) -> Unit
-) =
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-        .setAnchorView(fab)
-        .setAction(R.string.btn_retry, action).apply {
-            viewLifecycleOwner.lifecycle.observeSnackbar(this)
-        }.show()
-
-fun Fragment.showActionSnackbar(view: View, exception: Throwable, action: (View) -> Unit) {
-    val message = exception.localizedMessage ?: return
-    Snackbar.make(view, message, Snackbar.LENGTH_SHORT)
-        .setAction(R.string.btn_retry, action).apply {
-            viewLifecycleOwner.lifecycle.observeSnackbar(this)
-        }.show()
+    if (action != null) snackbar.setAction(R.string.btn_retry, action)
+    owner?.lifecycle?.observeSnackbar(snackbar)
+    return snackbar
 }
 
 fun Fragment.setLayout(orientation: Int) = when (orientation) {

@@ -62,9 +62,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     removePetPhoto(id)
-                }
+                }.show()
             }
         }
     }
@@ -87,9 +87,12 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         }
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(binding.root, exception) {
+                        binding.snackbar(
+                            message = exception.localizedMessage,
+                            owner = viewLifecycleOwner
+                        ) {
                             soldDialog(id).show()
-                        }
+                        }.show()
                         fabChatSold.setImageDrawable(chat)
                         fabChatSold.isClickable = true
                         progress.stop()
@@ -110,9 +113,12 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                         removePetPhoto(image)
                     }
                     result.onFailure { exception ->
-                        showActionSnackbar(binding.root, exception) {
+                        binding.snackbar(
+                            message = exception.localizedMessage,
+                            owner = viewLifecycleOwner
+                        ) {
                             removeDialog(id, image).show()
-                        }
+                        }.show()
                     }
                 }
             }
@@ -137,9 +143,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     checkStarredPet(id)
-                }
+                }.show()
                 btnStar.isClickable = false
                 progress.stop()
                 unstarPetButton()
@@ -156,9 +162,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 findNavController().navigate(action)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     createChat(chat)
-                }
+                }.show()
             }
         }
     }
@@ -192,9 +198,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     checkChat(pet, user)
-                }
+                }.show()
                 fabChatSold.setImageDrawable(chat)
                 fabChatSold.isClickable = true
                 progress.stop()
@@ -214,9 +220,9 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
                 loadProfileImage(imageSeller, storage.getUserPhoto(image))
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     getUser(pet, user)
-                }
+                }.show()
                 imageSeller.setImageResource(R.drawable.ic_person)
             }
         }
@@ -231,15 +237,15 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         btnStar.text = getString(R.string.lbl_loading)
         firestore.starPet(pet).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(binding.root, getString(R.string.txt_starred))
+                binding.snackbar(getString(R.string.txt_starred)).show()
                 starred = true
                 starPetButton()
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     starPet(pet)
-                }
+                }.show()
                 starred = false
                 unstarPetButton()
                 progress.stop()
@@ -255,15 +261,15 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
         btnStar.text = getString(R.string.lbl_loading)
         firestore.unstarPet(id).observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(binding.root, getString(R.string.txt_unstarred))
+                binding.snackbar(getString(R.string.txt_unstarred)).show()
                 starred = false
                 unstarPetButton()
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     unstarPet(id)
-                }
+                }.show()
                 starred = true
                 starPetButton()
                 progress.stop()
@@ -317,7 +323,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
 
         val savedStateHandle = findNavController().currentBackStackEntry?.savedStateHandle
         savedStateHandle?.getLiveData<Boolean>("edited")?.observe(viewLifecycleOwner) { edited ->
-            if (edited) showSnackbar(binding.root, getString(R.string.txt_pet_updated))
+            if (edited) binding.snackbar(getString(R.string.txt_pet_updated)).show()
             savedStateHandle.remove<Boolean>("edited")
         }
 

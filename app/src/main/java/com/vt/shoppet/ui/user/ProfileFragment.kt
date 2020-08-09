@@ -48,12 +48,12 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
             result.onSuccess {
                 toolbar.menu.clear()
                 progress.stop()
-                showSnackbar(binding.root, getString(R.string.txt_reported_user))
+                binding.snackbar(getString(R.string.txt_reported_user)).show()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     reportUser(uid, currentUid)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = report
                 progress.stop()
             }
@@ -68,9 +68,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 reportUser(uid, currentUid)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     addReport(uid, currentUid)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = report
                 progress.stop()
             }
@@ -93,9 +93,9 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
                 if (!document.exists()) toolbar.inflateMenu(R.menu.menu_profile)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     getReport(uid, currentUid)
-                }
+                }.show()
                 toolbar.menu.getItem(0).setIcon(R.drawable.ic_report)
             }
         }

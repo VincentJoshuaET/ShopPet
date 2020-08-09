@@ -4,6 +4,7 @@ import android.content.ContentValues
 import android.os.Bundle
 import android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI
 import android.provider.MediaStore.MediaColumns
+import android.view.Gravity
 import android.view.View
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
@@ -15,9 +16,7 @@ import androidx.navigation.fragment.findNavController
 import com.google.android.material.transition.MaterialSharedAxis
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.FragmentCameraBinding
-import com.vt.shoppet.util.showSnackbar
-import com.vt.shoppet.util.showTopSnackbar
-import com.vt.shoppet.util.topSnackbar
+import com.vt.shoppet.util.snackbar
 import com.vt.shoppet.util.viewBinding
 import com.vt.shoppet.viewmodel.VisionViewModel
 import dagger.hilt.android.AndroidEntryPoint
@@ -38,7 +37,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }
 
         override fun onError(exception: ImageCaptureException) =
-            showSnackbar(binding.root, exception)
+            binding.snackbar(message = exception.localizedMessage, gravity = Gravity.TOP).show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +50,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        showTopSnackbar(binding.root, getString(R.string.txt_camera))
+        binding.snackbar(message = getString(R.string.txt_camera), gravity = Gravity.TOP).show()
 
         val context = requireContext()
 
@@ -88,7 +87,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                 .build()
         val callback = ImageSavedCallback(cameraProviderFuture.get())
 
-        val snackbar = topSnackbar(binding.root, getString(R.string.txt_animal_undetected))
+        val snackbar = binding.snackbar(
+            message = getString(R.string.txt_animal_undetected),
+            gravity = Gravity.TOP
+        )
         var isAnimal = false
 
         val analyzer = ImageAnalysis.Analyzer { proxy ->

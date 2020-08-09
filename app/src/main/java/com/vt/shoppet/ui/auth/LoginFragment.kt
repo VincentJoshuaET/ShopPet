@@ -48,9 +48,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 findNavController().navigate(R.id.action_auth_to_home)
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     instanceId()
-                }
+                }.show()
                 auth.signOut()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
@@ -83,16 +83,16 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
         btnLogin.icon = progress as Drawable
         auth.verifyEmail().observe(viewLifecycleOwner) { result ->
             result.onSuccess {
-                showSnackbar(binding.root, getString(R.string.txt_verification_sent))
+                binding.snackbar(getString(R.string.txt_verification_sent)).show()
                 auth.signOut()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
                 progress.stop()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     verifyEmail()
-                }
+                }.show()
                 auth.signOut()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
@@ -130,9 +130,9 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
                 else unverified().show()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     signIn(email, password)
-                }
+                }.show()
                 btnLogin.isClickable = true
                 btnLogin.icon = null
                 progress.stop()

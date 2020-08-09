@@ -45,14 +45,14 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             result.onSuccess {
                 btnRegister.icon = check
                 progress.stop()
-                showSnackbar(binding.root, getString(R.string.txt_verification_sent))
+                binding.snackbar(getString(R.string.txt_verification_sent)).show()
                 auth.signOut()
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     verifyEmail()
-                }
+                }.show()
                 btnRegister.isClickable = true
                 btnRegister.icon = check
                 progress.stop()
@@ -70,9 +70,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 verifyEmail()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     addUser(user)
-                }
+                }.show()
                 btnRegister.isClickable = true
                 btnRegister.icon = check
                 progress.stop()
@@ -91,9 +91,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
                 addUser(user.copy(uid = uid))
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     createUser(user, email, password)
-                }
+                }.show()
                 btnRegister.isClickable = true
                 btnRegister.icon = check
                 progress.stop()
@@ -110,16 +110,16 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             result.onSuccess { snapshot ->
                 if (snapshot.isEmpty) createUser(user, email, password)
                 else {
-                    showSnackbar(binding.root, getString(R.string.txt_username_exists))
+                    binding.snackbar(getString(R.string.txt_username_exists)).show()
                     btnRegister.isClickable = true
                     btnRegister.icon = check
                     progress.stop()
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     checkUsername(user, email, password)
-                }
+                }.show()
                 binding.btnRegister.isClickable = true
                 btnRegister.icon = check
                 progress.stop()

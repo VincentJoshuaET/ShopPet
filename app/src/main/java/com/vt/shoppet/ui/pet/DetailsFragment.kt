@@ -50,9 +50,9 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 }
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     updatePet(pet)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = save
                 progress.stop()
             }
@@ -67,9 +67,9 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                 updatePet(pet.copy(id = reference.id))
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     addPet(pet)
-                }
+                }.show()
                 toolbar.menu.getItem(0).icon = save
                 progress.stop()
             }

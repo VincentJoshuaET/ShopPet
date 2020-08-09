@@ -34,13 +34,13 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
             result.onSuccess {
                 btnReset.icon = icon
                 progress.stop()
-                showSnackbar(binding.root, getString(R.string.txt_email_sent))
+                binding.snackbar(getString(R.string.txt_email_sent)).show()
                 findNavController().popBackStack()
             }
             result.onFailure { exception ->
-                showActionSnackbar(binding.root, exception) {
+                binding.snackbar(message = exception.localizedMessage, owner = viewLifecycleOwner) {
                     resetPassword(email)
-                }
+                }.show()
                 btnReset.isClickable = true
                 btnReset.icon = icon
                 progress.stop()
