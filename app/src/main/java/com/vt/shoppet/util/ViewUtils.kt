@@ -5,7 +5,6 @@ import android.graphics.Color
 import android.graphics.drawable.Animatable
 import android.util.TypedValue
 import android.view.View
-import android.widget.Button
 import androidx.annotation.MenuRes
 import androidx.annotation.StringRes
 import androidx.coordinatorlayout.widget.CoordinatorLayout
@@ -15,7 +14,6 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.LifecycleOwner
-import androidx.navigation.findNavController
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.CircularProgressDrawable
@@ -53,11 +51,9 @@ fun ActivityMainBinding.showSnackbar(
     message: String?,
     @StringRes id: Int = R.string.btn_retry,
     action: ((View) -> Unit)? = null
-) {
-    val snackbar = Snackbar.make(fragment, message ?: "Empty Message", Snackbar.LENGTH_SHORT)
-    if (action != null) snackbar.setAction(id, action)
-    snackbar.show()
-}
+) = Snackbar.make(fragment, message ?: "Empty Message", Snackbar.LENGTH_SHORT).apply {
+    if (action != null) setAction(id, action)
+}.show()
 
 fun <T : ViewBinding> T.snackbar(
     message: String?,
@@ -65,25 +61,19 @@ fun <T : ViewBinding> T.snackbar(
     gravity: Int? = null,
     owner: LifecycleOwner? = null,
     action: ((View) -> Unit)? = null
-): Snackbar {
-    val snackbar = Snackbar.make(root, message ?: "Empty Message", Snackbar.LENGTH_SHORT)
-    if (anchor != null) snackbar.anchorView = anchor
+) = Snackbar.make(root, message ?: "Empty Message", Snackbar.LENGTH_SHORT).apply {
+    if (anchor != null) anchorView = anchor
     if (gravity != null) {
-        val params = snackbar.view.layoutParams as CoordinatorLayout.LayoutParams
-        snackbar.view.layoutParams = params.apply { this.gravity = gravity }
+        val params = view.layoutParams as CoordinatorLayout.LayoutParams
+        view.layoutParams = params.apply { this.gravity = gravity }
     }
-    if (action != null) snackbar.setAction(R.string.btn_retry, action)
-    owner?.lifecycle?.observeSnackbar(snackbar)
-    return snackbar
+    if (action != null) setAction(R.string.btn_retry, action)
+    owner?.lifecycle?.observeSnackbar(this)
 }
 
 fun Fragment.setLayout(orientation: Int) = when (orientation) {
     Configuration.ORIENTATION_LANDSCAPE -> GridLayoutManager(context, 3)
     else -> GridLayoutManager(context, 2)
-}
-
-fun Button.popBackStackOnClick() = setOnClickListener {
-    findNavController().popBackStack()
 }
 
 fun RecyclerView.setOnLayoutChangeListener() =
@@ -106,19 +96,11 @@ fun ActivityMainBinding.setupHomeNavigationView() =
         toolbar.menu.clear()
     }
 
-fun ActivityMainBinding.setupToolbar() =
+fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int? = null) =
     apply {
         appbar.isVisible = true
         bottomNavigationView.isVisible = false
         drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
         toolbar.menu.clear()
-    }
-
-fun ActivityMainBinding.setupToolbar(@MenuRes menu: Int) =
-    apply {
-        appbar.isVisible = true
-        bottomNavigationView.isVisible = false
-        drawer.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
-        toolbar.menu.clear()
-        toolbar.inflateMenu(menu)
+        if (menu != null) toolbar.inflateMenu(menu)
     }

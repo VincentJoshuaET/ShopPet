@@ -63,7 +63,9 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
         val btnReset = binding.btnReset
 
         txtEmail.setErrorListener()
-        btnLogin.popBackStackOnClick()
+        btnLogin.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         btnReset.setOnClickListener {
             keyboard.hide(this)

@@ -176,7 +176,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
             keyboard.hide(this)
         }
 
-        btnLogin.popBackStackOnClick()
+        btnLogin.setOnClickListener {
+            findNavController().popBackStack()
+        }
 
         txtDateOfBirth.setOnClickListener {
             keyboard.hide(this)

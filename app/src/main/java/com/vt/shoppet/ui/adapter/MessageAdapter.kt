@@ -1,6 +1,5 @@
 package com.vt.shoppet.ui.adapter
 
-import android.view.LayoutInflater
 import android.view.ViewGroup
 import com.firebase.ui.firestore.FirestoreRecyclerAdapter
 import com.firebase.ui.firestore.FirestoreRecyclerOptions
@@ -14,7 +13,7 @@ open class MessageAdapter(
 ) : FirestoreRecyclerAdapter<Message, MessageHolder>(options) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MessageHolder =
-        MessageHolder(LayoutInflater.from(parent.context).inflate(viewType, parent, false))
+        MessageHolder(parent, viewType)
 
     override fun onBindViewHolder(holder: MessageHolder, position: Int, model: Message) =
         holder.bindView(model, actions)
