@@ -11,7 +11,7 @@ plugins {
 
 android {
     compileSdkVersion(30)
-    buildToolsVersion = "30.0.1"
+    buildToolsVersion = "30.0.2"
     ndkVersion = "21.3.6528147"
 
     defaultConfig {
@@ -66,7 +66,7 @@ dependencies {
     implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
 
     // Kotlin / Java
-    implementation(kotlin("stdlib-jdk7", "1.3.72"))
+    implementation(kotlin("stdlib-jdk7", "1.4.0"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.8")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.10")
@@ -75,6 +75,8 @@ dependencies {
     implementation("androidx.activity:activity-ktx:1.2.0-alpha07")
     implementation("androidx.appcompat:appcompat:1.2.0")
     implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
+    implementation("androidx.drawerlayout:drawerlayout:1.1.0")
     implementation("androidx.core:core-ktx:1.3.1")
     implementation("androidx.fragment:fragment-ktx:1.3.0-alpha07")
     implementation("androidx.preference:preference-ktx:1.1.1")
@@ -123,7 +125,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hiltAndroidVersion")
 
     // Lifecycle
-    val lifecycleVersion = "2.2.0"
+    val lifecycleVersion = "2.3.0-alpha06"
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
