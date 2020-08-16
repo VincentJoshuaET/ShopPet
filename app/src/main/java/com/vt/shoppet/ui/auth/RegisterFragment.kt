@@ -6,7 +6,6 @@ import android.view.View
 import androidx.core.text.trimmedLength
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.observe
 import androidx.navigation.fragment.findNavController
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.transition.MaterialContainerTransform

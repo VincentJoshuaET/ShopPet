@@ -1,6 +1,7 @@
 package com.vt.shoppet.di
 
 import com.google.firebase.auth.ktx.auth
+import com.google.firebase.crashlytics.ktx.crashlytics
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.iid.FirebaseInstanceId
 import com.google.firebase.ktx.Firebase
@@ -20,6 +21,10 @@ object FirebaseModule {
     @Provides
     @Singleton
     fun provideFirebaseAuth() = Firebase.auth
+
+    @Provides
+    @Singleton
+    fun provideFirebaseCrashlytics() = Firebase.crashlytics
 
     @Provides
     @Singleton
