@@ -69,7 +69,7 @@ android {
 
 dependencies {
     // Kotlin / Java
-    implementation(kotlin("stdlib"))
+    implementation(kotlin("stdlib-jdk7"))
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
     implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.10")
