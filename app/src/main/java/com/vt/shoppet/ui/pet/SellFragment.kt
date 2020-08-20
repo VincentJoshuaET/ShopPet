@@ -33,7 +33,7 @@ class SellFragment : Fragment(R.layout.fragment_sell) {
 
     private val args: SellFragmentArgs by navArgs()
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val upload by lazy { getDrawable(R.drawable.ic_upload) }
 
     private fun uploadImage(uri: Uri) {

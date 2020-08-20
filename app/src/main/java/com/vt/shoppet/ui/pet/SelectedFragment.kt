@@ -35,7 +35,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
     private val storage: StorageViewModel by viewModels()
     private val dataViewModel: DataViewModel by activityViewModels()
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val chat by lazy { getDrawable(R.drawable.ic_chat) }
 
     private var starred = false
@@ -338,7 +338,7 @@ class SelectedFragment : Fragment(R.layout.fragment_selected) {
             txtPrice.text = price
             txtType.text = pet.type
             txtSex.text = pet.sex
-            txtAge.text = pet.dateOfBirth.calculateAge()
+            txtAge.text = pet.dateOfBirth.calculateAge
             txtBreed.text = pet.breed
             txtVaccineStatus.text = pet.vaccineStatus
             txtMedicalRecords.text = pet.medicalRecords

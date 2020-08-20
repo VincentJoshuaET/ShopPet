@@ -32,7 +32,7 @@ fun Fragment.loadMessageImage(imageView: ImageView, reference: StorageReference)
     GlideApp.with(this)
         .load(reference)
         .fitCenter()
-        .placeholder(circularProgressLarge())
+        .placeholder(circularProgressLarge)
         .into(imageView)
 
 fun Fragment.loadProfileImage(imageView: ImageView, reference: StorageReference) =

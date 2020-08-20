@@ -31,7 +31,7 @@ class PetHolder(binding: ItemPetBinding) : RecyclerView.ViewHolder(binding.root)
         txtPrice.text = price
         txtType.text = pet.type
         txtSex.text = pet.sex
-        txtAge.text = pet.dateOfBirth.calculateAge()
+        txtAge.text = pet.dateOfBirth.calculateAge
         txtBreed.text = pet.breed
         txtDate.text = pet.date.calculatePostDuration(pet.sold)
         itemView.setOnClickListener(actions.onClick(pet, itemView))

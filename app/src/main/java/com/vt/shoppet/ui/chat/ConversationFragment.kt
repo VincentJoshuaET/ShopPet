@@ -47,13 +47,13 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
     lateinit var keyboard: KeyboardUtils
 
     private val send by lazy { getDrawable(R.drawable.ic_send) }
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
 
     private var uri = Uri.EMPTY
     private var action = 0
 
     private fun checkPermissions() =
-        if (checkSelfPermissions()) {
+        if (checkSelfPermissions) {
             when (action) {
                 SELECT_PHOTO -> selectPhoto.launch("image/*")
                 TAKE_PHOTO -> {
@@ -67,7 +67,7 @@ class ConversationFragment : Fragment(R.layout.fragment_conversation) {
 
     private val requestPermissions: ActivityResultLauncher<Array<String>>
         get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (it.checkAllPermissions()) {
+            if (it.checkAllPermissions) {
                 when (action) {
                     SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> {

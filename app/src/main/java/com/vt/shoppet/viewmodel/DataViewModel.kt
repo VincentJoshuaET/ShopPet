@@ -48,7 +48,7 @@ class DataViewModel @ViewModelInject constructor(
     val chats: LiveData<List<Chat>> = _chats
     val unread: LiveData<Int> = _unread
 
-    var filteredPets: LiveData<List<Pet>> = MutableLiveData<List<Pet>>()
+    var filteredPets: LiveData<List<Pet>> = MutableLiveData()
     val filter: LiveData<Filter> = _filter
 
     fun filterPets(filter: Filter) {

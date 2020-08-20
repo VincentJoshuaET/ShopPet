@@ -24,7 +24,7 @@ class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
     lateinit var keyboard: KeyboardUtils
 
     private fun resetPassword(email: String) {
-        val progress = circularProgress().apply { start() }
+        val progress = circularProgress.apply { start() }
         val btnReset = binding.btnReset
         val icon = getDrawable(R.drawable.ic_email)
         btnReset.isClickable = false

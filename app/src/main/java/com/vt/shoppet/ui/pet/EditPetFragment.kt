@@ -31,7 +31,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val save by lazy { getDrawable(R.drawable.ic_save) }
     private lateinit var toolbar: MaterialToolbar
 
@@ -58,7 +58,6 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
         }
     }
 
-    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -110,7 +109,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
             txtVaccineStatus.setText(pet.vaccineStatus, false)
             txtMedicalRecords.setText(pet.medicalRecords, false)
             txtSex.setText(pet.sex)
-            val age = pet.dateOfBirth.calculateEditableAge()
+            val age = pet.dateOfBirth.editableAge
             txtAge.setText(age.first)
             txtUnit.setText(age.second)
             txtDescription.setText(pet.description)
@@ -119,7 +118,7 @@ class EditPetFragment : Fragment(R.layout.fragment_edit_pet) {
                 keyboard.hide(this)
                 when (item.itemId) {
                     R.id.item_save -> {
-                        val name = txtName.text.toString().capitalizeWords()
+                        val name = txtName.text.toString().capitalizeWords
                         val price = txtPrice.text.toString().toIntOrNull() ?: 0
                         val vaccineStatus = txtVaccineStatus.text.toString()
                             .run { if (isNotEmpty()) this else null }

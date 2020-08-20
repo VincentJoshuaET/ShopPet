@@ -11,18 +11,13 @@ import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.vt.shoppet.R
 import com.vt.shoppet.databinding.DialogFilterBinding
 import com.vt.shoppet.model.Filter
-import com.vt.shoppet.util.KeyboardUtils
 import com.vt.shoppet.viewmodel.DataViewModel
 import dagger.hilt.android.AndroidEntryPoint
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class FilterDialog : BottomSheetDialogFragment() {
 
     private val viewModel: DataViewModel by activityViewModels()
-
-    @Inject
-    lateinit var keyboard: KeyboardUtils
 
     override fun onCreateView(
         inflater: LayoutInflater,

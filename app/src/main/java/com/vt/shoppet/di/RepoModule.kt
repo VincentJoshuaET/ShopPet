@@ -6,7 +6,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.android.components.ApplicationComponent
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import javax.inject.Singleton
 
 @Module
@@ -18,7 +17,6 @@ abstract class RepoModule {
     abstract fun bindAuthRepo(authRepoImpl: AuthRepoImpl): AuthRepo
 
     @Binds
-    @ExperimentalCoroutinesApi
     @Singleton
     abstract fun bindDataRepo(dataRepoImpl: DataRepoImpl): DataRepo
 

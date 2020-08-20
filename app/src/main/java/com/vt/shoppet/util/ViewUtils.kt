@@ -29,19 +29,20 @@ private fun Lifecycle.observeSnackbar(snackbar: Snackbar) =
         }
     })
 
-fun Fragment.circularProgress(): Animatable {
-    val value = TypedValue()
-    val context = requireContext()
-    context.theme.resolveAttribute(android.R.attr.progressBarStyleSmall, value, false)
-    val array = intArrayOf(android.R.attr.indeterminateDrawable)
-    val attributes = context.obtainStyledAttributes(value.data, array)
-    val drawable = attributes.getDrawable(0)
-    attributes.recycle()
-    return drawable as Animatable
-}
+val Fragment.circularProgress: Animatable
+    get() {
+        val value = TypedValue()
+        val context = requireContext()
+        context.theme.resolveAttribute(android.R.attr.progressBarStyleSmall, value, false)
+        val array = intArrayOf(android.R.attr.indeterminateDrawable)
+        val attributes = context.obtainStyledAttributes(value.data, array)
+        val drawable = attributes.getDrawable(0)
+        attributes.recycle()
+        return drawable as Animatable
+    }
 
-fun Fragment.circularProgressLarge() =
-    CircularProgressDrawable(requireContext()).apply {
+val Fragment.circularProgressLarge: CircularProgressDrawable
+    get() = CircularProgressDrawable(requireContext()).apply {
         setStyle(CircularProgressDrawable.LARGE)
         setColorSchemeColors(Color.WHITE)
         start()

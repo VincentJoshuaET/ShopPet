@@ -4,7 +4,6 @@ import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.QuerySnapshot
 import com.vt.shoppet.repo.DataRepo
 import com.vt.shoppet.repo.FirestoreRepo
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -12,11 +11,10 @@ import kotlinx.coroutines.flow.callbackFlow
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@ExperimentalCoroutinesApi
 @Singleton
 class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : DataRepo {
     override val currentUserFlow: Flow<DocumentSnapshot> =
-        callbackFlow<DocumentSnapshot> {
+        callbackFlow {
             val registration =
                 firestore.getUserReference(firestore.uid)
                     .addSnapshotListener { document, exception ->
@@ -31,7 +29,7 @@ class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : D
             }
         }
     override val petsFlow: Flow<QuerySnapshot> =
-        callbackFlow<QuerySnapshot> {
+        callbackFlow {
             val registration = firestore.getPets().addSnapshotListener { snapshots, exception ->
                 if (exception != null) {
                     val message = exception.localizedMessage ?: "Error"
@@ -44,7 +42,7 @@ class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : D
             }
         }
     override val starredPetsFlow: Flow<QuerySnapshot> =
-        callbackFlow<QuerySnapshot> {
+        callbackFlow {
             val registration =
                 firestore.getStarredPets().addSnapshotListener { snapshots, exception ->
                     if (exception != null) {
@@ -58,7 +56,7 @@ class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : D
             }
         }
     override val ownPetsFlow: Flow<QuerySnapshot> =
-        callbackFlow<QuerySnapshot> {
+        callbackFlow {
             val registration = firestore.getOwnPets().addSnapshotListener { snapshots, exception ->
                 if (exception != null) {
                     val message = exception.localizedMessage ?: "Error"
@@ -71,7 +69,7 @@ class DataRepoImpl @Inject constructor(private val firestore: FirestoreRepo) : D
             }
         }
     override val chatsFlow: Flow<QuerySnapshot> =
-        callbackFlow<QuerySnapshot> {
+        callbackFlow {
             val registration = firestore.getChats().addSnapshotListener { snapshots, exception ->
                 if (exception != null) {
                     val message = exception.localizedMessage ?: "Error"

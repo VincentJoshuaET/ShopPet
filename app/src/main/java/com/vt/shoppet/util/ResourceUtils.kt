@@ -8,9 +8,8 @@ import androidx.fragment.app.Fragment
 import com.vt.shoppet.R
 import java.util.*
 
-@ExperimentalStdlibApi
-fun String.capitalizeWords() =
-    split(" ").joinToString(" ") {
+val String.capitalizeWords
+    get() = split(" ").joinToString(" ") {
         it.toLowerCase(Locale.getDefault()).capitalize(Locale.getDefault())
     }
 

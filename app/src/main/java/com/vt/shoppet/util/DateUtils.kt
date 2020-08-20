@@ -12,37 +12,39 @@ val localZoneId: ZoneId = ZoneId.of("Asia/Manila")
 val dateOfBirthFormatter: DateTimeFormatter =
     DateTimeFormatter.ofPattern("MMMM d, yyyy").withZone(localZoneId)
 
-fun Timestamp.calculateAge(): String {
-    val instant = Instant.ofEpochSecond(seconds)
-    val seconds = Duration.between(instant, Instant.now()).seconds
-    val days = (seconds / 60 / 60 / 24).toInt()
-    val weeks = days / 7
-    val months = weeks / 4
-    val years = months / 12
+val Timestamp.calculateAge: String
+    get() {
+        val instant = Instant.ofEpochSecond(seconds)
+        val seconds = Duration.between(instant, Instant.now()).seconds
+        val days = (seconds / 60 / 60 / 24).toInt()
+        val weeks = days / 7
+        val months = weeks / 4
+        val years = months / 12
 
-    return when {
-        years >= 1 -> if (years == 1) "$years year old" else "$years years old"
-        months >= 1 -> if (months == 1) "$months month old" else "$months months old"
-        weeks >= 1 -> if (weeks == 1) "$weeks week old" else "$weeks weeks old"
-        else -> if (days == 1) "$days day old" else "$days days old"
+        return when {
+            years >= 1 -> if (years == 1) "$years year old" else "$years years old"
+            months >= 1 -> if (months == 1) "$months month old" else "$months months old"
+            weeks >= 1 -> if (weeks == 1) "$weeks week old" else "$weeks weeks old"
+            else -> if (days == 1) "$days day old" else "$days days old"
+        }
     }
-}
 
-fun Timestamp.calculateEditableAge(): Pair<String, String> {
-    val instant = Instant.ofEpochSecond(seconds)
-    val seconds = Duration.between(instant, Instant.now()).seconds
-    val days = (seconds / 60 / 60 / 24).toInt()
-    val weeks = days / 7
-    val months = weeks / 4
-    val years = months / 12
+val Timestamp.editableAge: Pair<String, String>
+    get() {
+        val instant = Instant.ofEpochSecond(seconds)
+        val seconds = Duration.between(instant, Instant.now()).seconds
+        val days = (seconds / 60 / 60 / 24).toInt()
+        val weeks = days / 7
+        val months = weeks / 4
+        val years = months / 12
 
-    return when {
-        years >= 1 -> Pair(years.toString(), if (years == 1) "year" else "years")
-        months >= 1 -> Pair(months.toString(), if (months == 1) "month" else "months")
-        weeks >= 1 -> Pair(weeks.toString(), if (weeks == 1) "week" else "weeks")
-        else -> Pair(days.toString(), if (days == 1) "day" else "days")
+        return when {
+            years >= 1 -> Pair(years.toString(), if (years == 1) "year" else "years")
+            months >= 1 -> Pair(months.toString(), if (months == 1) "month" else "months")
+            weeks >= 1 -> Pair(weeks.toString(), if (weeks == 1) "week" else "weeks")
+            else -> Pair(days.toString(), if (days == 1) "day" else "days")
+        }
     }
-}
 
 fun Timestamp.calculatePostDuration(sold: Boolean): String {
     val instant = Instant.ofEpochSecond(seconds)
@@ -89,24 +91,28 @@ private fun Timestamp.calculateDate(
     }
 }
 
-fun Timestamp.calculateChatDate(): String {
-    val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
-    val shortDateFormat = DateTimeFormatter.ofPattern("MMM d")
-    val longDateFormat = DateTimeFormatter.ofPattern("MMMM d, yyyy")
+val Timestamp.chatDate: String
+    get() {
+        val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
+        val shortDateFormat = DateTimeFormatter.ofPattern("MMM d")
+        val longDateFormat = DateTimeFormatter.ofPattern("MMMM d, yyyy")
 
-    return calculateDate(timeFormat, shortDateFormat, longDateFormat)
-}
+        return calculateDate(timeFormat, shortDateFormat, longDateFormat)
+    }
 
-fun Timestamp.calculateMessageDate(): String {
-    val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
-    val shortDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d")
-    val longDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d, yyyy")
+val Timestamp.messageDate: String
+    get() {
+        val timeFormat = DateTimeFormatter.ofPattern("h:mm a")
+        val shortDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d")
+        val longDateFormat = DateTimeFormatter.ofPattern("h:mm a, MMMM d, yyyy")
 
-    return calculateDate(timeFormat, shortDateFormat, longDateFormat)
-}
+        return calculateDate(timeFormat, shortDateFormat, longDateFormat)
+    }
 
-fun setCalendarConstraints(date: Long) =
-    CalendarConstraints.Builder()
-        .setOpenAt(date)
-        .setEnd(LocalDateTime.now().minusYears(18).atZone(localZoneId).toInstant().toEpochMilli())
+val Long.calendarConstraints: CalendarConstraints
+    get() = CalendarConstraints.Builder()
+        .setOpenAt(this)
+        .setEnd(
+            LocalDateTime.now().minusYears(18).atZone(localZoneId).toInstant().toEpochMilli()
+        )
         .build()

@@ -42,7 +42,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
     private var action = 0
 
     private fun checkPermissions() =
-        if (checkSelfPermissions()) {
+        if (checkSelfPermissions) {
             when (action) {
                 SELECT_PHOTO -> selectPhoto.launch("image/*")
                 TAKE_PHOTO -> findNavController().navigate(R.id.action_shop_to_camera)
@@ -52,7 +52,7 @@ class ShopFragment : Fragment(R.layout.fragment_shop) {
 
     private val requestPermissions: ActivityResultLauncher<Array<String>>
         get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (it.checkAllPermissions()) {
+            if (it.checkAllPermissions) {
                 when (action) {
                     SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> findNavController().navigate(R.id.action_shop_to_camera)

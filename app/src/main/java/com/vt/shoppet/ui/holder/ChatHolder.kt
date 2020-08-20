@@ -8,7 +8,7 @@ import com.vt.shoppet.actions.ChatActions
 import com.vt.shoppet.databinding.ItemChatBinding
 import com.vt.shoppet.model.Chat
 import com.vt.shoppet.model.User
-import com.vt.shoppet.util.calculateChatDate
+import com.vt.shoppet.util.chatDate
 
 class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -46,7 +46,7 @@ class ChatHolder(binding: ItemChatBinding) : RecyclerView.ViewHolder(binding.roo
         }
 
         txtMessage.text = chat.message
-        txtDate.text = chat.date.calculateChatDate()
+        txtDate.text = chat.date.chatDate
 
         itemView.setOnClickListener(actions.onClick(chat))
     }

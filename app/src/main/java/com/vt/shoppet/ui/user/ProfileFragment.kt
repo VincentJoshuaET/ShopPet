@@ -37,7 +37,7 @@ class ProfileFragment : Fragment(R.layout.fragment_profile) {
     private val dataViewModel: DataViewModel by activityViewModels()
 
     private lateinit var toolbar: MaterialToolbar
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val report by lazy { getDrawable(R.drawable.ic_report) }
 
     private fun reportUser(uid: String, currentUid: String) {

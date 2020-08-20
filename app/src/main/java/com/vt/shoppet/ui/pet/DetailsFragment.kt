@@ -32,7 +32,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val save by lazy { getDrawable(R.drawable.ic_save) }
     private lateinit var toolbar: MaterialToolbar
 
@@ -198,7 +198,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
             keyboard.hide(this)
             when (item.itemId) {
                 R.id.item_save -> {
-                    val name = txtName.text.toString().capitalizeWords()
+                    val name = txtName.text.toString().capitalizeWords
                     val price = txtPrice.text.toString().toIntOrNull() ?: 0
                     val vaccineStatus =
                         txtVaccineStatus.text.toString().run { if (isNotEmpty()) this else null }
@@ -209,7 +209,7 @@ class DetailsFragment : Fragment(R.layout.fragment_details) {
                     val unit = txtUnit.text.toString()
                     val description = txtDescription.text.toString().capitalize(Locale.getDefault())
                     val breed =
-                        if (custom) txtCustomBreed.text.toString().capitalizeWords()
+                        if (custom) txtCustomBreed.text.toString().capitalizeWords
                         else txtBreed.text.toString()
                     var fail = false
 

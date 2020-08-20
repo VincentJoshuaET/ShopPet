@@ -10,7 +10,7 @@ import com.vt.shoppet.actions.MessageActions
 import com.vt.shoppet.databinding.ItemMessageFromBinding
 import com.vt.shoppet.databinding.ItemMessageToBinding
 import com.vt.shoppet.model.Message
-import com.vt.shoppet.util.calculateMessageDate
+import com.vt.shoppet.util.messageDate
 
 class MessageHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root) {
 
@@ -42,7 +42,7 @@ class MessageHolder(binding: ViewBinding) : RecyclerView.ViewHolder(binding.root
     }
 
     fun bindView(message: Message, actions: MessageActions) {
-        txtDate?.text = message.date.calculateMessageDate()
+        txtDate?.text = message.date.messageDate
         txtMessage?.isVisible = message.message.isNotEmpty()
         txtMessage?.text = message.message
         if (imageMessage != null) {

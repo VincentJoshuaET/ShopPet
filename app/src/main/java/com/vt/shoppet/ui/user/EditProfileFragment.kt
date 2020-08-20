@@ -50,7 +50,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val save by lazy { getDrawable(R.drawable.ic_save) }
     private lateinit var toolbar: MaterialToolbar
 
@@ -61,7 +61,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
     private var dateOfBirth = 0L
 
     private fun checkPermissions() =
-        if (checkSelfPermissions()) {
+        if (checkSelfPermissions) {
             when (action) {
                 SELECT_PHOTO -> selectPhoto.launch("image/*")
                 TAKE_PHOTO -> {
@@ -75,7 +75,7 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
     private val requestPermissions: ActivityResultLauncher<Array<String>>
         get() = registerForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) {
-            if (it.checkAllPermissions()) {
+            if (it.checkAllPermissions) {
                 when (action) {
                     SELECT_PHOTO -> selectPhoto.launch("image/*")
                     TAKE_PHOTO -> {
@@ -290,9 +290,8 @@ class EditProfileFragment : Fragment(R.layout.fragment_edit_profile) {
 
             txtDateOfBirth.setOnClickListener {
                 keyboard.hide(this)
-                val constraints = setCalendarConstraints(dateOfBirth)
                 val builder = MaterialDatePicker.Builder.datePicker().apply {
-                    setCalendarConstraints(constraints)
+                    setCalendarConstraints(dateOfBirth.calendarConstraints)
                     setSelection(dateOfBirth)
                     setTitleText(R.string.hint_date_of_birth)
                 }

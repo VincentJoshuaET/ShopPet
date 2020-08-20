@@ -31,7 +31,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
 
     private fun instanceId() {
         val btnLogin = binding.btnLogin

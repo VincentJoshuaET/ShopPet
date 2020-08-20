@@ -32,7 +32,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
     @Inject
     lateinit var keyboard: KeyboardUtils
 
-    private val progress by lazy { circularProgress() }
+    private val progress by lazy { circularProgress }
     private val check by lazy { getDrawable(R.drawable.ic_check) }
 
     private fun verifyEmail() {
@@ -132,7 +132,6 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         sharedElementReturnTransition = MaterialContainerTransform()
     }
 
-    @ExperimentalStdlibApi
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
@@ -181,10 +180,9 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
 
         txtDateOfBirth.setOnClickListener {
             keyboard.hide(this)
-            val constraints = setCalendarConstraints(dateOfBirth)
             val builder =
                 MaterialDatePicker.Builder.datePicker().apply {
-                    setCalendarConstraints(constraints)
+                    setCalendarConstraints(dateOfBirth.calendarConstraints)
                     setSelection(dateOfBirth)
                     setTitleText(R.string.hint_date_of_birth)
                 }
@@ -202,7 +200,7 @@ class RegisterFragment : Fragment(R.layout.fragment_register) {
         btnRegister.setOnClickListener {
             keyboard.hide(this)
 
-            val name = txtName.text.toString().capitalizeWords()
+            val name = txtName.text.toString().capitalizeWords
             val email = txtEmail.text.toString()
             val username = txtUsername.text.toString()
             val password = txtPassword.text.toString()

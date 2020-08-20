@@ -43,6 +43,10 @@ android {
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_1_8.toString()
+        freeCompilerArgs = freeCompilerArgs + listOf(
+            "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+            "-Xopt-in=kotlin.ExperimentalStdlibApi"
+        )
     }
 
     buildFeatures {
@@ -52,6 +56,7 @@ android {
     lintOptions {
         isCheckDependencies = true
         isCheckGeneratedSources = true
+        disable("GradleDependency")
     }
 
     splits {
@@ -63,37 +68,35 @@ android {
 }
 
 dependencies {
-    implementation(fileTree(mapOf("dir" to "libs", "include" to listOf("*.jar"))))
-
     // Kotlin / Java
-    implementation(kotlin("stdlib-jdk7", "1.4.0"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.8")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.8")
+    implementation(kotlin("stdlib"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.9")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.3.9")
     coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:1.0.10")
 
     // Android Architecture Components
-    implementation("androidx.activity:activity-ktx:1.2.0-alpha07")
+    implementation("androidx.activity:activity-ktx:1.2.0-alpha08")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:1.1.3")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.0-rc1")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.drawerlayout:drawerlayout:1.1.0")
     implementation("androidx.core:core-ktx:1.3.1")
-    implementation("androidx.fragment:fragment-ktx:1.3.0-alpha07")
+    implementation("androidx.fragment:fragment-ktx:1.3.0-alpha08")
     implementation("androidx.preference:preference-ktx:1.1.1")
     implementation("androidx.recyclerview:recyclerview:1.2.0-alpha05")
 
     // CameraX
-    val cameraVersion = "1.0.0-beta07"
+    val cameraVersion = "1.0.0-beta08"
     implementation("androidx.camera:camera-camera2:$cameraVersion")
     implementation("androidx.camera:camera-core:$cameraVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraVersion")
-    implementation("androidx.camera:camera-view:1.0.0-alpha14")
+    implementation("androidx.camera:camera-view:1.0.0-alpha15")
 
     // Firebase
-    implementation("com.google.firebase:firebase-analytics-ktx:17.4.4")
+    implementation("com.google.firebase:firebase-analytics-ktx:17.5.0")
     implementation("com.google.firebase:firebase-auth-ktx:19.3.2")
-    implementation("com.google.firebase:firebase-core:17.4.4")
-    implementation("com.google.firebase:firebase-crashlytics-ktx:17.1.1")
+    implementation("com.google.firebase:firebase-core:17.5.0")
+    implementation("com.google.firebase:firebase-crashlytics-ktx:17.2.1")
     implementation("com.google.firebase:firebase-firestore-ktx:21.5.0")
     implementation("com.google.firebase:firebase-iid:20.2.4")
     implementation("com.google.firebase:firebase-messaging:20.2.4")
@@ -125,7 +128,7 @@ dependencies {
     kapt("com.google.dagger:hilt-android-compiler:$hiltAndroidVersion")
 
     // Lifecycle
-    val lifecycleVersion = "2.3.0-alpha06"
+    val lifecycleVersion = "2.3.0-alpha07"
     implementation("androidx.lifecycle:lifecycle-common-java8:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-livedata-ktx:$lifecycleVersion")
     implementation("androidx.lifecycle:lifecycle-process:$lifecycleVersion")
