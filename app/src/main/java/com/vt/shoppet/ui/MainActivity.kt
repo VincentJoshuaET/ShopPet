@@ -2,10 +2,7 @@ package com.vt.shoppet.ui
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
-import android.content.BroadcastReceiver
-import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
 import android.os.Build
 import android.os.Bundle
 import android.view.View
@@ -31,6 +28,8 @@ import com.vt.shoppet.viewmodel.StorageViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import org.greenrobot.eventbus.EventBus
+import org.greenrobot.eventbus.Subscribe
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -123,40 +122,36 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun showChatSnackbar(intent: Intent?) {
-        intent?.let {
-            val id =
-                intent.getStringExtra("CHAT_ID") ?: return@let
-            val senderIndex =
-                intent.getStringExtra("SENDER_INDEX")?.toIntOrNull() ?: return@let
-            val receiverIndex =
-                intent.getStringExtra("RECIPIENT_INDEX")?.toIntOrNull() ?: return@let
-            val senderUsername =
-                intent.getStringExtra("SENDER_USERNAME") ?: return@let
-            if (dataViewModel.chat.value?.id != id && navController.currentDestination?.id != R.id.fragment_conversation) {
-                binding.showSnackbar(
-                    message = "$senderUsername messaged you",
-                    id = R.string.btn_view
-                ) {
-                    getChat(id, senderIndex, receiverIndex, senderUsername) {
-                        showChatSnackbar(intent)
-                    }
+    private fun showChatSnackbar(event: Chat.Event) {
+        val id = event.id
+        val senderIndex = event.senderIndex.toIntOrNull() ?: return
+        val receiverIndex = event.receiverIndex.toIntOrNull() ?: return
+        val senderUsername = event.senderUsername
+        if (toolbar.title != senderUsername && navController.currentDestination?.id != R.id.fragment_conversation) {
+            binding.showSnackbar(
+                message = "$senderUsername messaged you",
+                id = R.string.btn_view
+            ) {
+                getChat(id, senderIndex, receiverIndex, senderUsername) {
+                    showChatSnackbar(event)
                 }
             }
         }
     }
 
-    private val receiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context?, intent: Intent?) =
-            showChatSnackbar(intent)
+    @Subscribe
+    fun onChatReceived(event: Chat.Event) {
+        if (auth.isLoggedIn()) showChatSnackbar(event)
     }
 
-    override fun onResume() {
-        super.onResume()
-        if (auth.isLoggedIn()) registerReceiver(
-            receiver,
-            IntentFilter(Intent.CATEGORY_APP_MESSAGING)
-        )
+    override fun onStart() {
+        super.onStart()
+        EventBus.getDefault().register(this)
+    }
+
+    override fun onStop() {
+        EventBus.getDefault().unregister(this)
+        super.onStop()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

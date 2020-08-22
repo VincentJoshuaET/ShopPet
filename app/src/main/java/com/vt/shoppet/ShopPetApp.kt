@@ -5,6 +5,7 @@ import android.content.SharedPreferences
 import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import dagger.hilt.android.HiltAndroidApp
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 @HiltAndroidApp
@@ -15,6 +16,7 @@ class ShopPetApp: Application() {
 
     override fun onCreate() {
         super.onCreate()
+        EventBus.builder().addIndex(EventBusIndex()).installDefaultEventBus()
         val mode =
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) preferences.getInt("theme", -1)
             else preferences.getInt("theme", 3)

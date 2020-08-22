@@ -77,7 +77,7 @@ dependencies {
     // Android Architecture Components
     implementation("androidx.activity:activity-ktx:1.2.0-alpha08")
     implementation("androidx.appcompat:appcompat:1.2.0")
-    implementation("androidx.constraintlayout:constraintlayout:2.0.0-rc1")
+    implementation("androidx.constraintlayout:constraintlayout:2.0.0")
     implementation("androidx.coordinatorlayout:coordinatorlayout:1.1.0")
     implementation("androidx.drawerlayout:drawerlayout:1.1.0")
     implementation("androidx.core:core-ktx:1.3.1")
@@ -91,6 +91,10 @@ dependencies {
     implementation("androidx.camera:camera-core:$cameraVersion")
     implementation("androidx.camera:camera-lifecycle:$cameraVersion")
     implementation("androidx.camera:camera-view:1.0.0-alpha15")
+
+    // EventBus
+    implementation("org.greenrobot:eventbus:3.2.0")
+    kapt("org.greenrobot:eventbus-annotation-processor:3.2.0")
 
     // Firebase
     implementation("com.google.firebase:firebase-analytics-ktx:17.5.0")
@@ -152,4 +156,7 @@ dependencies {
 
 kapt {
     correctErrorTypes = true
+    arguments {
+        arg("eventBusIndex", "com.vt.shoppet.EventBusIndex")
+    }
 }

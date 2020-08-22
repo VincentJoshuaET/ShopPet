@@ -1,12 +1,12 @@
 package com.vt.shoppet
 
-import android.content.Intent
-import androidx.core.os.bundleOf
 import com.google.firebase.messaging.FirebaseMessagingService
 import com.google.firebase.messaging.RemoteMessage
+import com.vt.shoppet.model.Chat
 import com.vt.shoppet.repo.AuthRepo
 import com.vt.shoppet.repo.FirestoreRepo
 import dagger.hilt.android.AndroidEntryPoint
+import org.greenrobot.eventbus.EventBus
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -30,18 +30,7 @@ class MessagingService : FirebaseMessagingService() {
         val receiverIndex = message.data["RECIPIENT_INDEX"] ?: return
         val senderUsername = message.data["SENDER_USERNAME"] ?: return
 
-        val bundle = bundleOf(
-            "CHAT_ID" to id,
-            "SENDER_INDEX" to senderIndex,
-            "RECIPIENT_INDEX" to receiverIndex,
-            "SENDER_USERNAME" to senderUsername
-        )
-
-        val intent = Intent(Intent.CATEGORY_APP_MESSAGING).apply {
-            putExtras(bundle)
-        }
-
-        sendBroadcast(intent)
+        EventBus.getDefault().post(Chat.Event(id, senderIndex, receiverIndex, senderUsername))
     }
 
 }

@@ -10,4 +10,6 @@ data class Chat(
     var read: MutableList<Boolean> = mutableListOf(),
     var empty: Boolean = false,
     var date: Timestamp = Timestamp.now()
-)
+) {
+    class Event(val id: String, val senderIndex: String, val receiverIndex: String, val senderUsername: String)
+}
