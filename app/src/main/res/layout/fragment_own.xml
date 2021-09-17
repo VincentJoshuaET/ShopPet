@@ -10,7 +10,9 @@
         android:id="@+id/recyclerPets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:spanCount="2"
         tools:listitem="@layout/item_pet" />
 
     <TextView

@@ -22,7 +22,3 @@
 -keepnames class androidx.navigation.fragment.NavHostFragment
 -keep class com.vt.shoppet.model.* { *; }
 -keepattributes *Annotation*
--keepclassmembers class * {
-    @org.greenrobot.eventbus.Subscribe <methods>;
-}
--keep enum org.greenrobot.eventbus.ThreadMode { *; }

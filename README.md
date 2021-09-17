@@ -6,5 +6,5 @@ Android pet marketplace application with MVVM architecture implementing:
 * Glide
 * Dagger Hilt
 * Material Components
-* Firebase ML Kit for Image Labeling
+* Google ML Vision for Image Labeling
 * Navigation Component with Safe Args

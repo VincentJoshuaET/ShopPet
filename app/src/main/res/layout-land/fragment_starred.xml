@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.pet.StarredFragment">
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerPets"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+        app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:spanCount="3"
+        tools:listitem="@layout/item_pet" />
+
+    <TextView
+        android:id="@+id/txtEmpty"
+        style="?attr/textAppearanceSubtitle2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="@string/lbl_no_pets"
+        android:visibility="gone" />
+
+</FrameLayout>

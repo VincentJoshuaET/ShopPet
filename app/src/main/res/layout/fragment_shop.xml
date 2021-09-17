@@ -10,7 +10,9 @@
         android:id="@+id/recyclerPets"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
         app:layout_behavior="@string/appbar_scrolling_view_behavior"
+        app:spanCount="2"
         tools:listitem="@layout/item_pet" />
 
     <com.google.android.material.floatingactionbutton.FloatingActionButton
@@ -18,6 +20,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="24dp"
+        android:contentDescription="@string/btn_sell"
         android:src="@drawable/ic_camera"
         android:visibility="invisible"
         app:layout_anchor="@id/recyclerPets"

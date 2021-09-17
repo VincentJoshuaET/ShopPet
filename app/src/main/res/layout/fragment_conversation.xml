@@ -11,10 +11,12 @@
         android:id="@+id/recyclerMessages"
         android:layout_width="0dp"
         android:layout_height="0dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/layoutImage"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
+        app:stackFromEnd="true"
         tools:listitem="@layout/item_message_from" />
 
     <TextView
@@ -61,6 +63,7 @@
             android:id="@+id/fabRemove"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:contentDescription="@string/btn_remove"
             android:src="@drawable/ic_cross"
             app:fabSize="mini"
             app:layout_anchor="@id/cardImage"
